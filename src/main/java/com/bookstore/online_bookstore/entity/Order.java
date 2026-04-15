@@ -23,4 +23,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
+
+    @Transient
+    private String paymentMethod;
 }
