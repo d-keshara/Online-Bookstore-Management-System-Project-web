@@ -1,9 +1,5 @@
 package com.bookstore.online_bookstore.service;
 
-import com.bookstore.online_bookstore.payment.Payment;
-import com.bookstore.online_bookstore.payment.CardPayment;
-import com.bookstore.online_bookstore.payment.CashPayment;
-
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.entity.OrderItem;
@@ -16,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Service
 public class OrderService {
@@ -28,51 +25,75 @@ public class OrderService {
 
     @Transactional
     public Order placeOrder(Order order) {
+        double totalOrderPrice = 0;
 
-        if (order.getItems() != null){
-           for (OrderItem item : order.getItems()){
+        for (OrderItem item : order.getItems()) {
 
-               Book book = bookRepository.findById(item.getBookId())
-                       .orElseThrow(() -> new RuntimeException("Book ID "+item.getBookId() + " not found!"));
+            Book book = bookRepository.findById(item.getBookId())
+                    .orElseThrow(() -> new RuntimeException("Book not found ID: " + item.getBookId()));
 
-               if (book.getStock() < item.getQuantity()) {
-                   throw new RuntimeException("Not enough stock for book: " + book.getTitle());
-               }
+            if (book.getStock() < item.getQuantity()) {
+                throw new RuntimeException("Out of stock! Only " + book.getStock() + " copies left of: " + book.getTitle());
+            }
 
-               book.setStock(book.getStock() - item.getQuantity());
-               bookRepository.save(book);
+            book.setStock(book.getStock() - item.getQuantity());
+            bookRepository.save(book);
 
-               item.setOrder(order);
-           }
-       }
-        Payment paymentProcessor;
-        if ("Card".equalsIgnoreCase(order.getPaymentMethod())) {
-            paymentProcessor = new CardPayment();
+            item.setOrder(order);
+
+            double itemTotalPrice = book.getPrice() * item.getQuantity();
+            item.setPrice(itemTotalPrice);
+
+            totalOrderPrice += itemTotalPrice;
         }
-        else{
-            paymentProcessor = new CashPayment();
-        }
+        order.setTotalPrice(totalOrderPrice);
 
-        paymentProcessor.processPayment(order.getTotalPrice());
+        Order savedOrder = orderRepository.save(order);
 
-        Order saveOrder = orderRepository.save(order);
-        generateReceipt(saveOrder);
-        return saveOrder;
+        generateReceiptFile(savedOrder);
+
+        return savedOrder;
     }
 
-    private void generateReceipt(Order order) {
-        File directory = new File("files");
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
+    private void generateReceiptFile(Order order) {
+        try {
+            // Check if the 'files' directory exists, if not create it
+            File directory = new File("files");
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
 
-        try (FileWriter writer = new FileWriter("files/receipt.txt", true)) {
-            writer.write("Order ID: " + order.getOrderId() + "\n");
-            writer.write("Total Price: Rs. " + order.getTotalPrice() + "\n");
-            writer.write("Status: SUCCESS\n");
-            writer.write("-------------------------------\n");
+            String fileName = "files/receipt_order_" + order.getOrderId() + ".txt";
+            FileWriter fileWriter = new FileWriter(fileName);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+
+            printWriter.println("==========================================");
+            printWriter.println("        ABC BOOKSTORE RECEIPT          ");
+            printWriter.println("==========================================");
+            printWriter.println("Order ID   : " + order.getOrderId());
+            printWriter.println("Date       : " + order.getOrderDate());
+            printWriter.println("------------------------------------------");
+
+            for (OrderItem item : order.getItems()) {
+                double unitPrice = item.getPrice()/ item.getQuantity();
+
+                printWriter.println("Book ID    : " + item.getBookId());
+                printWriter.println("Unit Price : LKR " + unitPrice);
+                printWriter.println("Quantity   : " + item.getQuantity());
+                printWriter.println("Subtotal   : LKR " + item.getPrice());
+                printWriter.println("------------------------------------------");
+            }
+
+            printWriter.println("TOTAL PAID : LKR " + order.getTotalPrice());
+            printWriter.println("==========================================");
+            printWriter.println("   Developed by Keshara - Group WD130      ");
+            printWriter.println("==========================================");
+
+            printWriter.close();
+            System.out.println(">>> Receipt generated successfully: " + fileName);
+
         } catch (IOException e) {
-            System.out.println("Could not generate receipt: " + e.getMessage());
+            System.out.println("Error generating receipt file: " + e.getMessage());
         }
     }
 }

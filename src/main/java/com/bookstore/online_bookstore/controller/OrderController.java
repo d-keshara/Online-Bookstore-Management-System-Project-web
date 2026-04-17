@@ -5,19 +5,15 @@ import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.service.OrderService; // <-- This tells the controller where your service is
 import com.bookstore.online_bookstore.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
-@RestController              //handle web requests
+@RestController
+@RequestMapping("/orders")
 public class OrderController {
 
-    // 1. We bring in your new Service layer
     @Autowired
     private OrderService orderService;
 
-    // 2. We keep the repository ONLY for the quick tests you wrote earlier
     @Autowired
     private OrderRepository orderRepository;
 
@@ -39,10 +35,8 @@ public class OrderController {
         return orderRepository.findAll();
     }
 
-    // 3. THIS is where we use your new method!
-    @PostMapping("/create-order")
+    @PostMapping("/checkout")
     public Order createRealOrder(@RequestBody Order newOrderFromFrontend){
-        // We call the placeOrder method that lives inside the OrderService class
         return orderService.placeOrder(newOrderFromFrontend);
     }
 }
