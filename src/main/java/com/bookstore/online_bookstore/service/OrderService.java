@@ -1,5 +1,6 @@
 package com.bookstore.online_bookstore.service;
 
+import java.io.File;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.entity.OrderItem;
@@ -56,6 +57,11 @@ public class OrderService {
     }
 
     private void generateReceiptFile(Order order) {
+
+        File folder = new File("files");
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
         try {
             // Check if the 'files' directory exists, if not create it
             File directory = new File("files");
@@ -68,7 +74,7 @@ public class OrderService {
             PrintWriter printWriter = new PrintWriter(fileWriter);
 
             printWriter.println("==========================================");
-            printWriter.println("        ABC BOOKSTORE RECEIPT          ");
+            printWriter.println("        NEXUS BOOKSTORE RECEIPT          ");
             printWriter.println("==========================================");
             printWriter.println("Order ID   : " + order.getOrderId());
             printWriter.println("Date       : " + order.getOrderDate());
