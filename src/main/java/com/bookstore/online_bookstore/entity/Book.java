@@ -22,6 +22,9 @@ public class Book {
     @Column(name = "stock")
     private Integer stock;
 
+    @Column(name = "category")
+    private String category;
+
 }
 
 

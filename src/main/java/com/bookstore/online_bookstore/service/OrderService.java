@@ -14,9 +14,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 @Service
 public class OrderService {
+
+    public List<Order> getOrdersByUsername(String username) {
+        return orderRepository.findByUserUsernameOrderByOrderDateDesc(username);
+    }
 
     @Autowired
     private OrderRepository orderRepository;
@@ -57,7 +62,7 @@ public class OrderService {
     }
 
     //receipt generation
-    
+
     private void generateReceiptFile(Order order) {
 
         File folder = new File("files");

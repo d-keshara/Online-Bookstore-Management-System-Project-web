@@ -15,6 +15,10 @@ public class Order {
     @Column(name = "order_id")
     private Integer orderId;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(name = "order_date")
     private LocalDateTime orderDate = LocalDateTime.now();
 
