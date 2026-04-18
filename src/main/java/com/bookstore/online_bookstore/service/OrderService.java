@@ -56,6 +56,8 @@ public class OrderService {
         return savedOrder;
     }
 
+    //receipt generation
+    
     private void generateReceiptFile(Order order) {
 
         File folder = new File("files");
@@ -103,3 +105,4 @@ public class OrderService {
         }
     }
 }
+// Final version of Admin and Order management module
