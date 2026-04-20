@@ -2,13 +2,13 @@ package com.bookstore.online_bookstore.controller;
 
 import java.util.List;
 import com.bookstore.online_bookstore.entity.Order;
-import com.bookstore.online_bookstore.service.OrderService; // <-- This tells the controller where your service is
+import com.bookstore.online_bookstore.service.OrderService;
 import com.bookstore.online_bookstore.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     @Autowired
@@ -16,6 +16,7 @@ public class OrderController {
 
     @Autowired
     private OrderRepository orderRepository;
+
 
     @GetMapping("/")         //listen to localhost
     public String welcome(){

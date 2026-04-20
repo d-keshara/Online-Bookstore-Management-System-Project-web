@@ -26,7 +26,7 @@ public class AuthController {
 
         // Hash the password before saving for security
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        
         // Force EVERYONE who uses this public endpoint to be a standard user.
         user.setRole("ROLE_USER");
 
