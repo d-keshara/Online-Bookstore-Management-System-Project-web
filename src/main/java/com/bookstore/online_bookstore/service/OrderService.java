@@ -4,8 +4,10 @@ import java.io.File;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.entity.OrderItem;
+import com.bookstore.online_bookstore.entity.User;
 import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.OrderRepository;
+import com.bookstore.online_bookstore.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +26,25 @@ public class OrderService {
     }
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private BookRepository bookRepository;
 
     @Transactional
     public Order placeOrder(Order order) {
+
+        User fullUser = userRepository.findById(order.getUser().getId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + order.getUser().getId()));
+
+        order.setUser(fullUser);
+
         double totalOrderPrice = 0;
 
         for (OrderItem item : order.getItems()) {
@@ -53,12 +67,24 @@ public class OrderService {
             totalOrderPrice += itemTotalPrice;
         }
         order.setTotalPrice(totalOrderPrice);
-
         Order savedOrder = orderRepository.save(order);
 
         generateReceiptFile(savedOrder);
 
+
+        try {
+            emailService.sendOrderConfirmation(
+                    savedOrder.getUser().getEmail(),
+                    savedOrder.getOrderId(),
+                    savedOrder.getTotalPrice()
+            );
+        } catch (Exception e) {
+            System.err.println("Receipt file created, but Email failed: " + e.getMessage());
+        }
+
         return savedOrder;
+
+
     }
 
     //receipt generation

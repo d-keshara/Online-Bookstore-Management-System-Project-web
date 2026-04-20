@@ -24,17 +24,16 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Username already exists!");
         }
 
-        //Hash the password before saving for security
+        // Hash the password before saving for security
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        //Default role for new signups
-        if (user.getRole() == null) {
-            user.setRole("ROLE_USER");
-        }
+        
+        // Force EVERYONE who uses this public endpoint to be a standard user.
+        user.setRole("ROLE_USER");
 
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully!");
     }
+
 
     // 2. Login (For check)
     @PostMapping("/login")
