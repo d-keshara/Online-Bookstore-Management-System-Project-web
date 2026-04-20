@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -55,4 +56,26 @@ public class BookController {
 
         return ResponseEntity.ok(books);
     }
+    // PUBLIC ENDPOINT: Search by Author
+    // URL: GET http://localhost:8080/api/books/author/(authorname)
+    @GetMapping("/author/{authorName}")
+    public ResponseEntity<List<Book>> getBoosByAuthor(@PathVariable String authorName){
+        List<Book> books = bookRepository.findByAuthorContainingIgnoreCase(authorName);
+
+        if (books.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(books);
+    }
+    // PUBLIC ENDPOINT: Filter by Price Range
+    // URL: GET http://localhost:8080/api/books/price?min=1000&max=5000
+    @GetMapping("/price")
+        public ResponseEntity<List<Book>> getBooksByPriceRange(@RequestParam BigDecimal min, @RequestParam BigDecimal max){
+            List<Book> books = bookRepository.findByPriceBetween(min, max);
+
+            if (books.isEmpty()){
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(books);
+        }
 }

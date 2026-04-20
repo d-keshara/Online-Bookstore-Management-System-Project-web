@@ -1,5 +1,6 @@
 package com.bookstore.online_bookstore.controller;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.HashMap;
 import com.bookstore.online_bookstore.entity.Book;
@@ -74,7 +75,7 @@ public class AdminController {
         double revenue = orderRepository.findAll().stream()
                 .map(Order::getTotalPrice)
                 .filter(price -> price != null)
-                .mapToDouble(Double::doubleValue)
+                .mapToDouble(BigDecimal::doubleValue)
                 .sum();
 
         stats.put("totalUsers", userCount);

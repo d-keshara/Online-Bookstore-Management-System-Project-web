@@ -3,6 +3,7 @@ package com.bookstore.online_bookstore.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import java.math.BigDecimal;
 
 @Entity
 @Data
@@ -23,5 +24,5 @@ public class OrderItem {
     private Integer bookId;
 
     private Integer quantity;
-    private Double price;
+    private BigDecimal price;
 }

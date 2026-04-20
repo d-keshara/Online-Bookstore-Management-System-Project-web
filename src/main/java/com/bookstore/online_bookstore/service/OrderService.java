@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -45,7 +46,7 @@ public class OrderService {
 
         order.setUser(fullUser);
 
-        double totalOrderPrice = 0;
+        BigDecimal totalOrderPrice = BigDecimal.ZERO;
 
         for (OrderItem item : order.getItems()) {
 
@@ -61,10 +62,10 @@ public class OrderService {
 
             item.setOrder(order);
 
-            double itemTotalPrice = book.getPrice() * item.getQuantity();
+            BigDecimal itemTotalPrice = book.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             item.setPrice(itemTotalPrice);
 
-            totalOrderPrice += itemTotalPrice;
+            totalOrderPrice = totalOrderPrice.add(itemTotalPrice);
         }
         order.setTotalPrice(totalOrderPrice);
         Order savedOrder = orderRepository.save(order);
@@ -114,7 +115,7 @@ public class OrderService {
             printWriter.println("------------------------------------------");
 
             for (OrderItem item : order.getItems()) {
-                double unitPrice = item.getPrice()/ item.getQuantity();
+                BigDecimal unitPrice = item.getPrice().divide(BigDecimal.valueOf(item.getQuantity()));
 
                 printWriter.println("Book ID    : " + item.getBookId());
                 printWriter.println("Unit Price : LKR " + unitPrice);
