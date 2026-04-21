@@ -30,8 +30,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-
-
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getProfile(Principal principal) {
         return ResponseEntity.ok(userService.getUserProfile(principal.getName()));
@@ -48,13 +46,21 @@ public class UserController {
         return ResponseEntity.ok(orderService.getOrdersByUsername(principal.getName()));
     }
 
+    @PutMapping("/{id}/settings")
+    public ResponseEntity<?> updateSettingsById(@PathVariable long id, @RequestBody Map<String, String> requestData) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+        return processUpdate(user, requestData);
+    }
+
     @PutMapping("/settings")
     public ResponseEntity<?> updateUserSettings(@RequestBody Map<String, String> requestData, Principal principal) {
-
-
         User user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        return processUpdate(user, requestData);
+    }
 
+    private ResponseEntity<?> processUpdate(User user, Map<String, String> requestData) {
         boolean updated = false;
 
         if (requestData.containsKey("email")) {
@@ -63,8 +69,11 @@ public class UserController {
         }
 
         if (requestData.containsKey("password")) {
-            user.setPassword(passwordEncoder.encode(requestData.get("password")));
-            updated = true;
+            String rawPassword = requestData.get("password");
+            if (rawPassword != null && !rawPassword.trim().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(rawPassword));
+                updated = true;
+            }
         }
 
         if (updated) {
@@ -74,6 +83,4 @@ public class UserController {
             return ResponseEntity.badRequest().body("No valid fields provided to update.");
         }
     }
-
-
 }
