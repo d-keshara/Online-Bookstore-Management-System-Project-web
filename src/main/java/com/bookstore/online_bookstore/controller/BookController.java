@@ -10,29 +10,21 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/books") // Unifies all endpoints in this file under /api/books
+@RequestMapping("/api/books")
 public class BookController {
 
     @Autowired
     private BookRepository bookRepository;
 
-    //ADMIN ENDPOINT: Add a new book
-    //URL: POST http://localhost:8080/api/books
     @PostMapping
     public ResponseEntity<Book> addBook(@RequestBody Book book) {
         return ResponseEntity.ok(bookRepository.save(book));
     }
 
-    //PUBLIC ENDPOINT: Get all books
-    //URL: GET http://localhost:8080/api/books
-
     @GetMapping
     public ResponseEntity<List<Book>> getAllBooks() {
         return ResponseEntity.ok(bookRepository.findAll());
     }
-
-    //PUBLIC ENDPOINT: Search by Title
-    //URL: GET http://localhost:8080/api/books/search?keyword=java
 
     @GetMapping("/search")
     public ResponseEntity<List<Book>> searchBooks(@RequestParam String keyword) {
@@ -43,39 +35,35 @@ public class BookController {
         return ResponseEntity.ok(results);
     }
 
-    // PUBLIC ENDPOINT: Filter by Category
-    // URL: GET http://localhost:8080/api/books/category/Fiction
-
     @GetMapping("/category/{categoryName}")
     public ResponseEntity<List<Book>> getBooksByCategory(@PathVariable String categoryName) {
         List<Book> books = bookRepository.findByCategory(categoryName);
 
         if (books.isEmpty()) {
-            return ResponseEntity.noContent().build(); //Returns 204 No Content instead of []
+            return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity.ok(books);
     }
-    // PUBLIC ENDPOINT: Search by Author
-    // URL: GET http://localhost:8080/api/books/author/(authorname)
-    @GetMapping("/author/{authorName}")
-    public ResponseEntity<List<Book>> getBoosByAuthor(@PathVariable String authorName){
-        List<Book> books = bookRepository.findByAuthorContainingIgnoreCase(authorName);
 
-        if (books.isEmpty()){
+    @GetMapping("/author/{authorName}")
+    public ResponseEntity<List<Book>> getBooksByAuthor(@PathVariable String authorName) {
+        List<Book> books = bookRepository.findByAuthor_NameContainingIgnoreCase(authorName);
+
+        if (books.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(books);
     }
-    // PUBLIC ENDPOINT: Filter by Price Range
-    // URL: GET http://localhost:8080/api/books/price?min=1000&max=5000
-    @GetMapping("/price")
-        public ResponseEntity<List<Book>> getBooksByPriceRange(@RequestParam BigDecimal min, @RequestParam BigDecimal max){
-            List<Book> books = bookRepository.findByPriceBetween(min, max);
 
-            if (books.isEmpty()){
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(books);
+    @GetMapping("/price")
+    public ResponseEntity<List<Book>> getBooksByPriceRange(@RequestParam BigDecimal min,
+                                                           @RequestParam BigDecimal max) {
+        List<Book> books = bookRepository.findByPriceBetween(min, max);
+
+        if (books.isEmpty()) {
+            return ResponseEntity.noContent().build();
         }
+        return ResponseEntity.ok(books);
+    }
 }

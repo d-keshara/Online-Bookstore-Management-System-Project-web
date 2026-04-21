@@ -1,5 +1,6 @@
 package com.bookstore.online_bookstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -17,8 +18,10 @@ public class Book {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "author")
-    private String author;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    @JsonBackReference
+    private Author author;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -28,29 +31,4 @@ public class Book {
 
     @Column(name = "category")
     private String category;
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
