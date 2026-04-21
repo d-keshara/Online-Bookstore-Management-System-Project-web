@@ -1,6 +1,5 @@
 package com.bookstore.online_bookstore.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -9,33 +8,43 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomAuthenticationEntryPoint authEntryPoint;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
+
                 .authorizeHttpRequests(auth -> auth
-                        //Public Routes
+
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/catalog/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/books/**").permitAll()
+                        .requestMatchers("/admin/**").authenticated()
+                        .requestMatchers("/buy/**").authenticated()
+                        .requestMatchers("/api/users/**").authenticated()
 
-                        //Admin Only Routes
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/books/**").hasRole("ADMIN")
-
-                        //regular login
                         .anyRequest().authenticated()
                 )
-                .httpBasic(basic -> basic.authenticationEntryPoint(authEntryPoint));
+
+
+                .formLogin(form -> form
+                        .defaultSuccessUrl("/catalog", true)
+                        .permitAll()
+                )
+
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/catalog?logout=true")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                )
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
