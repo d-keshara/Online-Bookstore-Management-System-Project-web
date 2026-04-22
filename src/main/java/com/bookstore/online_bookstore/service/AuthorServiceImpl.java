@@ -1,0 +1,58 @@
+package com.bookstore.online_bookstore.service;
+
+import com.bookstore.online_bookstore.entity.Author;
+import com.bookstore.online_bookstore.entity.Book;
+import com.bookstore.online_bookstore.repository.AuthorRepository;
+import com.bookstore.online_bookstore.repository.BookRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class AuthorServiceImpl implements AuthorService {
+
+    private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
+
+    public AuthorServiceImpl(AuthorRepository authorRepository, BookRepository bookRepository) {
+        this.authorRepository = authorRepository;
+        this.bookRepository = bookRepository;
+    }
+
+    @Override
+    public Author createAuthor(Author author) {
+        return authorRepository.save(author);
+    }
+
+    @Override
+    public List<Author> getAllAuthors() {
+        return authorRepository.findAll();
+    }
+
+    @Override
+    public Author getAuthorById(Long id) {
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
+    }
+
+    @Override
+    public Author updateAuthor(Long id, Author updatedAuthor) {
+        Author author = getAuthorById(id);
+        author.setName(updatedAuthor.getName());
+        author.setBiography(updatedAuthor.getBiography());
+        author.setProfileImageUrl(updatedAuthor.getProfileImageUrl());
+        return authorRepository.save(author);
+    }
+
+    @Override
+    public void deleteAuthor(Long id) {
+        Author author = getAuthorById(id);
+        authorRepository.delete(author);
+    }
+
+    @Override
+    public List<Book> getBooksByAuthorId(Long authorId) {
+        getAuthorById(authorId);
+        return bookRepository.findByAuthorId(authorId);
+    }
+}

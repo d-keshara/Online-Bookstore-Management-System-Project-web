@@ -6,7 +6,6 @@ import com.bookstore.online_bookstore.service.OrderService;
 import com.bookstore.online_bookstore.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -26,10 +25,7 @@ public class OrderController {
 
     @GetMapping("/test-save")
     public String testSaveOrder(){
-        Order newOrder = new Order();
-        newOrder.setTotalPrice(BigDecimal.valueOf(1500.50));
-        orderRepository.save(newOrder);
-        return "Success! A new order for 1500.50 was saved to the database.";
+        return "Use POST /api/orders/checkout with a valid user and items payload to create an order.";
     }
 
     @GetMapping("/all-orders")

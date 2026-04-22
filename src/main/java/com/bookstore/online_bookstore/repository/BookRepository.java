@@ -10,13 +10,18 @@ import java.util.List;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Integer> {
 
-    //Find books where the title contains the keyword
+    // Find books where the title contains the keyword
     List<Book> findByTitleContainingIgnoreCase(String keyword);
 
     // Find books by category
     List<Book> findByCategory(String category);
 
-    List<Book> findByAuthorContainingIgnoreCase(String author);
+    // Find books by author id
+    List<Book> findByAuthorId(Long authorId);
 
+    // Find books by author name
+    List<Book> findByAuthor_NameContainingIgnoreCase(String authorName);
+
+    // Find books by price range
     List<Book> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
 }

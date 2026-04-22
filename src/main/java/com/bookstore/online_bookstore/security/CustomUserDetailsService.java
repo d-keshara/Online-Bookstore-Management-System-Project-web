@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService{
 
@@ -23,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService{
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole().replace("ROLE_", ""))
+                .roles((user.getRole() == null ? "USER" : user.getRole().replace("ROLE_", "")))
                 .build();
     }
 }
