@@ -18,7 +18,7 @@ public class OnlineBookstoreApplication {
 	CommandLineRunner initDatabase(UserRepository userRepository) {
 		return args -> {
 
-			if (userRepository.findByUsername("admin") == null) {
+			if (userRepository.findByUsername("admin").isEmpty()) {
 				User admin = new User();
 				admin.setUsername("admin");
 

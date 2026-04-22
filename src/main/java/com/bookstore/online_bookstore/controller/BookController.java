@@ -2,7 +2,6 @@ package com.bookstore.online_bookstore.controller;
 
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.repository.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +12,11 @@ import java.util.List;
 @RequestMapping("/api/books")
 public class BookController {
 
-    @Autowired
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
+
+    public BookController(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
 
     @PostMapping
     public ResponseEntity<Book> addBook(@RequestBody Book book) {

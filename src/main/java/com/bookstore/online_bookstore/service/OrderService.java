@@ -1,6 +1,5 @@
 package com.bookstore.online_bookstore.service;
 
-import java.io.File;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.entity.OrderItem;
@@ -40,6 +39,12 @@ public class OrderService {
 
     @Transactional
     public Order placeOrder(Order order) {
+        if (order == null || order.getUser() == null || order.getUser().getId() == null) {
+            throw new RuntimeException("Order must contain a valid user ID.");
+        }
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            throw new RuntimeException("Order must contain at least one item.");
+        }
 
         User fullUser = userRepository.findById(order.getUser().getId())
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + order.getUser().getId()));
@@ -49,15 +54,25 @@ public class OrderService {
         BigDecimal totalOrderPrice = BigDecimal.ZERO;
 
         for (OrderItem item : order.getItems()) {
+            if (item.getBookId() == null) {
+                throw new RuntimeException("Each order item must include a book ID.");
+            }
+            if (item.getQuantity() == null || item.getQuantity() <= 0) {
+                throw new RuntimeException("Item quantity must be greater than zero.");
+            }
 
             Book book = bookRepository.findById(item.getBookId())
                     .orElseThrow(() -> new RuntimeException("Book not found ID: " + item.getBookId()));
 
-            if (book.getStock() < item.getQuantity()) {
+            Integer availableStock = book.getStock() == null ? 0 : book.getStock();
+            if (availableStock < item.getQuantity()) {
                 throw new RuntimeException("Out of stock! Only " + book.getStock() + " copies left of: " + book.getTitle());
             }
+            if (book.getPrice() == null) {
+                throw new RuntimeException("Book price is missing for book ID: " + item.getBookId());
+            }
 
-            book.setStock(book.getStock() - item.getQuantity());
+            book.setStock(availableStock - item.getQuantity());
             bookRepository.save(book);
 
             item.setOrder(order);
@@ -96,16 +111,11 @@ public class OrderService {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        try {
-            // Check if the 'files' directory exists, if not create it
-            File directory = new File("files");
-            if (!directory.exists()) {
-                directory.mkdir();
-            }
-
+        try (
+            FileWriter fileWriter = new FileWriter("files/receipt_order_" + order.getOrderId() + ".txt");
+            PrintWriter printWriter = new PrintWriter(fileWriter)
+        ) {
             String fileName = "files/receipt_order_" + order.getOrderId() + ".txt";
-            FileWriter fileWriter = new FileWriter(fileName);
-            PrintWriter printWriter = new PrintWriter(fileWriter);
 
             printWriter.println("==========================================");
             printWriter.println("        NEXUS BOOKSTORE RECEIPT          ");
@@ -115,7 +125,10 @@ public class OrderService {
             printWriter.println("------------------------------------------");
 
             for (OrderItem item : order.getItems()) {
-                BigDecimal unitPrice = item.getPrice().divide(BigDecimal.valueOf(item.getQuantity()));
+                BigDecimal unitPrice = BigDecimal.ZERO;
+                if (item.getPrice() != null && item.getQuantity() != null && item.getQuantity() > 0) {
+                    unitPrice = item.getPrice().divide(BigDecimal.valueOf(item.getQuantity()));
+                }
 
                 printWriter.println("Book ID    : " + item.getBookId());
                 printWriter.println("Unit Price : LKR " + unitPrice);
@@ -129,7 +142,6 @@ public class OrderService {
             printWriter.println("   Developed by Keshara - Group WD130      ");
             printWriter.println("==========================================");
 
-            printWriter.close();
             System.out.println(">>> Receipt generated successfully: " + fileName);
 
         } catch (IOException e) {

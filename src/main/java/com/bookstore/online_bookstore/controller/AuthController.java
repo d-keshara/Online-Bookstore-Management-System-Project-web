@@ -20,6 +20,11 @@ public class AuthController {
     //Register a new user
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
+        if (user == null || user.getUsername() == null || user.getUsername().isBlank()
+                || user.getPassword() == null || user.getPassword().isBlank()) {
+            return ResponseEntity.badRequest().body("Username and password are required.");
+        }
+
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body("Username already exists!");
         }
