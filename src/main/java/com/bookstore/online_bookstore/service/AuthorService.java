@@ -2,14 +2,20 @@ package com.bookstore.online_bookstore.service;
 
 import com.bookstore.online_bookstore.entity.Author;
 import com.bookstore.online_bookstore.entity.Book;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface AuthorService {
+
     Author createAuthor(Author author);
-    List<Author> getAllAuthors();
+
+    Page<Author> getAllAuthors(Pageable pageable);
+
     Author getAuthorById(Long id);
+
     Author updateAuthor(Long id, Author updatedAuthor);
+
     void deleteAuthor(Long id);
-    List<Book> getBooksByAuthorId(Long authorId);
+
+    Page<Book> getBooksByAuthorId(Long authorId, Pageable pageable);
 }

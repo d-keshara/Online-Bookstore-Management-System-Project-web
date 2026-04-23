@@ -3,6 +3,9 @@ package com.bookstore.online_bookstore.controller;
 import com.bookstore.online_bookstore.entity.Author;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.service.AuthorService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +28,16 @@ public class AuthorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Author>> getAllAuthors() {
-        return ResponseEntity.ok(authorService.getAllAuthors());
+    public ResponseEntity<Page<Author>> getAllAuthors(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Author> authors = authorService.getAllAuthors(pageable);
+
+        return new ResponseEntity<>(authors, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -35,8 +46,18 @@ public class AuthorController {
     }
 
     @GetMapping("/{id}/books")
-    public ResponseEntity<List<Book>> getBooksByAuthor(@PathVariable Long id) {
-        return ResponseEntity.ok(authorService.getBooksByAuthorId(id));
+    public ResponseEntity<Page<Book>> getAuthorBooks(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // Create the pageable object
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Pass it down to the service
+        Page<Book> books = authorService.getBooksByAuthorId(id, pageable);
+
+        return ResponseEntity.ok(books);
     }
 
     @PutMapping("/{id}")

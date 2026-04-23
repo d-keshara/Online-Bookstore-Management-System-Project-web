@@ -1,5 +1,6 @@
 package com.bookstore.online_bookstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -25,7 +26,7 @@ public class Author {
     private String profileImageUrl;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonIgnoreProperties("author")
     private List<Book> books = new ArrayList<>();
 
     public Long getId() {
