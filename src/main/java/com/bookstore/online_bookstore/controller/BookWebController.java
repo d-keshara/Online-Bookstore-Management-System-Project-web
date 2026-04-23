@@ -53,7 +53,7 @@ public class BookWebController {
             order.setUser(user);
             order.setTotalPrice(book.getPrice());
             order.setOrderDate(java.time.LocalDateTime.now());
-            order.setStatus("PAID"); // Setting a default status
+            order.setStatus("PAID");
             orderRepository.save(order);
 
 
