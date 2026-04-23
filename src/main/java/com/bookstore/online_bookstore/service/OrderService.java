@@ -85,38 +85,43 @@ public class OrderService {
         order.setTotalPrice(totalOrderPrice);
         Order savedOrder = orderRepository.save(order);
 
-        generateReceiptFile(savedOrder);
+        // Capture the file path returned by the receipt generator
+        String receiptFilePath = generateReceiptFile(savedOrder);
 
-
+        // Send the email and pass the file path!
         try {
-            emailService.sendOrderConfirmation(
-                    savedOrder.getUser().getEmail(),
-                    savedOrder.getOrderId(),
-                    savedOrder.getTotalPrice()
-            );
+            if (receiptFilePath != null) {
+                emailService.sendOrderConfirmation(
+                        savedOrder.getUser().getEmail(),
+                        savedOrder.getUser().getUsername(),
+                        savedOrder.getOrderId(),
+                        savedOrder.getTotalPrice(),
+                        receiptFilePath
+                );
+            } else {
+                System.err.println("Email skipped because receipt file path was null.");
+            }
         } catch (Exception e) {
             System.err.println("Receipt file created, but Email failed: " + e.getMessage());
         }
 
         return savedOrder;
-
-
     }
 
     //receipt generation
 
-    private void generateReceiptFile(Order order) {
-
+    private String generateReceiptFile(Order order) {
         File folder = new File("files");
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        try (
-            FileWriter fileWriter = new FileWriter("files/receipt_order_" + order.getOrderId() + ".txt");
-            PrintWriter printWriter = new PrintWriter(fileWriter)
-        ) {
-            String fileName = "files/receipt_order_" + order.getOrderId() + ".txt";
 
+        String fileName = "files/receipt_order_" + order.getOrderId() + ".txt";
+
+        try (
+                FileWriter fileWriter = new FileWriter(fileName);
+                PrintWriter printWriter = new PrintWriter(fileWriter)
+        ) {
             printWriter.println("==========================================");
             printWriter.println("        NEXUS BOOKSTORE RECEIPT          ");
             printWriter.println("==========================================");
@@ -139,13 +144,16 @@ public class OrderService {
 
             printWriter.println("TOTAL PAID : LKR " + order.getTotalPrice());
             printWriter.println("==========================================");
-            printWriter.println("   Developed by Keshara - Group WD130      ");
+            printWriter.println("        Developed by Group WD130          ");
             printWriter.println("==========================================");
 
             System.out.println(">>> Receipt generated successfully: " + fileName);
 
+            return fileName;
+
         } catch (IOException e) {
             System.out.println("Error generating receipt file: " + e.getMessage());
+            return null;
         }
     }
 }
