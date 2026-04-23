@@ -1,108 +1,98 @@
 package com.bookstore.online_bookstore.controller;
 
 import com.bookstore.online_bookstore.entity.Book;
+import com.bookstore.online_bookstore.entity.Order;
+import com.bookstore.online_bookstore.entity.OrderItem;
+import com.bookstore.online_bookstore.entity.User;
 import com.bookstore.online_bookstore.repository.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bookstore.online_bookstore.repository.UserRepository;
+import com.bookstore.online_bookstore.service.OrderService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class BookWebController {
 
     private final BookRepository bookRepository;
-    private final com.bookstore.online_bookstore.repository.OrderRepository orderRepository;
-    private final com.bookstore.online_bookstore.repository.UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final OrderService orderService; // Use the service we already improved!
 
     public BookWebController(BookRepository bookRepository,
-                             com.bookstore.online_bookstore.repository.OrderRepository orderRepository,
-                             com.bookstore.online_bookstore.repository.UserRepository userRepository) {
+                             UserRepository userRepository,
+                             OrderService orderService) {
         this.bookRepository = bookRepository;
-        this.orderRepository = orderRepository;
         this.userRepository = userRepository;
+        this.orderService = orderService;
     }
 
     @GetMapping("/catalog")
-    public String viewCatalog(Model model, @RequestParam(required = false) String keyword) {
-        List<Book> books;
+    public String viewCatalog(Model model,
+                              @RequestParam(required = false) String keyword,
+                              @RequestParam(defaultValue = "0") int page) {
+
+        // Define page size (e.g., 8 books look good on a web grid)
+        Pageable pageable = PageRequest.of(page, 8);
+        Page<Book> bookPage;
 
         if (keyword != null && !keyword.isEmpty()) {
-            books = bookRepository.findByTitleContainingIgnoreCase(keyword);
+            bookPage = bookRepository.findByTitleContainingIgnoreCase(keyword, pageable);
         } else {
-            books = bookRepository.findAll();
+            bookPage = bookRepository.findAll(pageable);
         }
 
-        model.addAttribute("books", books);
+        model.addAttribute("books", bookPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", bookPage.getTotalPages());
+        model.addAttribute("keyword", keyword);
+
         return "book-catalog";
     }
+
     @PostMapping("/buy")
-    public String buyBook(@RequestParam("bookId") Integer bookId, java.security.Principal principal) {
+    public String buyBook(@RequestParam("bookId") Integer bookId, Principal principal) {
         if (principal == null) return "redirect:/login";
 
-        Book book = bookRepository.findById(bookId).orElse(null);
         String username = principal.getName();
-        com.bookstore.online_bookstore.entity.User user = userRepository.findByUsername(username).orElse(null);
+        User user = userRepository.findByUsername(username).orElse(null);
+        Book book = bookRepository.findById(bookId).orElse(null);
 
         if (book != null && user != null) {
-            // 1. Save to Database
-            com.bookstore.online_bookstore.entity.Order order = new com.bookstore.online_bookstore.entity.Order();
+            // Instead of manual file writing here, we use the OrderService!
+            // This ensures the stock is updated, the receipt is saved, and the email is sent.
+
+            Order order = new Order();
             order.setUser(user);
-            order.setTotalPrice(book.getPrice());
-            order.setOrderDate(java.time.LocalDateTime.now());
+            order.setOrderDate(LocalDateTime.now());
             order.setStatus("PAID");
-            orderRepository.save(order);
 
+            OrderItem item = new OrderItem();
+            item.setBookId(bookId);
+            item.setQuantity(1);
+            item.setOrder(order);
 
-            java.io.File directory = new java.io.File("files");
-            if (!directory.exists()) {
-                directory.mkdir();
+            List<OrderItem> items = new ArrayList<>();
+            items.add(item);
+            order.setItems(items);
+
+            try {
+                // This one call handles everything we built earlier!
+                orderService.placeOrder(order);
+                return "redirect:/catalog?success";
+            } catch (Exception e) {
+                System.err.println("Order Error: " + e.getMessage());
+                return "redirect:/catalog?error";
             }
-
-
-            String fileName = "files/receipt_order_" + order.getOrderId() + ".txt";
-
-            try (java.io.BufferedWriter bw = new java.io.BufferedWriter(new java.io.FileWriter(fileName))) {
-                bw.write("========================================");
-                bw.newLine();
-                bw.write("        NEXUS BOOKSTORE RECEIPT         ");
-                bw.newLine();
-                bw.write("========================================");
-                bw.newLine();
-                bw.write("Order ID    : " + order.getOrderId());
-                bw.newLine();
-                bw.write("Date        : " + java.time.LocalDateTime.now());
-                bw.newLine();
-                bw.write("----------------------------------------");
-                bw.newLine();
-                bw.write("Book ID     : " + book.getBookId());
-                bw.newLine();
-                bw.write("Unit Price  : LKR " + book.getPrice());
-                bw.newLine();
-                bw.write("Quantity    : 1"); 
-                bw.newLine();
-                bw.write("Subtotal    : LKR " + book.getPrice());
-                bw.newLine();
-                bw.write("----------------------------------------");
-                bw.newLine();
-                bw.write("TOTAL PAID  : LKR " + book.getPrice());
-                bw.newLine();
-                bw.write("========================================");
-                bw.newLine();
-                bw.write("   Developed by Keshara - Group WD130   ");
-                bw.newLine();
-                bw.write("========================================");
-
-                bw.flush();
-                System.out.println("NEW RECEIPT CREATED: " + fileName);
-            } catch (java.io.IOException e) {
-                System.err.println("File Error: " + e.getMessage());
-            }
-
-            return "redirect:/catalog?success";
         }
         return "redirect:/catalog?error";
     }

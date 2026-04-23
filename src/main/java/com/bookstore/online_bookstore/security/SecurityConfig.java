@@ -2,6 +2,7 @@ package com.bookstore.online_bookstore.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,25 +19,27 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/catalog/**").permitAll()
+                        // 1. PUBLIC ACCESS: Everyone can see these (No login required)
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/catalog/**", "/").permitAll() // Web catalog is now public
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        .requestMatchers("/admin/**").authenticated()
-                        .requestMatchers("/buy/**").authenticated()
+                        // Allow searching and viewing books via API for everyone (Fixes Postman 401)
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/authors/**").permitAll()
+
+                        // 2. PROTECTED ACCESS: Only logged-in users can do these
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Optional: restrict admin routes
+                        .requestMatchers("/buy/**").authenticated()    // Must login to buy
                         .requestMatchers("/api/users/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
-
-
                 .formLogin(form -> form
                         .defaultSuccessUrl("/catalog", true)
                         .permitAll()
                 )
-
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("/catalog?logout=true")
@@ -44,7 +47,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults()); // Keeps Postman/API Basic Auth working
 
         return http.build();
     }

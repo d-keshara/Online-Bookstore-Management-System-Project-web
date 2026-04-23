@@ -4,9 +4,9 @@ import com.bookstore.online_bookstore.entity.Author;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.repository.AuthorRepository;
 import com.bookstore.online_bookstore.repository.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
@@ -19,14 +19,15 @@ public class AuthorServiceImpl implements AuthorService {
         this.bookRepository = bookRepository;
     }
 
+    // THIS METHOD WAS MISSING!
     @Override
     public Author createAuthor(Author author) {
         return authorRepository.save(author);
     }
 
     @Override
-    public List<Author> getAllAuthors() {
-        return authorRepository.findAll();
+    public Page<Author> getAllAuthors(Pageable pageable) {
+        return authorRepository.findAll(pageable);
     }
 
     @Override
@@ -51,8 +52,8 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public List<Book> getBooksByAuthorId(Long authorId) {
+    public Page<Book> getBooksByAuthorId(Long authorId, Pageable pageable) {
         getAuthorById(authorId);
-        return bookRepository.findByAuthorId(authorId);
+        return bookRepository.findByAuthorId(authorId, pageable);
     }
 }
