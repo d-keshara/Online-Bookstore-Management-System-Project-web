@@ -18,8 +18,14 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Author Name</label>
-            <input type="text" th:field="*{author}" class="form-control" required>
+            <label class="form-label">Select Author</label>
+            <select th:field="*{author}" class="form-select" required>
+                <option value="" disabled selected>-- Choose an Author --</option>
+                <option th:each="a : ${authors}" th:value="${a.id}" th:text="${a.name}">Author Name</option>
+            </select>
+            <div class="form-text">
+                Don't see the author? <a href="/admin/authors/add">Add them first</a>.
+            </div>
         </div>
 
         <div class="mb-3">
