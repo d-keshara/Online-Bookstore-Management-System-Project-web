@@ -1,6 +1,7 @@
 package com.bookstore.online_bookstore.controller;
 
 import com.bookstore.online_bookstore.entity.Book;
+import com.bookstore.online_bookstore.repository.AuthorRepository;
 import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,14 @@ public class AdminWebController {
 
     private final OrderRepository orderRepository;
     private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
 
     @Autowired
-    public AdminWebController(BookRepository bookRepository, OrderRepository orderRepository) {
+    public AdminWebController(BookRepository bookRepository, OrderRepository orderRepository, AuthorRepository authorRepository) {
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
+        this.authorRepository = authorRepository;
     }
 
     @GetMapping("/dashboard")
@@ -29,9 +32,11 @@ public class AdminWebController {
         return "admin-dashboard";
     }
 
-    @GetMapping("/add")
-    public String showAddForm(Model model) {
+    @GetMapping("/admin/add-book")
+    public String showAddBookForm(Model model) {
         model.addAttribute("book", new Book());
+
+        model.addAttribute("authors", authorRepository.findAll());
         return "add-book";
     }
 
@@ -41,11 +46,13 @@ public class AdminWebController {
         return "redirect:/admin/dashboard";
     }
 
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Integer id, Model model) {
-        Book book = bookRepository.findById(id).orElse(null);
-        if (book == null) return "redirect:/admin/dashboard";
+    @GetMapping("/admin/edit-book/{id}")
+    public String showEditBookForm(@PathVariable Integer id, Model model) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid book Id:" + id));
         model.addAttribute("book", book);
+
+        model.addAttribute("authors", authorRepository.findAll());
         return "edit-book";
     }
 
