@@ -1,10 +1,15 @@
 package com.bookstore.online_bookstore.controller;
 
+import java.io.File;
 import java.util.List;
 import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.service.OrderService;
 import com.bookstore.online_bookstore.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,6 +36,18 @@ public class OrderController {
     @GetMapping("/all-orders")
     public List<Order> viewAllOrders(){
         return orderRepository.findAll();
+    }
+
+    @GetMapping("/receipt/{orderId}")
+    public ResponseEntity<Resource> downloadReceipt(@PathVariable Integer orderId) {
+        File file = new File("files/receipt_order_" + orderId + ".txt");
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+        Resource resource = new FileSystemResource(file);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                .body(resource);
     }
 
     @PostMapping("/checkout")

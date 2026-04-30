@@ -28,7 +28,6 @@ public class User {
 
     @Column(name = "email")
     private String email;
-
     private String address;
     private String phoneNumber;
 
