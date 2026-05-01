@@ -3,7 +3,7 @@ package com.bookstore.online_bookstore.dto;
 import java.util.List;
 
 public class OrderRequestDTO {
-    private Long userId;
+    private Integer userId;
     private List<CartItemDTO> items;
 
     // Inner class for the items in the cart
@@ -19,8 +19,8 @@ public class OrderRequestDTO {
     }
 
     // Getters and Setters
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
     public List<CartItemDTO> getItems() { return items; }
     public void setItems(List<CartItemDTO> items) { this.items = items; }
 }

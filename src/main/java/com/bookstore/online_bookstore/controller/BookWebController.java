@@ -71,7 +71,7 @@ public class BookWebController {
             OrderRequestDTO orderRequest = new OrderRequestDTO();
 
             // Note: If your User ID is an Integer, use Long.valueOf(user.getId()) here
-            orderRequest.setUserId(Long.valueOf(user.getId().toString()));
+            orderRequest.setUserId(Integer.valueOf(user.getId().toString()));
 
             // 2. Create the Cart Item DTO
             OrderRequestDTO.CartItemDTO cartItem = new OrderRequestDTO.CartItemDTO();

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In - Nexus Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100vh;">
+
+<div class="container bg-white p-5 shadow-sm rounded" style="max-width: 450px;">
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary">NEXUS BOOKSTORE</h2>
+        <p class="text-muted">Welcome back! Please sign in.</p>
+    </div>
+
+    <!-- This shows up if they just finished signing up -->
+    <div th:if="${param.registered}" class="alert alert-success text-center shadow-sm">
+        Account created successfully! Please sign in.
+    </div>
+
+    <!-- This shows up if they type the wrong password -->
+    <div th:if="${param.error}" class="alert alert-danger text-center shadow-sm">
+        Invalid username or password.
+    </div>
+
+    <!-- This shows up when they click logout -->
+    <div th:if="${param.logout}" class="alert alert-info text-center shadow-sm">
+        You have been logged out successfully.
+    </div>
+
+    <!-- The Login Form goes directly to Spring Security -->
+    <form th:action="@{/login}" method="post">
+
+        <div class="mb-3">
+            <label for="username" class="form-label fw-bold">Username</label>
+            <input type="text" id="username" name="username" class="form-control" required placeholder="Enter username">
+        </div>
+
+        <div class="mb-4">
+            <label for="password" class="form-label fw-bold">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required placeholder="Enter password">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-3">Sign In</button>
+
+        <div class="d-flex justify-content-between">
+            <a href="/catalog" class="text-decoration-none">← Back to Catalog</a>
+            <a href="/register" class="text-decoration-none">Create Account</a>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>

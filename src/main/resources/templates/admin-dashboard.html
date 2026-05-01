@@ -17,10 +17,16 @@
 
 <nav class="navbar navbar-dark bg-dark mb-4">
     <div class="container">
-        <a class="navbar-brand" href="/admin/dashboard">Nexus Admin Panel</a>
-        <div class="d-flex">
-            <a href="/catalog" class="btn btn-outline-light btn-sm me-2">View Public Catalog</a>
-            <form th:action="@{/logout}" method="post" style="display:inline;">
+        <a class="navbar-brand fw-bold" href="/admin/dashboard">Nexus Admin Panel</a>
+        <div class="d-flex align-items-center gap-3">
+
+            <!-- NEW: Manage Users / Admins Button -->
+            <a href="/admin/users" class="btn btn-warning btn-sm fw-bold text-dark shadow-sm">
+                ⚙️ Manage Users & Admins
+            </a>
+
+            <a href="/catalog" class="btn btn-outline-light btn-sm">View Public Catalog</a>
+            <form th:action="@{/logout}" method="post" class="m-0 p-0">
                 <button type="submit" class="btn btn-danger btn-sm">Logout</button>
             </form>
         </div>
@@ -30,7 +36,11 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Inventory Management</h2>
-        <a href="/admin/add" class="btn btn-success px-4">+ Add New Book</a>
+
+        <div class="d-flex gap-2">
+            <a href="/admin/authors/add" class="btn btn-primary px-4">+ Add New Author</a>
+            <a href="/admin/add" class="btn btn-success px-4">+ Add New Book</a>
+        </div>
     </div>
 
     <div class="table-container shadow-sm">
@@ -50,7 +60,9 @@
             <tr th:each="book : ${books}">
                 <td th:text="${book.bookId}">1</td>
                 <td class="fw-bold" th:text="${book.title}">Book Title</td>
-                <td th:text="${book.author}">Author Name</td>
+
+                <td th:text="${book.author != null ? book.author.name : 'Unknown Author'}">Author Name</td>
+
                 <td>
                     <span class="badge bg-info text-dark" th:text="${book.category}">Category</span>
                 </td>
@@ -79,7 +91,7 @@
     </div>
 
     <div class="mt-4 text-muted small">
-        <p>Logged in as: <span class="fw-bold">Admin</span> | Nexus Bookstore Management System v1.0</p>
+        <p>Logged in as: <span class="fw-bold">Admin</span> | Nexus Bookstore - Group WD130 Project</p>
     </div>
 </div>
 

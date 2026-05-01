@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Nexus Bookstore - Catalog</title>
@@ -16,9 +16,11 @@
         }
         .navbar-brand { font-size: 1.5rem; letter-spacing: 1px; }
         .price-tag { font-size: 1.4rem; color: #198754; }
-        /* Style for pagination */
         .pagination .page-link { color: #212529; }
         .pagination .active .page-link { background-color: #212529; border-color: #212529; color: white; }
+        /* Style for the title link */
+        .title-link { text-decoration: none; color: inherit; }
+        .title-link:hover { color: #0d6efd; }
     </style>
 </head>
 <body class="bg-light">
@@ -28,10 +30,28 @@
         <a class="navbar-brand fw-bold" href="/catalog">NEXUS BOOKSTORE</a>
 
         <div class="d-flex align-items-center gap-2">
-            <a href="/admin/orders" class="btn btn-warning btn-sm fw-bold shadow-sm">
-                🛒 View Cart
-            </a>
-            <a href="/admin/dashboard" class="btn btn-outline-info btn-sm">Admin Dashboard</a>
+            <th:block sec:authorize="isAnonymous()">
+                <a href="/login" class="btn btn-outline-light btn-sm fw-bold">Sign In</a>
+                <a href="/register" class="btn btn-primary btn-sm fw-bold shadow-sm">Sign Up</a>
+            </th:block>
+
+            <th:block sec:authorize="isAuthenticated()">
+                <a href="/my-orders" class="btn btn-warning btn-sm fw-bold shadow-sm">
+                    📦 My Orders
+                </a>
+            </th:block>
+
+            <th:block sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                <a href="/admin/dashboard" class="btn btn-outline-info btn-sm">
+                    Admin Dashboard
+                </a>
+            </th:block>
+
+            <th:block sec:authorize="isAuthenticated()">
+                <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                    <button type="submit" class="btn btn-sm btn-danger ms-2">Logout</button>
+                </form>
+            </th:block>
 
             <form th:action="@{/catalog}" method="get" class="d-flex ms-2">
                 <input class="form-control form-control-sm me-2" type="search" name="keyword"
@@ -45,12 +65,7 @@
 <div class="container">
 
     <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-        <strong>Success!</strong> The item has been processed. You can check your <strong>View Cart / Order History</strong> for details.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-        <strong>Error!</strong> We couldn't process that request. Please try again.
+        <strong>Success!</strong> The item has been processed.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
@@ -60,7 +75,11 @@
         <div class="col" th:each="book : ${books}">
             <div class="card h-100 shadow-sm book-card">
                 <div class="card-body d-flex flex-column p-4">
-                    <h5 class="card-title fw-bold text-dark" th:text="${book.title}">Book Title</h5>
+
+                    <!-- TITLE LINK: Leads to the Details page for reviews -->
+                    <a th:href="@{'/catalog/details/' + ${book.bookId}}" class="title-link">
+                        <h5 class="card-title fw-bold" th:text="${book.title}">Book Title</h5>
+                    </a>
 
                     <p class="card-text text-muted mb-2">
                         By <span th:text="${book.author != null ? book.author.name : 'Unknown Author'}">Author Name</span>
@@ -73,42 +92,49 @@
                     <div class="mt-auto">
                         <div class="price-tag fw-bold mb-3">LKR <span th:text="${book.price}">0.00</span></div>
 
-                        <form th:action="@{/buy}" method="post">
-                            <input type="hidden" name="bookId" th:value="${book.bookId}" />
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 mb-2">
+                            <a th:href="@{'/catalog/details/' + ${book.bookId}}" class="btn btn-outline-secondary btn-sm">View Details & Reviews</a>
+                        </div>
 
+                        <!-- BUY/CART FOR LOGGED IN USERS -->
+                        <form sec:authorize="isAuthenticated()" th:action="@{/buy}" method="post">
+                            <input type="hidden" name="bookId" th:value="${book.bookId}" />
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <button type="submit" class="btn btn-outline-primary w-100 btn-sm">Add to Cart</button>
+                                    <button type="button" class="btn btn-outline-primary w-100 btn-sm" onclick="alert('Multi-item cart coming soon!')">Add to Cart</button>
                                 </div>
                                 <div class="col-6">
                                     <button type="submit" class="btn btn-primary w-100 btn-sm fw-bold">Buy Now</button>
                                 </div>
                             </div>
                         </form>
+
+                        <!-- FOR GUESTS -->
+                        <div sec:authorize="isAnonymous()" class="row g-2">
+                            <div class="col-6">
+                                <a href="/login" class="btn btn-outline-primary w-100 btn-sm">Add to Cart</a>
+                            </div>
+                            <div class="col-6">
+                                <a href="/login" class="btn btn-primary w-100 btn-sm fw-bold">Buy Now</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div th:if="${totalPages == 0}" class="col-12 text-center py-5">
-            <h3 class="text-muted">No books match your search.</h3>
-            <a href="/catalog" class="btn btn-primary mt-3">Reset Catalog</a>
-        </div>
     </div>
 
+    <!-- Pagination -->
     <nav th:if="${totalPages > 0}" aria-label="Page navigation" class="mt-5">
         <ul class="pagination justify-content-center">
-
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/catalog(page=${currentPage - 1}, keyword=${keyword})}" tabindex="-1">Previous</a>
+                <a class="page-link" th:href="@{/catalog(page=${currentPage - 1}, keyword=${keyword})}">Previous</a>
             </li>
-
             <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
                 th:classappend="${pageNumber == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{/catalog(page=${pageNumber}, keyword=${keyword})}"
-                   th:text="${pageNumber + 1}">1</a>
+                <a class="page-link" th:href="@{/catalog(page=${pageNumber}, keyword=${keyword})}" th:text="${pageNumber + 1}">1</a>
             </li>
-
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                 <a class="page-link" th:href="@{/catalog(page=${currentPage + 1}, keyword=${keyword})}">Next</a>
             </li>
@@ -119,7 +145,7 @@
 
 <footer class="mt-5 py-4 bg-white border-top">
     <div class="container text-center text-muted">
-        <small>© 2026 Nexus Bookstore - Group 6 Project</small>
+        <small>© 2026 Nexus Bookstore - Group WD130 Project</small>
     </div>
 </footer>
 

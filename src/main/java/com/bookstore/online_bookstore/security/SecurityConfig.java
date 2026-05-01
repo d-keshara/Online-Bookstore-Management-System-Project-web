@@ -16,27 +16,37 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 1. PUBLIC ACCESS: Everyone can see these (No login required)
-                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/catalog/**", "/").permitAll() // Web catalog is now public
+                        // 1. PUBLIC ACCESS: Static resources and Catalog
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/catalog", "/catalog/**").permitAll()
+                        .requestMatchers("/login", "/register", "/register/save").permitAll()
+
+                        // 2. PUBLIC API ACCESS
+                        .requestMatchers(HttpMethod.GET, "/api/books/**", "/api/authors/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // Allow searching and viewing books via API for everyone (Fixes Postman 401)
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/authors/**").permitAll()
+                        // 3. RESTRICTED: Admin only
+                        .requestMatchers("/admin/**").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
-                        // 2. PROTECTED ACCESS: Only logged-in users can do these
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Optional: restrict admin routes
-                        .requestMatchers("/buy/**").authenticated()    // Must login to buy
+                        // 4. RESTRICTED: Logged-in users only
+                        .requestMatchers("/buy/**", "/my-orders/**", "/reviews/add").authenticated()
                         .requestMatchers("/api/users/**").authenticated()
 
+                        // 5. CATCH-ALL
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/catalog", true)
                         .permitAll()
                 )
@@ -47,13 +57,8 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
-                .httpBasic(Customizer.withDefaults()); // Keeps Postman/API Basic Auth working
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
