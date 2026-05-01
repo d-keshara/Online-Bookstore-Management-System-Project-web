@@ -2,6 +2,8 @@ package com.bookstore.online_bookstore.controller;
 
 import java.io.File;
 import java.util.List;
+
+import com.bookstore.online_bookstore.dto.OrderRequestDTO;
 import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.service.OrderService;
 import com.bookstore.online_bookstore.repository.OrderRepository;
@@ -51,7 +53,8 @@ public class OrderController {
     }
 
     @PostMapping("/checkout")
-    public Order createRealOrder(@RequestBody Order newOrderFromFrontend){
+    public Order createRealOrder(@RequestBody OrderRequestDTO newOrderFromFrontend){
+        // Now it perfectly passes the DTO to your upgraded service!
         return orderService.placeOrder(newOrderFromFrontend);
     }
 }

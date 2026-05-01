@@ -1,5 +1,6 @@
 package com.bookstore.online_bookstore.controller;
 
+import com.bookstore.online_bookstore.repository.AuthorRepository;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.repository.AuthorRepository;
 import com.bookstore.online_bookstore.repository.BookRepository;
@@ -35,8 +36,10 @@ public class AdminWebController {
     @GetMapping("/admin/add-book")
     public String showAddBookForm(Model model) {
         model.addAttribute("book", new Book());
-
         model.addAttribute("authors", authorRepository.findAll());
+        // 3. Added authors to the model for the dropdown
+        model.addAttribute("authors", authorRepository.findAll());
+
         return "add-book";
     }
 
@@ -51,8 +54,10 @@ public class AdminWebController {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid book Id:" + id));
         model.addAttribute("book", book);
-
         model.addAttribute("authors", authorRepository.findAll());
+        // 4. Added authors to the model for the dropdown
+        model.addAttribute("authors", authorRepository.findAll());
+
         return "edit-book";
     }
 
