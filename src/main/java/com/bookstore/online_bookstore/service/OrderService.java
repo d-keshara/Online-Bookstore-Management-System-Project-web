@@ -1,5 +1,6 @@
 package com.bookstore.online_bookstore.service;
 
+import com.bookstore.online_bookstore.dto.OrderRequestDTO;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.entity.OrderItem;
@@ -16,6 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,50 +40,60 @@ public class OrderService {
     private BookRepository bookRepository;
 
     @Transactional
-    public Order placeOrder(Order order) {
-        if (order == null || order.getUser() == null || order.getUser().getId() == null) {
+    public Order placeOrder(OrderRequestDTO orderRequest) {
+        if (orderRequest == null || orderRequest.getUserId() == null) {
             throw new RuntimeException("Order must contain a valid user ID.");
         }
-        if (order.getItems() == null || order.getItems().isEmpty()) {
+        if (orderRequest.getItems() == null || orderRequest.getItems().isEmpty()) {
             throw new RuntimeException("Order must contain at least one item.");
         }
 
-        User fullUser = userRepository.findById(order.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + order.getUser().getId()));
+        User fullUser = userRepository.findById(orderRequest.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + orderRequest.getUserId()));
 
+        Order order = new Order();
         order.setUser(fullUser);
 
+        List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalOrderPrice = BigDecimal.ZERO;
 
-        for (OrderItem item : order.getItems()) {
-            if (item.getBookId() == null) {
+        for (OrderRequestDTO.CartItemDTO cartItem : orderRequest.getItems()) {
+            if (cartItem.getBookId() == null) {
                 throw new RuntimeException("Each order item must include a book ID.");
             }
-            if (item.getQuantity() == null || item.getQuantity() <= 0) {
+            if (cartItem.getQuantity() == null || cartItem.getQuantity() <= 0) {
                 throw new RuntimeException("Item quantity must be greater than zero.");
             }
 
-            Book book = bookRepository.findById(item.getBookId())
-                    .orElseThrow(() -> new RuntimeException("Book not found ID: " + item.getBookId()));
+            Book book = bookRepository.findById(cartItem.getBookId())
+                    .orElseThrow(() -> new RuntimeException("Book not found ID: " + cartItem.getBookId()));
 
             Integer availableStock = book.getStock() == null ? 0 : book.getStock();
-            if (availableStock < item.getQuantity()) {
+            if (availableStock < cartItem.getQuantity()) {
                 throw new RuntimeException("Out of stock! Only " + book.getStock() + " copies left of: " + book.getTitle());
             }
             if (book.getPrice() == null) {
-                throw new RuntimeException("Book price is missing for book ID: " + item.getBookId());
+                throw new RuntimeException("Book price is missing for book ID: " + cartItem.getBookId());
             }
 
-            book.setStock(availableStock - item.getQuantity());
+            // Deduct stock
+            book.setStock(availableStock - cartItem.getQuantity());
             bookRepository.save(book);
 
+            // Build the real OrderItem from the DTO
+            OrderItem item = new OrderItem();
             item.setOrder(order);
+            item.setBookId(cartItem.getBookId());
+            item.setQuantity(cartItem.getQuantity());
 
-            BigDecimal itemTotalPrice = book.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            BigDecimal itemTotalPrice = book.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
             item.setPrice(itemTotalPrice);
 
             totalOrderPrice = totalOrderPrice.add(itemTotalPrice);
+            orderItems.add(item);
         }
+
+        order.setItems(orderItems);
         order.setTotalPrice(totalOrderPrice);
         Order savedOrder = orderRepository.save(order);
 
@@ -157,4 +169,3 @@ public class OrderService {
         }
     }
 }
-// Final version of Admin and Order management module

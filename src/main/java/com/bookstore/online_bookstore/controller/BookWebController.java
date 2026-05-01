@@ -1,8 +1,7 @@
 package com.bookstore.online_bookstore.controller;
 
+import com.bookstore.online_bookstore.dto.OrderRequestDTO;
 import com.bookstore.online_bookstore.entity.Book;
-import com.bookstore.online_bookstore.entity.Order;
-import com.bookstore.online_bookstore.entity.OrderItem;
 import com.bookstore.online_bookstore.entity.User;
 import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class BookWebController {
 
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
-    private final OrderService orderService; // Use the service we already improved!
+    private final OrderService orderService; // Upgraded service!
 
     public BookWebController(BookRepository bookRepository,
                              UserRepository userRepository,
@@ -68,30 +66,30 @@ public class BookWebController {
         Book book = bookRepository.findById(bookId).orElse(null);
 
         if (book != null && user != null) {
-            // Instead of manual file writing here, we use the OrderService!
-            // This ensures the stock is updated, the receipt is saved, and the email is sent.
 
-            Order order = new Order();
-            order.setUser(user);
-            order.setOrderDate(LocalDateTime.now());
-            order.setStatus("PAID");
+            // 1. Create the new lightweight DTO
+            OrderRequestDTO orderRequest = new OrderRequestDTO();
 
-            OrderItem item = new OrderItem();
-            item.setBookId(bookId);
-            item.setQuantity(1);
-            item.setOrder(order);
+            // Note: If your User ID is an Integer, use Long.valueOf(user.getId()) here
+            orderRequest.setUserId(Long.valueOf(user.getId().toString()));
 
-            List<OrderItem> items = new ArrayList<>();
-            items.add(item);
-            order.setItems(items);
+            // 2. Create the Cart Item DTO
+            OrderRequestDTO.CartItemDTO cartItem = new OrderRequestDTO.CartItemDTO();
+            cartItem.setBookId(bookId);
+            cartItem.setQuantity(1); // Default to 1 for the simple "Buy" button
+
+            // 3. Add the item to the request
+            List<OrderRequestDTO.CartItemDTO> cartItems = new ArrayList<>();
+            cartItems.add(cartItem);
+            orderRequest.setItems(cartItems);
 
             try {
-                // This one call handles everything we built earlier!
-                orderService.placeOrder(order);
+                // 4. Pass the new DTO to the upgraded service!
+                orderService.placeOrder(orderRequest);
                 return "redirect:/catalog?success";
             } catch (Exception e) {
                 System.err.println("Order Error: " + e.getMessage());
-                return "redirect:/catalog?error";
+                return "redirect:/catalog?error=" + e.getMessage(); // Passes exact error to UI
             }
         }
         return "redirect:/catalog?error";
