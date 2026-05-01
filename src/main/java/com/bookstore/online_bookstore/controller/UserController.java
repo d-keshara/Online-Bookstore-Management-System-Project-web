@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/settings")
-    public ResponseEntity<?> updateSettingsById(@PathVariable long id, @RequestBody Map<String, String> requestData) {
+    public ResponseEntity<?> updateSettingsById(@PathVariable Integer id, @RequestBody Map<String, String> requestData) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
         return processUpdate(user, requestData);

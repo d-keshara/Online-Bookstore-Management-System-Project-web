@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Details - Nexus Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .star-rating { color: #ffc107; font-size: 1.2rem; }
+        .review-card { border-left: 4px solid #0d6efd; background: #f8f9fa; }
+        .navbar-brand { font-size: 1.5rem; letter-spacing: 1px; }
+
+        .rating-wrapper {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        .rating-wrapper input { display: none; }
+        .rating-wrapper label {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23ccc' class='bi bi-star-fill' viewBox='0 0 16 16'%3E%3Cpath d='M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100%;
+            transition: .3s;
+        }
+        .rating-wrapper input:checked ~ label,
+        .rating-wrapper label:hover,
+        .rating-wrapper label:hover ~ label {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23ffc107' class='bi bi-star-fill' viewBox='0 0 16 16'%3E%3Cpath d='M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/catalog">NEXUS BOOKSTORE</a>
+        <div class="d-flex align-items-center gap-2">
+            <a href="/catalog" class="btn btn-outline-light btn-sm fw-bold">← Back to Catalog</a>
+            <th:block sec:authorize="isAnonymous()">
+                <a href="/login" class="btn btn-primary btn-sm fw-bold shadow-sm">Sign In</a>
+            </th:block>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="row" th:if="${book != null}">
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4 mb-4 border-0">
+                <h1 class="fw-bold text-dark" th:text="${book.title}">Book Title</h1>
+                <p class="text-muted fs-5">By
+                    <span th:text="${book.author != null ? book.author.name : 'Unknown Author'}">Author</span>
+                </p>
+                <hr>
+                <p class="lead text-secondary"
+                   th:text="${book.description != null && !book.description.isEmpty() ? book.description : 'Explore this title at Nexus Bookstore.'}">
+                    Description
+                </p>
+                <div class="mt-4 d-flex align-items-center gap-3">
+                    <span class="badge bg-primary px-3 py-2" th:text="${book.category}">Category</span>
+                    <h3 class="text-success fw-bold m-0">LKR <span th:text="${book.price}">0.00</span></h3>
+                </div>
+            </div>
+
+            <div class="card shadow-sm p-4 border-0">
+                <h3 class="mb-4 fw-bold">Customer Reviews</h3>
+                <div th:if="${#lists.isEmpty(book.reviews)}" class="text-muted py-3">
+                    No reviews yet. Be the first to share your thoughts!
+                </div>
+
+                <div th:each="review : ${book.reviews}" class="review-card p-3 mb-3 rounded shadow-sm">
+                    <div class="d-flex justify-content-between">
+                        <strong th:text="${review.user != null ? (review.user.fullName != null ? review.user.fullName : review.user.username) : 'Anonymous Customer'}">User</strong>
+                        <div class="star-rating">
+                            <span th:if="${review.rating > 0}" th:each="i : ${#numbers.sequence(1, review.rating)}">★</span>
+                        </div>
+                    </div>
+                    <p class="mb-1 mt-2 text-dark" th:text="${review.comment}">Comment</p>
+                    <small class="text-muted" th:if="${review.createdAt != null}"
+                           th:text="${#temporals.format(review.createdAt, 'dd-MM-yyyy')}">Date</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 sticky-top border-0" style="top: 100px;">
+                <div sec:authorize="isAuthenticated()">
+                    <h4 class="mb-3 fw-bold">Write a Review</h4>
+                    <form th:action="@{/reviews/add}" method="post">
+                        <input type="hidden" name="bookId" th:value="${book.bookId}">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small d-block">YOUR RATING</label>
+                            <div class="rating-wrapper">
+                                <input type="radio" id="star5" name="rating" value="5" required/><label for="star5"></label>
+                                <input type="radio" id="star4" name="rating" value="4"/><label for="star4"></label>
+                                <input type="radio" id="star3" name="rating" value="3"/><label for="star3"></label>
+                                <input type="radio" id="star2" name="rating" value="2"/><label for="star2"></label>
+                                <input type="radio" id="star1" name="rating" value="1"/><label for="star1"></label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">COMMENT</label>
+                            <textarea name="comment" class="form-control" rows="4" required placeholder="What did you think of this book?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">Submit Review</button>
+                    </form>
+                </div>
+
+                <div sec:authorize="isAnonymous()" class="text-center py-3">
+                    <i class="bi bi-person-lock text-primary" style="font-size: 2.5rem;"></i>
+                    <h5 class="fw-bold mt-2">Sign in to Review</h5>
+                    <p class="text-muted small">Only registered customers can leave reviews.</p>
+                    <a href="/login" class="btn btn-primary w-100 fw-bold shadow-sm">Login Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:unless="${book != null}" class="text-center py-5">
+        <h2 class="text-muted">Book Not Found</h2>
+        <a href="/catalog" class="btn btn-primary mt-3">Back to Catalog</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

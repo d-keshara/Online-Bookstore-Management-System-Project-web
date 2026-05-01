@@ -1,5 +1,6 @@
 package com.bookstore.online_bookstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +15,8 @@ public class Order {
     @Column(name = "order_id")
     private Integer orderId;
 
+    // --- CRITICAL FIX: Prevents JSON Infinite Loop ---
+    @JsonIgnoreProperties({"orders", "password"})
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

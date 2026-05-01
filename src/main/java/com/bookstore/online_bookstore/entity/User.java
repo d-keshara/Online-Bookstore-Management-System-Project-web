@@ -1,8 +1,10 @@
 package com.bookstore.online_bookstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import java.util.List;
 
 @SuppressWarnings("JpaDataSourceORMInspection")
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,6 +32,11 @@ public class User {
     private String email;
     private String address;
     private String phoneNumber;
+
+    // --- CRITICAL FIX: The missing list and JSON loop prevention ---
+    @JsonIgnoreProperties("user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Order> orders;
 
     public User(){}
 
@@ -96,6 +103,12 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
 }
-
-

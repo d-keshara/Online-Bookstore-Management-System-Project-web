@@ -1,12 +1,12 @@
 package com.bookstore.online_bookstore.controller;
 
-import com.bookstore.online_bookstore.repository.AuthorRepository;
 import com.bookstore.online_bookstore.entity.Book;
+import com.bookstore.online_bookstore.entity.User; // Make sure this matches your User entity import
 import com.bookstore.online_bookstore.repository.AuthorRepository;
 import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.OrderRepository;
+import com.bookstore.online_bookstore.repository.UserRepository; // New import
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +18,14 @@ public class AdminWebController {
     private final OrderRepository orderRepository;
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
-
+    private final UserRepository userRepository; // Added UserRepository
 
     @Autowired
-    public AdminWebController(BookRepository bookRepository, OrderRepository orderRepository, AuthorRepository authorRepository) {
+    public AdminWebController(BookRepository bookRepository, OrderRepository orderRepository, AuthorRepository authorRepository, UserRepository userRepository) {
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
         this.authorRepository = authorRepository;
+        this.userRepository = userRepository; // Initialized
     }
 
     @GetMapping("/dashboard")
@@ -33,13 +34,10 @@ public class AdminWebController {
         return "admin-dashboard";
     }
 
-    @GetMapping("/admin/add-book")
+    @GetMapping("/add")
     public String showAddBookForm(Model model) {
         model.addAttribute("book", new Book());
         model.addAttribute("authors", authorRepository.findAll());
-        // 3. Added authors to the model for the dropdown
-        model.addAttribute("authors", authorRepository.findAll());
-
         return "add-book";
     }
 
@@ -49,15 +47,12 @@ public class AdminWebController {
         return "redirect:/admin/dashboard";
     }
 
-    @GetMapping("/admin/edit-book/{id}")
+    @GetMapping("/edit/{id}")
     public String showEditBookForm(@PathVariable Integer id, Model model) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid book Id:" + id));
         model.addAttribute("book", book);
         model.addAttribute("authors", authorRepository.findAll());
-        // 4. Added authors to the model for the dropdown
-        model.addAttribute("authors", authorRepository.findAll());
-
         return "edit-book";
     }
 
@@ -71,5 +66,25 @@ public class AdminWebController {
     public String viewOrders(Model model) {
         model.addAttribute("orders", orderRepository.findAll());
         return "order-history";
+    }
+
+    @GetMapping("/users")
+    public String manageUsers(Model model) {
+        model.addAttribute("users", userRepository.findAll());
+        return "admin-users";
+    }
+
+    @GetMapping("/users/promote/{id}")
+    public String promoteToAdmin(@PathVariable Integer id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        user.setRole("ADMIN"); // Upgrades them to an Admin
+        userRepository.save(user);
+        return "redirect:/admin/users?promoted";
+    }
+
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable Integer id) {
+        userRepository.deleteById(id);
+        return "redirect:/admin/users?deleted";
     }
 }
