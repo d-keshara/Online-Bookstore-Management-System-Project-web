@@ -29,12 +29,13 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                         .requestMatchers("/", "/catalog", "/catalog/**").permitAll()
                         .requestMatchers("/login", "/register", "/register/save").permitAll()
-
+                        .requestMatchers("/register/author", "/register/author/save").permitAll()
                         // 2. PUBLIC API ACCESS
                         .requestMatchers(HttpMethod.GET, "/api/books/**", "/api/authors/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // 3. RESTRICTED: Admin only
+                        // 3. RESTRICTED: Admin and author only
+                        .requestMatchers("/author/**").hasAnyAuthority("AUTHOR", "ROLE_AUTHOR")
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
                         // 4. RESTRICTED: Logged-in users only

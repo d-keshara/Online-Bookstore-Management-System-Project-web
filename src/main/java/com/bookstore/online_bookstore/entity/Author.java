@@ -1,16 +1,12 @@
 package com.bookstore.online_bookstore.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("JpaDataSourceORMInspection")
 @Entity
 @Table(name = "authors")
-@Inheritance(strategy = InheritanceType.JOINED) // OOP: Inheritance
 public class Author {
 
     @Id
@@ -25,47 +21,28 @@ public class Author {
 
     private String profileImageUrl;
 
+    // NEW: The "Glue" linking the profile to a user account
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnoreProperties("author")
     private List<Book> books = new ArrayList<>();
 
-    public Long getId() {
-        return id;
-    }
+    // Standard Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getBiography() { return biography; }
+    public void setBiography(String biography) { this.biography = biography; }
+    public String getProfileImageUrl() { return profileImageUrl; }
+    public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
+    public List<Book> getBooks() { return books; }
+    public void setBooks(List<Book> books) { this.books = books; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getBiography() {
-        return biography;
-    }
-
-    public void setBiography(String biography) {
-        this.biography = biography;
-    }
-
-    public String getProfileImageUrl() {
-        return profileImageUrl;
-    }
-
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
-
-    public List<Book> getBooks() {
-        return books;
-    }
-
-    public void setBooks(List<Book> books) {
-        this.books = books;
-    }
+    // NEW: User Getter and Setter
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

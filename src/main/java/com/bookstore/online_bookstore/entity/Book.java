@@ -16,7 +16,6 @@ public class Book {
     @Column(name = "title")
     private String title;
 
-    // 1. ADD THE DESCRIPTION FIELD
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
@@ -36,6 +35,10 @@ public class Book {
     @Column(name = "category")
     private String category;
 
+    // NEW: The approval status for the Book Architecture!
+    @Column(nullable = false)
+    private String approvalStatus = "PENDING";
+
     public Book() {
     }
 
@@ -49,14 +52,8 @@ public class Book {
         this.category = category;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     public Integer getBookId() { return bookId; }
     public void setBookId(Integer bookId) { this.bookId = bookId; }
     public String getTitle() { return title; }
@@ -71,4 +68,8 @@ public class Book {
     public void setStock(Integer stock) { this.stock = stock; }
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    // NEW Getters and Setters
+    public String getApprovalStatus() { return approvalStatus; }
+    public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
 }

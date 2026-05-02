@@ -1,10 +1,13 @@
 package com.bookstore.online_bookstore.controller;
 
+import com.bookstore.online_bookstore.entity.Author;
 import com.bookstore.online_bookstore.entity.Book;
+import com.bookstore.online_bookstore.entity.InviteToken;
 import com.bookstore.online_bookstore.entity.Order;
 import com.bookstore.online_bookstore.entity.Review;
 import com.bookstore.online_bookstore.entity.User;
 import com.bookstore.online_bookstore.repository.BookRepository;
+import com.bookstore.online_bookstore.repository.InviteTokenRepository;
 import com.bookstore.online_bookstore.repository.ReviewRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
 import com.bookstore.online_bookstore.service.OrderService;
@@ -16,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-
 import java.util.List;
 
 @Controller
@@ -27,17 +29,20 @@ public class UserWebController {
     private final PasswordEncoder passwordEncoder;
     private final BookRepository bookRepository;
     private final ReviewRepository reviewRepository;
+    private final InviteTokenRepository inviteTokenRepository;
 
     public UserWebController(OrderService orderService,
                              UserRepository userRepository,
                              PasswordEncoder passwordEncoder,
                              BookRepository bookRepository,
-                             ReviewRepository reviewRepository) {
+                             ReviewRepository reviewRepository,
+                             InviteTokenRepository inviteTokenRepository) {
         this.orderService = orderService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.bookRepository = bookRepository;
         this.reviewRepository = reviewRepository;
+        this.inviteTokenRepository = inviteTokenRepository;
     }
 
     @GetMapping("/catalog/details/{id}")
@@ -77,7 +82,6 @@ public class UserWebController {
 
     @GetMapping("/my-reviews")
     public String showMyReviews(Model model, Principal principal) {
-        // FIX: Added null check to prevent 500 error if not logged in
         if (principal == null) {
             return "redirect:/login";
         }
@@ -95,39 +99,41 @@ public class UserWebController {
 
     @GetMapping("/my-account")
     public String showMyAccount(Model model, Principal principal) {
-        // Principal holds the username (email) of the currently logged-in user
         if (principal == null) {
             return "redirect:/login";
         }
 
-        // Find the user in the database
         User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
 
         if (currentUser == null) {
             return "redirect:/login";
         }
 
-        // Send the user data to the HTML page
         model.addAttribute("user", currentUser);
         return "my-account";
     }
 
     @PostMapping("/register/save")
-    public String saveNewUser(@ModelAttribute("user") User user) {
+    public String saveNewUser(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) {
+
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "Username is already taken. Please choose a different one.");
+            return "redirect:/register";
+        }
+
         user.setRole("USER");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+
         return "redirect:/login?registered=true";
     }
+
     @PostMapping("/reviews/delete/{id}")
     public String deleteReview(@PathVariable Integer id) {
-        // Fires the direct SQL delete, bypassing Hibernate's lazy checking
         reviewRepository.forceDeleteById(id);
-
         return "redirect:/my-reviews";
     }
 
-    // NEW: Handles the Edit button click and loads the edit form
     @GetMapping("/reviews/edit/{id}")
     public String showEditReviewForm(@PathVariable Integer id, Model model, Principal principal) {
         if (principal == null) {
@@ -137,13 +143,12 @@ public class UserWebController {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid review Id:" + id));
 
-        // Ensure users can only edit their own reviews
         if (!review.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/my-reviews";
         }
 
         model.addAttribute("review", review);
-        return "edit-review"; // This looks for an edit-review.html file
+        return "edit-review";
     }
 
     @PostMapping("/reviews/update/{id}")
@@ -151,13 +156,13 @@ public class UserWebController {
         Review existingReview = reviewRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid review Id:" + id));
 
-        // Update the fields
         existingReview.setRating(updatedReview.getRating());
         existingReview.setComment(updatedReview.getComment());
 
         reviewRepository.save(existingReview);
         return "redirect:/my-reviews";
     }
+
     @PostMapping("/account/update")
     public String updateProfile(@RequestParam String fullName,
                                 @RequestParam String phoneNumber,
@@ -170,15 +175,12 @@ public class UserWebController {
         User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
 
         if (currentUser != null) {
-            // Update the allowed fields
             currentUser.setFullName(fullName);
             currentUser.setPhoneNumber(phoneNumber);
             currentUser.setAddress(address);
 
-            // Save back to the database
             userRepository.save(currentUser);
 
-            // Send a success message to the front-end
             redirectAttributes.addFlashAttribute("successMessage", "Profile details updated successfully!");
         }
 
@@ -197,19 +199,16 @@ public class UserWebController {
         User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
 
         if (currentUser != null) {
-            // Check 1: Does the current password match what's in the database?
             if (!passwordEncoder.matches(currentPassword, currentUser.getPassword())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Your current password was incorrect.");
                 return "redirect:/my-account";
             }
 
-            // Check 2: Did they type the new password correctly twice?
             if (!newPassword.equals(confirmPassword)) {
                 redirectAttributes.addFlashAttribute("errorMessage", "New passwords do not match!");
                 return "redirect:/my-account";
             }
 
-            // If both checks pass, encrypt the new password and save it
             currentUser.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(currentUser);
 
@@ -217,5 +216,46 @@ public class UserWebController {
         }
 
         return "redirect:/my-account";
+    }
+
+    @GetMapping("/register/author")
+    public String showAuthorRegistrationForm(Model model) {
+        model.addAttribute("user", new User());
+        return "register-author";
+    }
+
+    @PostMapping("/register/author/save")
+    public String saveNewAuthor(@ModelAttribute("user") User user,
+                                @RequestParam("inviteCode") String inviteCode,
+                                RedirectAttributes redirectAttributes) {
+
+        InviteToken tokenRecord = inviteTokenRepository.findByToken(inviteCode).orElse(null);
+
+        if (tokenRecord == null || tokenRecord.isUsed()) {
+            redirectAttributes.addFlashAttribute("error", "Invalid or already used Invite Code!");
+            return "redirect:/register/author";
+        }
+
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "Username is already taken. Please choose a different one.");
+            return "redirect:/register/author";
+        }
+
+        user.setRole("ROLE_AUTHOR");
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        Author newProfile = new Author();
+        newProfile.setName(user.getFullName() != null && !user.getFullName().isEmpty()
+                ? user.getFullName() : user.getUsername());
+
+        newProfile.setUser(user);
+        user.setAuthor(newProfile);
+
+        userRepository.save(user);
+
+        tokenRecord.setUsed(true);
+        inviteTokenRepository.save(tokenRecord);
+
+        return "redirect:/login?author_registered=true";
     }
 }

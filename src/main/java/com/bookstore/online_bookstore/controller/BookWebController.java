@@ -24,7 +24,7 @@ public class BookWebController {
 
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
-    private final OrderService orderService; // Upgraded service!
+    private final OrderService orderService;
 
     public BookWebController(BookRepository bookRepository,
                              UserRepository userRepository,
@@ -39,14 +39,13 @@ public class BookWebController {
                               @RequestParam(required = false) String keyword,
                               @RequestParam(defaultValue = "0") int page) {
 
-        // Define page size (e.g., 8 books look good on a web grid)
         Pageable pageable = PageRequest.of(page, 8);
         Page<Book> bookPage;
 
         if (keyword != null && !keyword.isEmpty()) {
-            bookPage = bookRepository.findByTitleContainingIgnoreCase(keyword, pageable);
+            bookPage = bookRepository.findByTitleContainingIgnoreCaseAndApprovalStatus(keyword, "APPROVED", pageable);
         } else {
-            bookPage = bookRepository.findAll(pageable);
+            bookPage = bookRepository.findByApprovalStatus("APPROVED", pageable);
         }
 
         model.addAttribute("books", bookPage.getContent());
@@ -66,30 +65,22 @@ public class BookWebController {
         Book book = bookRepository.findById(bookId).orElse(null);
 
         if (book != null && user != null) {
-
-            // 1. Create the new lightweight DTO
             OrderRequestDTO orderRequest = new OrderRequestDTO();
-
-            // Note: If your User ID is an Integer, use Long.valueOf(user.getId()) here
             orderRequest.setUserId(Integer.valueOf(user.getId().toString()));
 
-            // 2. Create the Cart Item DTO
             OrderRequestDTO.CartItemDTO cartItem = new OrderRequestDTO.CartItemDTO();
             cartItem.setBookId(bookId);
-            cartItem.setQuantity(1); // Default to 1 for the simple "Buy" button
+            cartItem.setQuantity(1);
 
-            // 3. Add the item to the request
             List<OrderRequestDTO.CartItemDTO> cartItems = new ArrayList<>();
             cartItems.add(cartItem);
             orderRequest.setItems(cartItems);
 
             try {
-                // 4. Pass the new DTO to the upgraded service!
                 orderService.placeOrder(orderRequest);
                 return "redirect:/catalog?success";
             } catch (Exception e) {
-                System.err.println("Order Error: " + e.getMessage());
-                return "redirect:/catalog?error=" + e.getMessage(); // Passes exact error to UI
+                return "redirect:/catalog?error=" + e.getMessage();
             }
         }
         return "redirect:/catalog?error";

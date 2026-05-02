@@ -7,146 +7,91 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         .navbar-brand { font-size: 1.5rem; letter-spacing: 1px; }
-
-        /* Book Card Hover Effect */
         .hover-shadow { transition: all 0.3s ease; }
         .hover-shadow:hover {
             transform: translateY(-5px);
-            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
         }
-
-        /* Category Ribbon Styles */
-        .category-ribbon { display: flex; text-align: center; color: white; font-weight: 500; font-size: 0.9rem; }
-        .cat-box { flex: 1; padding: 15px 5px; text-decoration: none; color: inherit; transition: opacity 0.2s; }
-        .cat-box:hover { opacity: 0.8; color: white; }
-
-        .pagination .page-link { color: #212529; }
-        .pagination .active .page-link { background-color: #212529; border-color: #212529; color: white; }
     </style>
 </head>
 <body class="bg-light">
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/catalog">NEXUS BOOKSTORE</a>
+        <a class="navbar-brand fw-bold fs-3" th:href="@{/catalog}">NEXUS BOOKSTORE</a>
 
-        <div class="d-flex align-items-center gap-2">
-            <th:block sec:authorize="isAnonymous()">
-                <a href="/login" class="btn btn-outline-light btn-sm fw-bold">Sign In</a>
-                <a href="/register" class="btn btn-primary btn-sm fw-bold shadow-sm">Sign Up</a>
-            </th:block>
-
-            <th:block sec:authorize="isAuthenticated()">
-                <!-- NEW: My Account Button -->
-                <a href="/my-account" class="btn btn-light btn-sm fw-bold shadow-sm text-dark me-1">
-                    <i class="bi bi-person-circle"></i> My Account
-                </a>
-                <a href="/my-orders" class="btn btn-warning btn-sm fw-bold shadow-sm">📦 My Orders</a>
-                <a href="/my-reviews" class="btn btn-outline-warning btn-sm fw-bold text-white">⭐ My Reviews</a>
-            </th:block>
-
-            <th:block sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                <a href="/admin/dashboard" class="btn btn-outline-info btn-sm">Admin Dashboard</a>
-            </th:block>
-
-            <th:block sec:authorize="isAuthenticated()">
-                <form th:action="@{/logout}" method="post" class="m-0 p-0">
-                    <button type="submit" class="btn btn-sm btn-danger ms-2">Logout</button>
-                </form>
-            </th:block>
-
-            <form th:action="@{/catalog}" method="get" class="d-flex ms-3">
-                <input class="form-control form-control-sm me-2" type="search" name="keyword"
-                       th:value="${keyword}" placeholder="Search title..." aria-label="Search">
-                <button class="btn btn-sm btn-light" type="submit">Search</button>
+        <div class="d-flex align-items-center gap-3">
+            <form class="d-flex" th:action="@{/catalog}" method="get">
+                <input class="form-control form-control-sm me-2" type="search" name="keyword" th:value="${keyword}" placeholder="Search books..." aria-label="Search">
+                <button class="btn btn-outline-light btn-sm" type="submit">Search</button>
             </form>
+
+            <!-- GUEST VIEW -->
+            <div sec:authorize="isAnonymous()" class="d-flex gap-2">
+                <a th:href="@{/login}" class="btn btn-outline-light btn-sm ms-2">Sign In</a>
+                <a th:href="@{/register}" class="btn btn-primary btn-sm">Sign Up</a>
+            </div>
+
+            <!-- LOGGED IN VIEW -->
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+
+                <!-- ADMIN FEATURES -->
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/dashboard}" class="btn btn-warning btn-sm fw-bold text-dark">
+                        <i class="bi bi-speedometer2"></i> Admin Panel
+                    </a>
+                </div>
+
+                <!-- AUTHOR FEATURES -->
+                <div sec:authorize="hasRole('AUTHOR')">
+                    <a th:href="@{/author/dashboard}" class="btn btn-info btn-sm fw-bold text-white">
+                        <i class="bi bi-pen"></i> Author Portal
+                    </a>
+                </div>
+
+                <a th:href="@{/my-account}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+                </form>
+            </div>
         </div>
     </div>
 </nav>
 
-<!-- Visual Category Ribbon -->
-<div class="container-fluid px-0 mb-5 d-none d-md-block shadow-sm">
-    <div class="category-ribbon">
-        <a href="#" class="cat-box" style="background-color: #f1948a;"><i class="bi bi-book d-block mb-1 fs-4"></i>Fiction</a>
-        <a href="#" class="cat-box" style="background-color: #a9dfbf;"><i class="bi bi-journal-richtext d-block mb-1 fs-4"></i>Children's</a>
-        <a href="#" class="cat-box" style="background-color: #f5cba7;"><i class="bi bi-translate d-block mb-1 fs-4"></i>Translations</a>
-        <a href="#" class="cat-box" style="background-color: #85c1e9;"><i class="bi bi-journal-text d-block mb-1 fs-4"></i>Short Stories</a>
-        <a href="#" class="cat-box" style="background-color: #c39bd3;"><i class="bi bi-mortarboard d-block mb-1 fs-4"></i>Educational</a>
-    </div>
-</div>
-
-<div class="container">
-    <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-        <strong>Success!</strong> The item has been processed.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <div class="text-center mb-5">
-        <h6 class="text-info fw-bold tracking-wide text-uppercase mb-1">Explore Our Fastest Selling Titles</h6>
+<div class="container mb-5">
+    <div class="text-center mb-5 mt-4">
         <h2 class="fw-bold text-dark">Best Sellers</h2>
-        <hr class="w-25 mx-auto border-info border-3 opacity-100 mt-3">
+        <hr class="mx-auto border-info border-3 opacity-100" style="width: 120px;">
     </div>
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-
+    <!-- Book Grid -->
+    <div class="row row-cols-1 row-cols-md-4 g-4">
         <div class="col" th:each="book : ${books}">
-            <div class="card h-100 border-0 shadow-sm text-center position-relative pt-3 hover-shadow">
+            <div class="card h-100 border-0 shadow-sm text-center p-3 hover-shadow">
+                <div class="bg-secondary bg-opacity-10 rounded mx-auto mt-2 d-flex align-items-center justify-content-center" style="width: 150px; height: 220px;">
+                    <i class="bi bi-book fs-1 text-secondary opacity-50"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-uppercase mb-1" th:text="${book.title}">Book Title</h5>
+                    <p class="text-muted small mb-2" th:text="${book.author != null ? book.author.name : 'Unknown Author'}">Author</p>
+                    <h5 class="text-info fw-bold" th:text="'LKR ' + ${book.price}">LKR 0.00</h5>
 
-                <!-- Discount Badge -->
-                <span class="badge bg-danger position-absolute top-0 end-0 mt-2 me-2 px-2 py-1 shadow-sm">15% OFF</span>
-
-                <!-- UPDATED BOOK COVER: Now points to your local image folder -->
-                <a th:href="@{'/catalog/details/' + ${book.bookId}}">
-                    <img th:src="@{/images/story-thieves.jpg}" class="card-img-top mx-auto mt-2 shadow-sm rounded" style="width: 150px; height: 220px; object-fit: cover;" alt="Book Cover">
-                </a>
-
-                <div class="card-body d-flex flex-column pb-4">
-                    <!-- Static Star Rating Placeholder -->
-                    <div class="text-warning mb-2 small">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-half"></i>
-                        <span class="text-muted ms-1 small">4.5</span>
+                    <div sec:authorize="isAuthenticated()">
+                        <form th:action="@{/buy}" method="post">
+                            <input type="hidden" name="bookId" th:value="${book.bookId}">
+                            <button type="submit" class="btn btn-sm btn-dark w-100 mt-2 py-2">Buy Now</button>
+                        </form>
                     </div>
 
-                    <!-- Title -->
-                    <h6 class="card-title fw-bold text-uppercase mb-1" style="font-size: 0.9rem;">
-                        <a th:href="@{'/catalog/details/' + ${book.bookId}}" class="text-dark text-decoration-none" th:text="${book.title}">Book Title</a>
-                    </h6>
-
-                    <!-- Author & Category -->
-                    <p class="text-muted small mb-2" th:text="${book.author != null ? book.author.name : 'Unknown Author'}">Author Name</p>
-                    <span class="badge bg-light text-dark border mb-3 mx-auto" th:text="${book.category}">Category</span>
-
-                    <div class="mt-auto">
-                        <!-- Prices -->
-                        <p class="text-muted mb-0 small text-decoration-line-through">LKR <span th:text="${book.price + 500}">0.00</span></p>
-                        <p class="text-info fw-bold mb-3 fs-5">LKR <span th:text="${book.price}">0.00</span></p>
-
-                        <!-- Action Buttons: AUTHENTICATED -->
-                        <form sec:authorize="isAuthenticated()" th:action="@{/buy}" method="post">
-                            <input type="hidden" name="bookId" th:value="${book.bookId}" />
-                            <div class="d-flex gap-1 justify-content-center">
-                                <button type="button" class="btn btn-outline-primary btn-sm w-50" onclick="alert('Multi-item cart coming soon!')">
-                                    <i class="bi bi-cart-plus"></i> Cart
-                                </button>
-                                <button type="submit" class="btn btn-primary btn-sm w-50 fw-bold">Buy</button>
-                            </div>
-                        </form>
-
-                        <!-- Action Buttons: ANONYMOUS (Guest) -->
-                        <div sec:authorize="isAnonymous()" class="d-flex gap-1 justify-content-center">
-                            <a href="/login" class="btn btn-outline-primary btn-sm w-50"><i class="bi bi-cart-plus"></i> Cart</a>
-                            <a href="/login" class="btn btn-primary btn-sm w-50 fw-bold">Buy</a>
-                        </div>
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/login}" class="btn btn-sm btn-outline-secondary w-100 mt-2 py-2">Sign in to Buy</a>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- Pagination -->
@@ -155,23 +100,15 @@
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                 <a class="page-link" th:href="@{/catalog(page=${currentPage - 1}, keyword=${keyword})}">Previous</a>
             </li>
-            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
-                th:classappend="${pageNumber == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{/catalog(page=${pageNumber}, keyword=${keyword})}" th:text="${pageNumber + 1}">1</a>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
+                <a class="page-link" th:href="@{/catalog(page=${i}, keyword=${keyword})}" th:text="${i + 1}">1</a>
             </li>
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                 <a class="page-link" th:href="@{/catalog(page=${currentPage + 1}, keyword=${keyword})}">Next</a>
             </li>
         </ul>
     </nav>
-
 </div>
-
-<footer class="mt-5 py-4 bg-white border-top">
-    <div class="container text-center text-muted">
-        <small>© 2026 Nexus Bookstore - Group WD130 Project</small>
-    </div>
-</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

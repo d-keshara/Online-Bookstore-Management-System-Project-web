@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Submissions Queue - Nexus Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/admin/dashboard">Nexus Admin Panel</a>
+        <a href="/admin/dashboard" class="btn btn-outline-light btn-sm">← Back to Dashboard</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-inbox-fill text-warning me-2"></i>Author Submissions Queue</h2>
+    </div>
+
+    <div class="bg-white p-4 rounded-3 shadow-sm mb-5">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th class="text-center">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${pendingBooks}">
+                <td class="fw-bold" th:text="${book.title}">Title</td>
+                <td th:text="${book.author != null ? book.author.name : 'Unknown'}">Author</td>
+                <td><span class="badge bg-secondary" th:text="${book.category}">Category</span></td>
+                <td><span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Awaiting Review</span></td>
+                <td class="text-center">
+                    <a th:href="@{'/admin/requests/review/' + ${book.bookId}}" class="btn btn-primary btn-sm px-4 fw-bold">
+                        Review & Publish →
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(pendingBooks)}">
+                <td colspan="5" class="text-center py-5 text-muted">
+                    <i class="bi bi-check-circle fs-1 text-success d-block mb-3"></i>
+                    <h5 class="fw-bold">You're all caught up!</h5>
+                    <p>There are no pending book submissions from authors at this time.</p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

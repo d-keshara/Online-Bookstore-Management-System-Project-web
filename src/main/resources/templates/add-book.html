@@ -19,7 +19,6 @@
 
         <div class="mb-3">
             <label class="form-label fw-bold">Select Author</label>
-            <!-- Standardizing ID usage to match your Integer ID updates[cite: 8, 10] -->
             <select th:field="*{author}" class="form-select" required>
                 <option value="" disabled selected>-- Choose an Author --</option>
                 <option th:each="a : ${authors}" th:value="${a.id}" th:text="${a.name}">Author Name</option>
@@ -29,16 +28,25 @@
             </div>
         </div>
 
-        <!-- NEW FIELD: Description[cite: 9, 10] -->
         <div class="mb-3">
             <label class="form-label fw-bold">Book Description</label>
             <textarea th:field="*{description}" class="form-control" rows="5"
                       placeholder="Enter a detailed summary for the book details page..." required></textarea>
         </div>
 
+        <!-- FIXED CATEGORY SELECTION -->
         <div class="mb-3">
             <label class="form-label fw-bold">Category</label>
-            <input type="text" th:field="*{category}" class="form-control" placeholder="e.g. Technology, Fiction" required>
+            <select th:field="*{category}" class="form-select" required>
+                <option value="" disabled selected>Select a category...</option>
+                <option value="Fiction">Fiction</option>
+                <option value="Non-Fiction">Non-Fiction</option>
+                <option value="Sci-Fi & Fantasy">Sci-Fi & Fantasy</option>
+                <option value="Mystery & Thriller">Mystery & Thriller</option>
+                <option value="Biography">Biography</option>
+                <option value="Educational">Educational</option>
+                <option value="Romance">Romance</option>
+            </select>
         </div>
 
         <div class="row">
