@@ -8,46 +8,53 @@
 <body class="bg-light p-5">
 
 <div class="container bg-white p-4 shadow-sm rounded" style="max-width: 600px;">
-    <h2 class="mb-4">Add New Book to Inventory</h2>
+    <h2 class="mb-4 fw-bold">Add New Book to Inventory</h2>
 
     <form th:action="@{/admin/save}" th:object="${book}" method="post">
 
         <div class="mb-3">
-            <label class="form-label">Book Title</label>
-            <input type="text" th:field="*{title}" class="form-control" required>
+            <label class="form-label fw-bold">Book Title</label>
+            <input type="text" th:field="*{title}" class="form-control" placeholder="Enter book title" required>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Select Author</label>
+            <label class="form-label fw-bold">Select Author</label>
+            <!-- Standardizing ID usage to match your Integer ID updates[cite: 8, 10] -->
             <select th:field="*{author}" class="form-select" required>
                 <option value="" disabled selected>-- Choose an Author --</option>
                 <option th:each="a : ${authors}" th:value="${a.id}" th:text="${a.name}">Author Name</option>
             </select>
             <div class="form-text">
-                Don't see the author? <a href="/admin/authors/add">Add them first</a>.
+                Don't see the author? <a href="/admin/authors/add" class="text-decoration-none">Add them first</a>.
             </div>
         </div>
 
+        <!-- NEW FIELD: Description[cite: 9, 10] -->
         <div class="mb-3">
-            <label class="form-label">Category</label>
+            <label class="form-label fw-bold">Book Description</label>
+            <textarea th:field="*{description}" class="form-control" rows="5"
+                      placeholder="Enter a detailed summary for the book details page..." required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Category</label>
             <input type="text" th:field="*{category}" class="form-control" placeholder="e.g. Technology, Fiction" required>
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label class="form-label">Price (LKR)</label>
-                <!-- Added min="0" here to prevent negative prices -->
+                <label class="form-label fw-bold">Price (LKR)</label>
                 <input type="number" step="0.01" min="0" th:field="*{price}" class="form-control" required>
             </div>
             <div class="col-md-6 mb-3">
-                <label class="form-label">Stock Quantity</label>
+                <label class="form-label fw-bold">Stock Quantity</label>
                 <input type="number" min="0" th:field="*{stock}" class="form-control" required>
             </div>
         </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success px-4">Save to Database</button>
-            <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-success px-4 fw-bold">Save to Database</button>
+            <a href="/admin/dashboard" class="btn btn-secondary px-4">Cancel</a>
         </div>
     </form>
 </div>
