@@ -40,6 +40,7 @@ public class SecurityConfig {
                         // 4. RESTRICTED: Logged-in users only
                         .requestMatchers("/buy/**", "/my-orders/**", "/reviews/add").authenticated()
                         .requestMatchers("/api/users/**").authenticated()
+                        .requestMatchers("/my-orders", "/my-reviews", "/reviews/**", "/my-account").authenticated()
 
                         // 5. CATCH-ALL
                         .anyRequest().authenticated()
