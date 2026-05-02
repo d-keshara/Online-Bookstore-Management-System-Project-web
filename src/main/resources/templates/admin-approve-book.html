@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Approve Publication - Nexus Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light p-md-5">
+
+<div class="container bg-white p-4 p-md-5 shadow-sm rounded-4" style="max-width: 700px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h3 class="fw-bold text-primary mb-0">Publishing Review</h3>
+        <span class="badge bg-warning text-dark fs-6 px-3 py-2"><i class="bi bi-hourglass-split"></i> PENDING</span>
+    </div>
+
+    <!-- Review Details (Read Only) -->
+    <div class="bg-light p-4 rounded-3 mb-4 border">
+        <h5 class="fw-bold" th:text="${book.title}">Book Title</h5>
+        <p class="text-muted mb-2">By <strong th:text="${book.author != null ? book.author.name : 'Unknown'}">Author Name</strong> | <span class="badge bg-secondary" th:text="${book.category}">Category</span></p>
+        <hr>
+        <p class="mb-0" style="white-space: pre-wrap;" th:text="${book.description}">Synopsis goes here...</p>
+    </div>
+
+    <!-- Admin Action Form to set Price and Stock -->
+    <form th:action="@{'/admin/requests/approve/' + ${book.bookId}}" method="post">
+
+        <h5 class="fw-bold mb-3"><i class="bi bi-tag-fill text-success me-2"></i>Set Retail Details</h5>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Retail Price (LKR)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted">Rs.</span>
+                    <input type="number" step="0.01" min="0" name="price" class="form-control form-control-lg border-success" required placeholder="0.00">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Initial Stock Allocation</label>
+                <input type="number" min="0" name="stock" class="form-control form-control-lg" required placeholder="e.g. 50">
+            </div>
+        </div>
+
+        <div class="alert alert-info border-0 mb-4">
+            <i class="bi bi-info-circle-fill me-2"></i> Clicking approve will officially publish this book to the public catalog and notify the author.
+        </div>
+
+        <div class="d-flex gap-2 pt-2 border-top mt-4">
+            <a href="/admin/requests" class="btn btn-outline-secondary px-4 fw-bold">Cancel</a>
+            <button type="submit" class="btn btn-success px-5 fw-bold ms-auto"><i class="bi bi-check-circle-fill me-2"></i>Approve & Publish</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

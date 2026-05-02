@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Sign Up - Nexus Bookstore</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
 
@@ -13,7 +14,13 @@
         <p class="text-muted">Join Nexus Bookstore today!</p>
     </div>
 
-    <!-- Added an ID to the form so our JavaScript can grab it -->
+    <!-- This shows up if they pick a duplicate username -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show text-center shadow-sm" role="alert">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <form id="registerForm" th:action="@{/register/save}" th:object="${user}" method="post">
 
         <h5 class="mb-3 border-bottom pb-2">Account Details</h5>
@@ -26,15 +33,12 @@
         <div class="row g-3 mb-4">
             <div class="col-md-6">
                 <label class="form-label fw-bold">Password</label>
-                <!-- Added an ID to the password box -->
                 <input type="password" id="password" th:field="*{password}" class="form-control" required placeholder="Create a password">
                 <small class="text-muted" style="font-size: 0.8em;">Min. 8 chars & 2 symbols (!@#$ etc.)</small>
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-bold">Confirm Password</label>
-                <!-- New Confirm Password box (Not bound to the database object) -->
                 <input type="password" id="confirmPassword" class="form-control" required placeholder="Repeat password">
-                <!-- Hidden error message that JavaScript will trigger -->
                 <small id="passwordError" class="text-danger fw-bold mt-1" style="display: none; font-size: 0.85em;"></small>
             </div>
         </div>
@@ -66,28 +70,32 @@
         <div class="text-center mt-3">
             <p class="text-muted">Already have an account? <a href="/login" class="text-decoration-none">Sign in here</a>.</p>
         </div>
+
+        <div class="text-center mt-4 pt-3 border-top">
+            <p class="text-muted mb-0" style="font-size: 0.85rem;">
+                Looking to publish with Nexus?
+                <a th:href="@{/register/author}" class="text-secondary text-decoration-none fw-bold">Access the Author Portal</a>
+            </p>
+        </div>
     </form>
 </div>
 
-<!-- JAVASCRIPT: Validates the password rules before letting the form submit -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.getElementById("registerForm").addEventListener("submit", function(event) {
         const password = document.getElementById("password").value;
         const confirmPassword = document.getElementById("confirmPassword").value;
         const errorText = document.getElementById("passwordError");
 
-        // This regex counts how many special symbols are in the password
         const symbolCount = (password.match(/[^a-zA-Z0-9]/g) || []).length;
 
-        // 1. Check Length
         if (password.length < 8) {
-            event.preventDefault(); // Stops the form from submitting
+            event.preventDefault();
             errorText.textContent = "Must be at least 8 characters.";
             errorText.style.display = "block";
             return;
         }
 
-        // 2. Check Symbol Count
         if (symbolCount < 2) {
             event.preventDefault();
             errorText.textContent = "Must contain at least 2 symbols.";
@@ -95,7 +103,6 @@
             return;
         }
 
-        // 3. Check if they match
         if (password !== confirmPassword) {
             event.preventDefault();
             errorText.textContent = "Passwords do not match.";
@@ -103,7 +110,6 @@
             return;
         }
 
-        // If it passes all tests, hide any errors and let it submit naturally!
         errorText.style.display = "none";
     });
 </script>

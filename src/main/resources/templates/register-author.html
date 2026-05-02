@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Author Registration - Nexus Bookstore</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-lg border-0 rounded-3">
+
+        <div class="card-header bg-dark text-white text-center py-4 rounded-top-3">
+          <h3 class="mb-0 fw-bold"><i class="bi bi-pen"></i> Join as an Author</h3>
+          <p class="mb-0 text-secondary mt-1">Nexus Bookstore Publishing</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+
+          <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+          <!-- ADDED ID TO FORM FOR JAVASCRIPT -->
+          <form id="authorRegisterForm" th:action="@{/register/author/save}" th:object="${user}" method="post">
+
+            <h5 class="mb-3 border-bottom pb-2">Account Credentials</h5>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Username</label>
+              <input type="text" th:field="*{username}" class="form-control bg-light" required placeholder="Choose a unique login ID" />
+            </div>
+
+            <!-- ENFORCED PASSWORD RULES -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Password</label>
+                <input type="password" id="password" th:field="*{password}" class="form-control bg-light" required placeholder="Create password" />
+                <small class="text-muted" style="font-size: 0.8em;">Min. 8 chars & 2 symbols (!@#$ etc.)</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="form-control bg-light" required placeholder="Repeat password" />
+                <small id="passwordError" class="text-danger fw-bold mt-1" style="display: none; font-size: 0.85em;"></small>
+              </div>
+            </div>
+
+            <h5 class="mb-3 border-bottom pb-2 mt-4">Author Profile Details</h5>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Full Name / Pen Name</label>
+              <input type="text" th:field="*{fullName}" class="form-control bg-light" required placeholder="e.g. Stephen King" />
+              <div class="form-text"><small>This name will be displayed on your books and public profile.</small></div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold">Contact Email</label>
+              <input type="email" th:field="*{email}" class="form-control bg-light" required placeholder="author@example.com" />
+            </div>
+
+            <h5 class="mb-3 border-bottom pb-2 mt-4 text-danger">Security Authorization</h5>
+
+            <div class="mb-4 p-3 border border-danger rounded bg-danger bg-opacity-10">
+              <label class="form-label text-danger fw-bold"><i class="bi bi-key-fill"></i> Secret Invite Code</label>
+              <input type="text" name="inviteCode" class="form-control border-danger" required placeholder="e.g. NEXUS-AUTHOR-99" />
+              <div class="form-text text-danger mt-2"><small>Registration is invite-only. You must enter a valid code provided by the administrator to publish on this platform.</small></div>
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold mt-2 shadow-sm">Complete Registration</button>
+
+          </form>
+
+          <div class="text-center mt-4 pt-3 border-top">
+            <p class="text-muted mb-0">Already have an author account? <a th:href="@{/login}" class="text-primary text-decoration-none fw-bold">Log in here</a></p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- NEW: PASSWORD VALIDATION SCRIPT -->
+<script>
+  document.getElementById("authorRegisterForm").addEventListener("submit", function(event) {
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const errorText = document.getElementById("passwordError");
+
+      const symbolCount = (password.match(/[^a-zA-Z0-9]/g) || []).length;
+
+      if (password.length < 8) {
+          event.preventDefault();
+          errorText.textContent = "Must be at least 8 characters.";
+          errorText.style.display = "block";
+          return;
+      }
+
+      if (symbolCount < 2) {
+          event.preventDefault();
+          errorText.textContent = "Must contain at least 2 symbols.";
+          errorText.style.display = "block";
+          return;
+      }
+
+      if (password !== confirmPassword) {
+          event.preventDefault();
+          errorText.textContent = "Passwords do not match.";
+          errorText.style.display = "block";
+          return;
+      }
+
+      errorText.style.display = "none";
+  });
+</script>
+
+</body>
+</html>
