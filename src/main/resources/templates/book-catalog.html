@@ -24,17 +24,18 @@
         /* ── NAVBAR ── */
         .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; }
         .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 64px; }
-
         .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
         .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
         .brand-bookstore { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 400; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-top: 3px; }
 
-        .nav-search { flex: 1; display: flex; align-items: center; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 2px; padding: 0 1rem; gap: 0.5rem; }
-        .nav-search input { background: transparent; border: none; outline: none; color: #fff; font-family: 'DM Sans', sans-serif; width: 100%; height: 38px; }
-        .nav-search button { background: none; border: none; color: rgba(255,255,255,0.55); cursor: pointer; padding: 0; }
+        .nav-search { flex: 1; display: flex; align-items: center; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 0 1rem; gap: 0.5rem; transition: 0.2s; }
+        .nav-search:focus-within { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
+        .nav-search input { background: transparent; border: none; outline: none; color: #fff; font-family: 'DM Sans', sans-serif; width: 100%; height: 40px; }
+        .nav-search button { background: none; border: none; color: rgba(255,255,255,0.55); cursor: pointer; padding: 0; transition: 0.2s; }
+        .nav-search button:hover { color: var(--accent); }
 
         .nav-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
-        .btn-nav { display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500; padding: 0.42rem 0.9rem; border-radius: 2px; border: 1px solid transparent; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+        .btn-nav { display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 0.45rem 1rem; border-radius: 4px; border: 1px solid transparent; cursor: pointer; text-decoration: none; transition: all 0.15s; }
         .btn-nav-ghost { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.2); }
         .btn-nav-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); }
         .btn-nav-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
@@ -43,46 +44,51 @@
         .btn-nav-danger { background: #b83232; color: #fff; }
 
         /* ── CATEGORY BAR ── */
-        .cat-bar-wrapper { background: var(--paper-card); border-bottom: 1px solid var(--border); position: sticky; top: 64px; z-index: 900; }
-        .cat-bar { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; overflow-x: auto; scrollbar-width: none; }
-        .cat-pill { padding: 0.85rem 1.1rem; font-size: 13px; font-weight: 500; color: var(--ink-muted); border-bottom: 2.5px solid transparent; text-decoration: none; white-space: nowrap; transition: 0.15s; }
+        .cat-bar-wrapper { background: var(--paper-card); border-bottom: 1px solid var(--border); position: sticky; top: 64px; z-index: 900; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .cat-bar { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; overflow-x: auto; scrollbar-width: none; gap: 0.5rem; }
+        .cat-bar::-webkit-scrollbar { display: none; }
+        .cat-pill { padding: 1rem 1.1rem; font-size: 13.5px; font-weight: 500; color: var(--ink-muted); border-bottom: 3px solid transparent; text-decoration: none; white-space: nowrap; transition: 0.2s; }
+        .cat-pill:hover { color: var(--ink); }
         .cat-pill.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
 
         /* ── HERO STRIP ── */
-        .hero-strip { background: linear-gradient(135deg, #1a1a1a 0%, #2f2a24 100%); padding: 3.5rem 2rem; text-align: center; }
-        .hero-strip h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.2rem); color: #fff; font-weight: 700; }
+        .hero-strip { background: linear-gradient(135deg, #121212 0%, #2f2a24 100%); padding: 4rem 2rem; text-align: center; position: relative; overflow: hidden; }
+        .hero-strip::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%); pointer-events: none; }
+        .hero-strip h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 6vw, 3.8rem); color: #fff; font-weight: 700; position: relative; z-index: 1; margin-bottom: 0.5rem; letter-spacing: 1px; }
         .hero-strip h1 em { color: var(--accent); font-style: normal; }
-        .hero-strip p { color: rgba(255,255,255,0.5); font-size: 14px; }
+        .hero-strip p { color: rgba(255,255,255,0.7); font-size: 16px; position: relative; z-index: 1; font-weight: 300; letter-spacing: 0.5px; }
 
-        /* ── BOOK GRID (FIXED FOR PERFECT COLUMNS) ── */
-        .page-layout { max-width: 1280px; margin: 0 auto; padding: 2.5rem 2rem 5rem; flex: 1; w-100; }
+        /* ── BOOK GRID ── */
+        .page-layout { max-width: 1280px; margin: 0 auto; padding: 3rem 2rem 5rem; flex: 1; width: 100%; }
 
-        .book-grid {
-            display: grid;
-            gap: 1.5rem;
-            grid-template-columns: 1fr; /* Mobile */
-        }
+        .book-grid { display: grid; gap: 1.8rem; grid-template-columns: 1fr; }
         @media (min-width: 576px) { .book-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 768px) { .book-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 992px) { .book-grid { grid-template-columns: repeat(4, 1fr); } }
-        @media (min-width: 1200px) { .book-grid { grid-template-columns: repeat(5, 1fr); } } /* Perfect Desktop Row */
+        @media (min-width: 1200px) { .book-grid { grid-template-columns: repeat(5, 1fr); } }
 
-        .book-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease; display: flex; flex-direction: column; }
-        .book-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+        .book-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease; display: flex; flex-direction: column; position: relative; }
+        .book-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); border-color: rgba(0,0,0,0.15); }
 
-        .book-cover { height: 260px; background: var(--paper-warm); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-        .book-cover img { width: 100%; height: 100%; object-fit: cover; }
-        .book-cover-art { width: 130px; height: 190px; border-radius: 2px 6px 6px 2px; box-shadow: 3px 4px 16px rgba(0,0,0,0.22); background: #1e3a5f; display: flex; align-items: center; justify-content: center; }
+        .book-cover { height: 280px; background: var(--paper-warm); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 1px solid var(--border); }
+        .book-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .book-card:hover .book-cover img { transform: scale(1.05); }
 
-        .book-body { padding: 1rem; display: flex; flex-direction: column; flex: 1; }
-        .book-category-tag { font-size: 10.5px; font-weight: 600; text-transform: uppercase; color: var(--accent); margin-bottom: 0.3rem; }
-        .book-title { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .book-author { font-size: 12.5px; color: var(--ink-muted); margin-bottom: 0.8rem; }
-        .book-price { font-size: 1.1rem; font-weight: 700; font-family: 'Playfair Display', serif; }
+        .book-body { padding: 1.2rem; display: flex; flex-direction: column; flex: 1; }
+        .book-category-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; letter-spacing: 0.5px; }
+        .book-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.3rem; line-height: 1.3; color: var(--ink); text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.2s; }
+        .book-title:hover { color: var(--accent); }
+        .book-author { font-size: 13px; color: var(--ink-muted); margin-bottom: 1rem; font-weight: 500; }
+        .book-price { font-size: 1.25rem; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--ink); }
 
-        .btn-buy { background: var(--ink); color: #fff; padding: 0.45rem 0.85rem; font-size: 12px; font-weight: 500; border: none; border-radius: 2px; cursor: pointer; transition: 0.15s; white-space: nowrap; }
-        .btn-buy:hover { background: var(--accent); }
-        .btn-signin-prompt { color: var(--ink-muted); font-size: 12px; border: 1px solid var(--border-strong); padding: 0.45rem 0.85rem; text-decoration: none; border-radius: 2px; transition: 0.15s; white-space: nowrap; }
+        .btn-buy { background: var(--ink); color: #fff; padding: 0.5rem 1rem; font-size: 13px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 0.4rem; }
+        .btn-buy:hover { background: var(--accent); transform: scale(1.02); }
+
+        /* ── CUSTOM BLACK PAGINATION ── */
+        .pagination .page-link { color: var(--ink); border-color: var(--border); padding: 0.6rem 1rem; font-weight: 500; transition: 0.2s; }
+        .pagination .page-item.active .page-link { background-color: var(--ink); border-color: var(--ink); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .pagination .page-link:hover:not(.active) { background-color: var(--paper-warm); color: var(--accent); border-color: var(--border-strong); }
+        .pagination .page-item.disabled .page-link { color: var(--ink-muted); background-color: var(--paper); border-color: var(--border); }
     </style>
 </head>
 <body>
@@ -95,10 +101,10 @@
         </a>
 
         <form class="nav-search" th:action="@{/catalog}" method="get">
-            <i class="bi bi-search" style="color:rgba(255,255,255,0.4);"></i>
-            <input type="search" name="keyword" th:value="${keyword}" placeholder="Search titles, authors...">
+            <i class="bi bi-search" style="color:rgba(255,255,255,0.6);"></i>
+            <input type="search" name="keyword" th:value="${keyword}" placeholder="Search titles, authors, genres...">
             <input type="hidden" name="sort" th:value="${currentSort}">
-            <button type="submit" title="Search"><i class="bi bi-arrow-right"></i></button>
+            <button type="submit" title="Search"><i class="bi bi-arrow-right fs-5"></i></button>
         </form>
 
         <div class="nav-actions">
@@ -110,8 +116,8 @@
 
             <!-- LOGGED IN VIEW -->
             <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-1">
-                <a th:href="@{/cart}" class="btn-nav btn-nav-ghost"><i class="bi bi-cart3 fs-6"></i> Cart</a>
-                <a th:href="@{/my-orders}" class="btn-nav btn-nav-ghost"><i class="bi bi-box-seam fs-6"></i> Orders</a>
+                <a th:href="@{/cart}" class="btn-nav btn-nav-ghost"><i class="bi bi-cart3 fs-5"></i> Cart</a>
+                <a th:href="@{/my-orders}" class="btn-nav btn-nav-ghost"><i class="bi bi-box-seam fs-5"></i> Orders</a>
 
                 <div sec:authorize="hasRole('ADMIN')" style="border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.5rem; margin-left: 0.2rem;">
                     <a th:href="@{/admin/dashboard}" class="btn-nav btn-nav-warn"><i class="bi bi-speedometer2"></i> Admin</a>
@@ -120,29 +126,33 @@
                     <a th:href="@{/author/dashboard}" class="btn-nav btn-nav-info"><i class="bi bi-pen"></i> Portal</a>
                 </div>
 
-                <a th:href="@{/my-account}" class="btn-nav btn-nav-ghost ms-2"><i class="bi bi-person-circle fs-5"></i></a>
+                <a th:href="@{/my-account}" class="btn-nav btn-nav-ghost ms-2" title="My Profile"><i class="bi bi-person-circle fs-4"></i></a>
                 <form th:action="@{/logout}" method="post" class="m-0">
-                    <button type="submit" class="btn-nav btn-nav-danger px-2" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
+                    <button type="submit" class="btn-nav btn-nav-danger px-2" title="Logout"><i class="bi bi-box-arrow-right fs-5"></i></button>
                 </form>
             </div>
         </div>
     </div>
 </nav>
 
-<div th:if="${param.added != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: var(--accent-light); color: var(--accent-dark); font-weight: 600; padding: 0.8rem;" role="alert">
+<!-- ══ NOTIFICATIONS ══ -->
+<div th:if="${orderSuccess}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #e8f4eb; color: #1e4620; font-weight: 600; padding: 1rem; border-bottom: 2px solid #c3e6cb !important;" role="alert">
+    <i class="bi bi-check-circle-fill me-2 fs-5 align-text-bottom"></i>
+    <span th:text="${orderSuccess}"></span>
+    <a th:href="@{/my-orders}" class="ms-3 fw-bold text-decoration-underline" style="color: #1e4620;">View My Orders</a>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div th:if="${param.added != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: var(--accent-light); color: var(--accent-dark); font-weight: 600; padding: 1rem; border-bottom: 2px solid #eecab3 !important;" role="alert">
     <i class="bi bi-bag-check-fill me-2 fs-5 align-text-bottom"></i> Book successfully added to your cart!
-    <a th:href="@{/cart}" class="ms-3 fw-bold text-decoration-underline" style="color: var(--accent-dark);">View Cart</a>
+    <a th:href="@{/cart}" class="ms-3 fw-bold text-decoration-underline" style="color: var(--accent-dark);">Proceed to Checkout</a>
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
-<div th:if="${param.success != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #e8f4eb; color: #1e4620; font-weight: 600; padding: 0.8rem;" role="alert">
-    <i class="bi bi-check-circle-fill me-2 fs-5 align-text-bottom"></i> Order placed successfully! Thank you for shopping with Nexus.
-    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-
+<!-- ══ 10 CATEGORIES BAR ══ -->
 <div class="cat-bar-wrapper">
     <div class="cat-bar">
-        <a class="cat-pill" th:href="@{/catalog(sort=${currentSort})}" th:classappend="${selectedCategory == null || selectedCategory == ''} ? 'active'">All Books</a>
+        <a class="cat-pill" th:href="@{/catalog(sort=${currentSort})}" th:classappend="${selectedCategory == null || selectedCategory == ''} ? 'active'"><i class="bi bi-grid me-1"></i> All Books</a>
         <a class="cat-pill" th:href="@{/catalog(category='Fiction', sort=${currentSort})}" th:classappend="${selectedCategory == 'Fiction'} ? 'active'">Fiction</a>
         <a class="cat-pill" th:href="@{/catalog(category='Non-Fiction', sort=${currentSort})}" th:classappend="${selectedCategory == 'Non-Fiction'} ? 'active'">Non-Fiction</a>
         <a class="cat-pill" th:href="@{/catalog(category='Sci-Fi & Fantasy', sort=${currentSort})}" th:classappend="${selectedCategory == 'Sci-Fi & Fantasy'} ? 'active'">Sci-Fi & Fantasy</a>
@@ -150,29 +160,30 @@
         <a class="cat-pill" th:href="@{/catalog(category='Biography', sort=${currentSort})}" th:classappend="${selectedCategory == 'Biography'} ? 'active'">Biography</a>
         <a class="cat-pill" th:href="@{/catalog(category='Educational', sort=${currentSort})}" th:classappend="${selectedCategory == 'Educational'} ? 'active'">Educational</a>
         <a class="cat-pill" th:href="@{/catalog(category='Romance', sort=${currentSort})}" th:classappend="${selectedCategory == 'Romance'} ? 'active'">Romance</a>
-        <a class="cat-pill" th:href="@{/catalog(category='Computers & Technology', sort=${currentSort})}" th:classappend="${selectedCategory == 'Computers & Technology'} ? 'active'">Computers & Technology</a>
+        <a class="cat-pill" th:href="@{/catalog(category='Computers & Technology', sort=${currentSort})}" th:classappend="${selectedCategory == 'Computers & Technology'} ? 'active'">Tech & IT</a>
         <a class="cat-pill" th:href="@{/catalog(category='History', sort=${currentSort})}" th:classappend="${selectedCategory == 'History'} ? 'active'">History</a>
         <a class="cat-pill" th:href="@{/catalog(category='Children & YA', sort=${currentSort})}" th:classappend="${selectedCategory == 'Children & YA'} ? 'active'">Children & YA</a>
     </div>
 </div>
 
-<div class="hero-strip">
+<!-- ══ DYNAMIC HERO STRIP ══ -->
+<div class="hero-strip shadow-sm">
     <h1>
-        <span th:if="${selectedCategory != null and selectedCategory != ''}" th:text="${selectedCategory}">Category</span>
+        <span th:if="${selectedCategory != null and selectedCategory != ''}" th:text="${selectedCategory}">Category Name</span>
         <span th:if="${selectedCategory == null or selectedCategory == ''}"><em>Best Sellers</em> &amp; New Arrivals</span>
     </h1>
-    <p th:if="${keyword != null and keyword != ''}">Results for "<span th:text="${keyword}"></span>"</p>
-    <p th:if="${keyword == null or keyword == ''}">Discover your next great read — curated for you</p>
+    <p th:if="${keyword != null and keyword != ''}">Displaying search results for "<strong th:text="${keyword}" class="text-white"></strong>"</p>
+    <p th:if="${keyword == null or keyword == ''}">Discover your next great read — curated exclusively for you.</p>
 </div>
 
 <div class="page-layout">
 
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-        <h2 class="h4 fw-bold font-playfair mb-0" th:text="${selectedCategory == null ? 'Catalog' : selectedCategory}"></h2>
-        <div class="d-flex align-items-center gap-2">
-            <label class="text-muted small fw-bold">Sort by:</label>
-            <select class="form-select form-select-sm shadow-none border-secondary" style="width: 160px;" onchange="window.location.href=this.value">
-                <option th:value="@{/catalog(category=${selectedCategory}, keyword=${keyword}, sort='newest')}" th:selected="${currentSort == 'newest'}">Newest First</option>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 border-bottom pb-3 gap-3">
+        <h2 class="h3 fw-bold font-playfair mb-0" style="color: var(--ink);" th:text="${selectedCategory == null ? 'Complete Collection' : selectedCategory + ' Books'}"></h2>
+        <div class="d-flex align-items-center gap-3 bg-white px-3 py-2 rounded shadow-sm border">
+            <label class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;"><i class="bi bi-funnel-fill me-1"></i> Sort by:</label>
+            <select class="form-select form-select-sm shadow-none border-0 fw-bold" style="width: auto; background-color: transparent; cursor: pointer;" onchange="window.location.href=this.value">
+                <option th:value="@{/catalog(category=${selectedCategory}, keyword=${keyword}, sort='newest')}" th:selected="${currentSort == 'newest'}">Newest Arrivals</option>
                 <option th:value="@{/catalog(category=${selectedCategory}, keyword=${keyword}, sort='price_asc')}" th:selected="${currentSort == 'price_asc'}">Price: Low to High</option>
                 <option th:value="@{/catalog(category=${selectedCategory}, keyword=${keyword}, sort='price_desc')}" th:selected="${currentSort == 'price_desc'}">Price: High to Low</option>
             </select>
@@ -184,10 +195,16 @@
         <div class="book-card" th:each="book : ${books}">
 
             <div class="book-cover">
+                <div class="position-absolute top-0 end-0 m-2 z-1" th:if="${book.stock <= 5 and book.stock > 0}">
+                    <span class="badge bg-danger shadow-sm">Only [[${book.stock}]] left!</span>
+                </div>
+                <div class="position-absolute top-0 end-0 m-2 z-1" th:if="${book.stock <= 0}">
+                    <span class="badge bg-dark shadow-sm">Out of Stock</span>
+                </div>
                 <a th:href="@{/details(id=${book.bookId})}" class="w-100 h-100 d-flex align-items-center justify-content-center" style="text-decoration: none;">
                     <img th:if="${book.coverImagePath != null}" th:src="@{${book.coverImagePath}}" alt="Cover">
-                    <div th:if="${book.coverImagePath == null}" class="book-cover-art">
-                        <i class="bi bi-book cover-icon"></i>
+                    <div th:if="${book.coverImagePath == null}" style="width: 130px; height: 190px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: #2c3e50; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-book text-white-50" style="font-size: 3rem;"></i>
                     </div>
                 </a>
             </div>
@@ -195,94 +212,121 @@
             <div class="book-body">
                 <div class="book-category-tag" th:text="${book.category != null ? book.category : 'General'}">Category</div>
 
-                <a th:href="@{/details(id=${book.bookId})}" style="text-decoration: none; color: inherit; display: block;">
-                    <div class="book-title" th:text="${book.title}">Title</div>
-                </a>
-
+                <a th:href="@{/details(id=${book.bookId})}" class="book-title" th:text="${book.title}">Title</a>
                 <div class="book-author" th:text="${book.author != null ? book.author.name : 'Unknown Author'}">Author</div>
 
-                <div class="mt-auto d-flex justify-content-between align-items-center">
+                <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
                     <span class="book-price" th:text="'LKR ' + ${book.price}">0.00</span>
 
                     <div sec:authorize="isAuthenticated()">
                         <form th:action="@{/cart/add}" method="post" class="m-0">
                             <input type="hidden" name="bookId" th:value="${book.bookId}">
-                            <button type="submit" class="btn-buy"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+                            <button type="submit" class="btn-buy" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-secondary' : ''}">
+                                <i class="bi bi-cart-plus fs-5"></i> <span>Add</span>
+                            </button>
                         </form>
                     </div>
                     <div sec:authorize="isAnonymous()">
-                        <a th:href="@{/login}" class="btn-signin-prompt"><i class="bi bi-lock"></i> Sign In</a>
+                        <a th:href="@{/login}" class="btn-buy bg-white border border-secondary text-dark"><i class="bi bi-lock me-1"></i> Sign In</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <nav th:if="${totalPages != null and totalPages > 1}" class="mt-5">
-        <ul class="pagination justify-content-center shadow-sm">
+    <div th:if="${books == null or books.empty}" class="text-center py-5">
+        <i class="bi bi-journal-x display-1 text-muted mb-3 opacity-50"></i>
+        <h3 class="font-playfair fw-bold text-muted">No books found</h3>
+        <p class="text-muted">Try adjusting your search or selecting a different category.</p>
+        <a th:href="@{/catalog}" class="btn btn-dark mt-3 px-4 py-2 rounded-1">Clear Filters</a>
+    </div>
+
+    <!-- BLACK THEMED PAGINATION -->
+    <nav th:if="${totalPages != null and totalPages > 1}" class="mt-5 pt-4">
+        <ul class="pagination justify-content-center shadow-sm rounded overflow-hidden">
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link text-dark" th:href="@{/catalog(page=${currentPage - 1}, category=${selectedCategory}, keyword=${keyword}, sort=${currentSort})}">Prev</a>
+                <a class="page-link" th:href="@{/catalog(page=${currentPage - 1}, category=${selectedCategory}, keyword=${keyword}, sort=${currentSort})}">
+                    <i class="bi bi-chevron-left"></i> Previous
+                </a>
             </li>
             <th:block th:if="${totalPages > 0}">
                 <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
-                    <a class="page-link" th:href="@{/catalog(page=${i}, category=${selectedCategory}, keyword=${keyword}, sort=${currentSort})}" th:text="${i + 1}"
-                       th:style="${currentPage == i} ? 'background:#1a1a1a; border-color:#1a1a1a; color:#fff;' : 'color:#1a1a1a;'"></a>
+                    <a class="page-link" th:href="@{/catalog(page=${i}, category=${selectedCategory}, keyword=${keyword}, sort=${currentSort})}" th:text="${i + 1}"></a>
                 </li>
             </th:block>
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link text-dark" th:href="@{/catalog(page=${currentPage + 1}, category=${selectedCategory}, keyword=${keyword}, sort=${currentSort})}">Next</a>
+                <a class="page-link" th:href="@{/catalog(page=${currentPage + 1}, category=${selectedCategory}, keyword=${keyword}, sort=${currentSort})}">
+                    Next <i class="bi bi-chevron-right"></i>
+                </a>
             </li>
         </ul>
     </nav>
 </div>
 
-<!-- 🌟 NEW: Premium Custom Footer with Group Signature 🌟 -->
-<footer class="mt-auto" style="background: var(--ink); color: rgba(255,255,255,0.7); font-size: 14px; padding-top: 4rem; padding-bottom: 2rem; margin-top: 5rem;">
+<!-- ══ PREMIUM ENHANCED FOOTER ══ -->
+<footer class="mt-auto position-relative" style="background: var(--ink); color: rgba(255,255,255,0.7); font-size: 15px; padding-top: 5rem; padding-bottom: 2rem; margin-top: 5rem;">
+    <!-- Decorative Top Accent Line -->
+    <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, var(--accent) 0%, #e67e22 50%, var(--accent) 100%);"></div>
+
     <div class="container" style="max-width: 1200px;">
-        <div class="row gy-4 mb-5">
+        <div class="row gy-5 mb-5">
             <div class="col-lg-4 pe-lg-5">
-                <div style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; margin-bottom: 1.2rem;">
-                    <span style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px;">NEXUS</span>
-                    <span style="font-family: 'DM Sans', sans-serif; font-size: 0.8rem; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-top: 3px;">BOOKSTORE</span>
+                <div style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; margin-bottom: 1.5rem;">
+                    <span style="font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; letter-spacing: 2px;">NEXUS</span>
+                    <span style="font-family: 'DM Sans', sans-serif; font-size: 0.85rem; letter-spacing: 2px; color: var(--accent); border-left: 2px solid rgba(255,255,255,0.2); padding-left: 0.8rem; margin-top: 3px;">BOOKSTORE</span>
                 </div>
-                <p style="line-height: 1.8;">Your premium destination for the world's best books. Discover, read, and grow with us.</p>
+                <p style="line-height: 1.8; margin-bottom: 2rem;">Your premium destination for the world's best literature, educational materials, and timeless classics. Discover, read, and grow with us today.</p>
+
+                <div class="d-flex gap-3 fs-5">
+                    <a href="#" class="text-white-50 text-decoration-none transition-hover" style="transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white-50 text-decoration-none transition-hover" style="transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-white-50 text-decoration-none transition-hover" style="transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="text-white-50 text-decoration-none transition-hover" style="transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-linkedin"></i></a>
+                </div>
             </div>
-            <div class="col-lg-4">
-                <h5 class="text-white fw-bold mb-4 font-playfair fs-4">Quick Links</h5>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 class="text-white fw-bold mb-4 font-playfair fs-4">Explore</h5>
                 <ul class="list-unstyled d-flex flex-column gap-3 mb-0">
-                    <li><a th:href="@{/catalog}" class="text-decoration-none" style="color: rgba(255,255,255,0.7); transition: 0.2s;">Home & Catalog</a></li>
-                    <li><a th:href="@{/cart}" class="text-decoration-none" style="color: rgba(255,255,255,0.7); transition: 0.2s;">Shopping Cart</a></li>
-                    <li><a th:href="@{/my-orders}" class="text-decoration-none" style="color: rgba(255,255,255,0.7); transition: 0.2s;">Order History</a></li>
-                    <li><a th:href="@{/author/dashboard}" class="text-decoration-none" style="color: rgba(255,255,255,0.7); transition: 0.2s;">Author Portal</a></li>
+                    <li><a th:href="@{/catalog}" class="text-decoration-none" style="color: rgba(255,255,255,0.7); transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Browse Catalog</a></li>
+                    <li><a th:href="@{/catalog(sort='newest')}" class="text-decoration-none" style="color: rgba(255,255,255,0.7); transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">New Arrivals</a></li>
+                    <li><a th:href="@{/cart}" class="text-decoration-none" style="color: rgba(255,255,255,0.7); transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Shopping Cart</a></li>
+                    <li sec:authorize="isAuthenticated()"><a th:href="@{/my-orders}" class="text-decoration-none" style="color: rgba(255,255,255,0.7); transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Track My Orders</a></li>
                 </ul>
             </div>
-            <div class="col-lg-4">
-                <h5 class="text-white fw-bold mb-4 font-playfair fs-4">Contact Details</h5>
+
+            <div class="col-lg-5 col-md-6">
+                <h5 class="text-white fw-bold mb-4 font-playfair fs-4">Contact & Support</h5>
                 <ul class="list-unstyled d-flex flex-column gap-3 mb-0">
-                    <li class="d-flex align-items-start gap-3">
-                        <i class="bi bi-geo-alt-fill mt-1" style="color: var(--accent); font-size: 1.1rem;"></i>
-                        <span>SLIIT Campus, Malabe,<br>Sri Lanka</span>
+                    <li class="d-flex align-items-start gap-3 p-3 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                        <i class="bi bi-geo-alt-fill mt-1 fs-5" style="color: var(--accent);"></i>
+                        <div>
+                            <strong class="text-white d-block mb-1">Main Headquarters</strong>
+                            <span>SLIIT Campus, New Kandy Road,<br>Malabe, Sri Lanka</span>
+                        </div>
                     </li>
-                    <li class="d-flex align-items-center gap-3">
-                        <i class="bi bi-telephone-fill" style="color: var(--accent); font-size: 1.1rem;"></i>
-                        <span>0760649784</span>
-                    </li>
-                    <li class="d-flex align-items-center gap-3">
-                        <i class="bi bi-envelope-fill" style="color: var(--accent); font-size: 1.1rem;"></i>
-                        <span>nexusbookstore@gmail.com</span>
-                    </li>
+                    <div class="d-flex gap-3">
+                        <li class="d-flex align-items-center gap-2 p-3 rounded flex-fill" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                            <i class="bi bi-telephone-fill fs-5" style="color: var(--accent);"></i>
+                            <span class="text-white fw-bold">076 064 9784</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-2 p-3 rounded flex-fill" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                            <i class="bi bi-envelope-fill fs-5" style="color: var(--accent);"></i>
+                            <span class="text-white">support@nexus.lk</span>
+                        </li>
+                    </div>
                 </ul>
             </div>
         </div>
-        <div class="border-top border-secondary pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-center text-md-start">
+
+        <div class="border-top pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-center text-md-start" style="border-color: rgba(255,255,255,0.1) !important;">
             <div>
-                © 2026 Nexus Bookstore. All Rights Reserved.<br>
-                <span style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">Designed and developed by WD130 Group</span>
+                <span class="text-white">&copy; 2026 Nexus Bookstore.</span> All Rights Reserved.
             </div>
-            <div class="d-flex gap-4 fs-5">
-                <a href="#" style="color: rgba(255,255,255,0.7);"><i class="bi bi-facebook"></i></a>
-                <a href="#" style="color: rgba(255,255,255,0.7);"><i class="bi bi-instagram"></i></a>
-                <a href="#" style="color: rgba(255,255,255,0.7);"><i class="bi bi-twitter-x"></i></a>
+            <div style="background: rgba(200, 96, 42, 0.1); padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid rgba(200, 96, 42, 0.2);">
+                <span style="color: var(--accent); font-weight: 600; font-size: 0.95rem;">
+                    <i class="bi bi-code-slash me-2"></i>Designed & Developed by WD130 Group
+                </span>
             </div>
         </div>
     </div>

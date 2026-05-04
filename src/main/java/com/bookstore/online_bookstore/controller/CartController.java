@@ -1,21 +1,17 @@
 package com.bookstore.online_bookstore.controller;
 
-import com.bookstore.online_bookstore.dto.OrderRequestDTO;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.CartItem;
 import com.bookstore.online_bookstore.entity.User;
 import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.CartItemRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
-import com.bookstore.online_bookstore.service.OrderService;
+import com.bookstore.online_bookstore.service.CartService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -25,14 +21,14 @@ public class CartController {
     private final CartItemRepository cartItemRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
-    private final OrderService orderService;
+    private final CartService cartService;
 
     public CartController(CartItemRepository cartItemRepository, BookRepository bookRepository,
-                          UserRepository userRepository, OrderService orderService) {
+                          UserRepository userRepository, CartService cartService) {
         this.cartItemRepository = cartItemRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
-        this.orderService = orderService;
+        this.cartService = cartService;
     }
 
     @GetMapping
@@ -42,39 +38,26 @@ public class CartController {
         if (user == null) return "redirect:/login";
 
         List<CartItem> cartItems = cartItemRepository.findByUser(user);
-        BigDecimal total = BigDecimal.ZERO;
-        for (CartItem item : cartItems) {
-            total = total.add(item.getBook().getPrice().multiply(new BigDecimal(item.getQuantity())));
-        }
-
         model.addAttribute("cartItems", cartItems);
-        model.addAttribute("cartTotal", total);
+        model.addAttribute("cartTotal", cartService.calculateTotal(user));
         return "cart";
     }
 
     @PostMapping("/add")
-    public String addToCart(@RequestParam("bookId") Integer bookId, Principal principal) {
+    public String addToCart(@RequestParam("bookId") Integer bookId,
+                            @RequestParam(value = "quantity", defaultValue = "1") int quantity,
+                            Principal principal) {
         if (principal == null) return "redirect:/login";
         User user = userRepository.findByUsername(principal.getName()).orElse(null);
         Book book = bookRepository.findById(bookId).orElse(null);
 
         if (user != null && book != null) {
-            CartItem existingItem = cartItemRepository.findByUserAndBook(user, book);
-            if (existingItem != null) {
-                existingItem.setQuantity(existingItem.getQuantity() + 1);
-                cartItemRepository.save(existingItem);
-            } else {
-                CartItem newItem = new CartItem();
-                newItem.setUser(user);
-                newItem.setBook(book);
-                newItem.setQuantity(1);
-                cartItemRepository.save(newItem);
-            }
+            cartService.addToCart(user, book, quantity);
         }
-        return "redirect:/catalog?added";
+
+        return "redirect:/cart";
     }
 
-    // 🌟 NEW: Handles + and - quantity buttons! 🌟
     @PostMapping("/update")
     public String updateQuantity(@RequestParam("itemId") Integer itemId, @RequestParam("action") String action) {
         CartItem item = cartItemRepository.findById(itemId).orElse(null);
@@ -87,7 +70,6 @@ public class CartController {
                     item.setQuantity(item.getQuantity() - 1);
                     cartItemRepository.save(item);
                 } else {
-                    // If quantity hits 0, remove it from the cart
                     cartItemRepository.delete(item);
                 }
             }
@@ -99,37 +81,5 @@ public class CartController {
     public String removeFromCart(@RequestParam("itemId") Integer itemId) {
         cartItemRepository.deleteById(itemId);
         return "redirect:/cart";
-    }
-
-    @Transactional
-    @PostMapping("/checkout")
-    public String checkoutCart(Principal principal) {
-        if (principal == null) return "redirect:/login";
-        User user = userRepository.findByUsername(principal.getName()).orElse(null);
-        if (user == null) return "redirect:/login";
-
-        List<CartItem> cartItems = cartItemRepository.findByUser(user);
-        if (cartItems.isEmpty()) return "redirect:/cart?empty";
-
-        try {
-            OrderRequestDTO orderRequest = new OrderRequestDTO();
-            orderRequest.setUserId(Integer.valueOf(user.getId().toString()));
-
-            List<OrderRequestDTO.CartItemDTO> orderItems = new ArrayList<>();
-            for (CartItem item : cartItems) {
-                OrderRequestDTO.CartItemDTO dto = new OrderRequestDTO.CartItemDTO();
-                dto.setBookId(item.getBook().getBookId());
-                dto.setQuantity(item.getQuantity());
-                orderItems.add(dto);
-            }
-            orderRequest.setItems(orderItems);
-
-            orderService.placeOrder(orderRequest);
-            cartItemRepository.deleteByUser(user);
-
-            return "redirect:/my-orders?success";
-        } catch (Exception e) {
-            return "redirect:/cart?error=" + e.getMessage();
-        }
     }
 }

@@ -5,82 +5,101 @@
     <title>Add New Book - Nexus Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1a1a; --paper: #faf8f4; --paper-card: #ffffff;
+            --accent: #c8602a; --border: rgba(0,0,0,0.09); --radius-lg: 8px;
+        }
+        body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .premium-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+        .form-control, .form-select { border: 1px solid var(--border); padding: 0.75rem 1rem; border-radius: 4px; box-shadow: none !important; }
+        .form-control:focus, .form-select:focus { border-color: var(--ink); }
+        .form-label { font-weight: 600; color: var(--ink-soft); font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 0.5rem; }
+    </style>
 </head>
-<body class="bg-light p-5">
+<body>
 
-<div class="container bg-white p-4 shadow-sm rounded" style="max-width: 600px;">
-    <h2 class="mb-4 fw-bold">Add New Book to Inventory</h2>
+<div class="container py-5">
+    <div class="mb-4 d-flex align-items-center gap-3">
+        <a href="/admin/dashboard" class="btn btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;"><i class="bi bi-arrow-left fs-5"></i></a>
+        <h2 class="fw-bold font-playfair mb-0 text-dark">Add New Book to Inventory</h2>
+    </div>
 
-    <!-- CRITICAL: Added enctype="multipart/form-data" for file uploads -->
-    <form th:action="@{/admin/save}" th:object="${book}" method="post" enctype="multipart/form-data">
+    <div class="premium-card p-4 p-md-5 mx-auto" style="max-width: 800px;">
+        <form th:action="@{/admin/save}" th:object="${book}" method="post" enctype="multipart/form-data">
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Book Title</label>
-            <input type="text" th:field="*{title}" class="form-control" placeholder="Enter book title" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Select Author</label>
-            <select th:field="*{author}" class="form-select" required>
-                <option value="" disabled selected>-- Choose an Author --</option>
-                <option th:each="a : ${authors}" th:value="${a.id}" th:text="${a.name}">Author Name</option>
-            </select>
-            <div class="form-text">
-                Don't see the author? <a href="/admin/authors/add" class="text-decoration-none">Add them first</a>.
+            <div class="row g-4 mb-4">
+                <div class="col-md-7">
+                    <label class="form-label">Book Title <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{title}" class="form-control" placeholder="Enter full book title" required>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Category <span class="text-danger">*</span></label>
+                    <select th:field="*{category}" class="form-select" required>
+                        <option value="" disabled selected>Select a category...</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Sci-Fi & Fantasy">Sci-Fi & Fantasy</option>
+                        <option value="Mystery & Thriller">Mystery & Thriller</option>
+                        <option value="Biography">Biography</option>
+                        <option value="Educational">Educational</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Computers & Technology">Computers & Technology</option>
+                        <option value="History">History</option>
+                        <option value="Children & YA">Children & YA</option>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Book Description</label>
-            <textarea th:field="*{description}" class="form-control" rows="5"
-                      placeholder="Enter a detailed summary for the book details page..." required></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Category</label>
-            <select th:field="*{category}" class="form-select" required>
-                <option value="" disabled selected>Select a category...</option>
-                <option value="Fiction">Fiction</option>
-                <option value="Non-Fiction">Non-Fiction</option>
-                <option value="Sci-Fi & Fantasy">Sci-Fi & Fantasy</option>
-                <option value="Mystery & Thriller">Mystery & Thriller</option>
-                <option value="Biography">Biography</option>
-                <option value="Educational">Educational</option>
-                <option value="Romance">Romance</option>
-                <!-- NEW CATEGORIES -->
-                <option value="Computers & Technology">Computers & Technology</option>
-                <option value="History">History</option>
-                <option value="Children & YA">Children & YA</option>
-            </select>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Price (LKR)</label>
-                <input type="number" step="0.01" min="0" th:field="*{price}" class="form-control" required>
+            <div class="mb-4 pb-4 border-bottom">
+                <label class="form-label">Select Author <span class="text-danger">*</span></label>
+                <div class="d-flex gap-3">
+                    <select th:field="*{author}" class="form-select" required>
+                        <option value="" disabled selected>-- Choose an Author --</option>
+                        <option th:each="a : ${authors}" th:value="${a.id}" th:text="${a.name}">Author Name</option>
+                    </select>
+                    <a href="/admin/authors/add" class="btn btn-outline-dark fw-bold text-nowrap">Add New Author</a>
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-bold">Stock Quantity</label>
-                <input type="number" min="0" th:field="*{stock}" class="form-control" required>
-            </div>
-        </div>
 
-        <!-- NEW: Image Upload Section -->
-        <div class="mb-4">
-            <label class="form-label fw-bold">Book Cover Photo</label>
-            <div class="p-4 text-center rounded bg-light" style="border: 2px dashed #ccc;">
-                <i class="bi bi-cloud-arrow-up fs-2 text-secondary mb-2"></i>
-                <input type="file" name="imageFile" id="imageFile" class="form-control mt-2" accept="image/png, image/jpeg, image/jpg" required>
-                <div class="form-text mt-2">Recommended: PNG or JPG. Max size: 5MB.</div>
+            <div class="mb-4">
+                <label class="form-label">Book Description / Synopsis <span class="text-danger">*</span></label>
+                <textarea th:field="*{description}" class="form-control" rows="5" placeholder="Enter a detailed summary for the book details page..." required></textarea>
             </div>
-        </div>
 
-        <div class="d-flex gap-2 mt-3">
-            <button type="submit" class="btn btn-success px-4 fw-bold">Save to Database</button>
-            <a href="/admin/dashboard" class="btn btn-secondary px-4">Cancel</a>
-        </div>
-    </form>
+            <div class="row g-4 mb-4 pb-4 border-bottom">
+                <div class="col-md-6">
+                    <label class="form-label">Retail Price (LKR) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-secondary">Rs.</span>
+                        <input type="number" step="0.01" min="0" th:field="*{price}" class="form-control border-secondary" required placeholder="0.00">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Initial Stock Quantity <span class="text-danger">*</span></label>
+                    <input type="number" min="0" th:field="*{stock}" class="form-control border-secondary" required placeholder="e.g. 50">
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <label class="form-label">Book Cover Photo <span class="text-danger">*</span></label>
+                <div class="p-5 text-center rounded" style="background: var(--paper-warm); border: 2px dashed rgba(0,0,0,0.15); transition: 0.2s;">
+                    <i class="bi bi-cloud-arrow-up fs-1 text-secondary mb-3 d-block opacity-75"></i>
+                    <input type="file" name="imageFile" id="imageFile" class="form-control w-75 mx-auto shadow-sm" accept="image/png, image/jpeg, image/jpg" required>
+                    <div class="form-text mt-3 fw-bold text-muted">Recommended format: PNG or JPG. Max size: 5MB.</div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-end pt-3">
+                <a href="/admin/dashboard" class="btn btn-light border px-4 py-3 fw-bold text-dark">Cancel</a>
+                <button type="submit" class="btn px-5 py-3 fw-bold shadow-sm" style="background: var(--ink); color: white;"><i class="bi bi-save me-2"></i> Save Book to Database</button>
+            </div>
+        </form>
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
