@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart — Nexus Bookstore</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+        --ink: #1a1a1a; --ink-muted: #888;
+        --paper: #faf8f4; --paper-card: #ffffff;
+        --accent: #c8602a; --border: rgba(0,0,0,0.09);
+        --radius-lg: 8px;
+    }
+    body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); }
+
+    /* NAVBAR */
+    .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; }
+    .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
+    .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
+    .brand-bookstore { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 400; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-top: 3px; }
+
+    .btn-nav-ghost { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 12.5px; font-weight: 500; padding: 0.42rem 0.9rem; border: 1px solid transparent; color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.15s; }
+    .btn-nav-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); }
+
+    /* CART LAYOUT */
+    .page-layout { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; min-height: 60vh; }
+    .cart-title { font-family: 'Playfair Display', serif; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 2rem; }
+
+    .cart-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; display: flex; gap: 1.5rem; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+    .cart-img-box { width: 80px; height: 110px; background: #f3efe8; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .cart-img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+    .item-details { flex: 1; }
+    .item-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .item-author { font-size: 0.85rem; color: var(--ink-muted); }
+    .item-price { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+
+    .summary-card { background: var(--ink); color: #fff; border-radius: var(--radius-lg); padding: 2rem; position: sticky; top: 100px; }
+    .btn-checkout { background: var(--accent); color: #fff; width: 100%; padding: 0.8rem; border: none; border-radius: 4px; font-weight: 600; letter-spacing: 0.5px; transition: 0.2s; }
+    .btn-checkout:hover { background: var(--accent-dark); }
+
+    .btn-remove { background: none; border: none; color: #b83232; font-size: 0.85rem; text-decoration: underline; padding: 0; }
+
+    /* Qty Adjuster styles */
+    .qty-btn { background: transparent; border: 1px solid var(--border); color: var(--ink); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: 0.15s; }
+    .qty-btn:hover { background: var(--paper-warm); }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a class="nav-brand" th:href="@{/catalog}">
+      <span class="brand-nexus">NEXUS</span>
+      <span class="brand-bookstore">BOOKSTORE</span>
+    </a>
+    <a th:href="@{/catalog}" class="btn-nav-ghost"><i class="bi bi-arrow-left"></i> Continue Shopping</a>
+  </div>
+</nav>
+
+<div class="page-layout">
+  <h1 class="cart-title">Your Shopping Cart</h1>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div th:if="${cartItems.empty}" class="text-center p-5 border rounded bg-white">
+        <i class="bi bi-cart-x fs-1 text-muted mb-3"></i>
+        <h4>Your cart is empty</h4>
+        <a th:href="@{/catalog}" class="btn btn-dark mt-3 px-4">Browse Books</a>
+      </div>
+
+      <div th:each="item : ${cartItems}" class="cart-card">
+        <div class="cart-img-box">
+          <img th:if="${item.book.coverImagePath != null}" th:src="@{${item.book.coverImagePath}}" alt="Cover">
+          <i th:if="${item.book.coverImagePath == null}" class="bi bi-book fs-3 text-secondary"></i>
+        </div>
+
+        <div class="item-details">
+          <div class="book-category-tag text-uppercase" style="font-size: 10px; color: var(--accent); font-weight: 600;" th:text="${item.book.category}">Category</div>
+          <div class="item-title" th:text="${item.book.title}">Title</div>
+          <div class="item-author" th:text="${item.book.author != null ? item.book.author.name : 'Unknown'}">Author</div>
+
+          <form th:action="@{/cart/remove}" method="post" class="mt-2">
+            <input type="hidden" name="itemId" th:value="${item.id}">
+            <button type="submit" class="btn-remove"><i class="bi bi-trash3"></i> Remove</button>
+          </form>
+        </div>
+
+        <!-- 🌟 UPDATED: Added + and - quantity controls 🌟 -->
+        <div class="text-end d-flex flex-column align-items-end">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="text-muted small">Qty:</span>
+
+            <form th:action="@{/cart/update}" method="post" class="m-0">
+              <input type="hidden" name="itemId" th:value="${item.id}">
+              <input type="hidden" name="action" value="decrease">
+              <button type="submit" class="qty-btn"><i class="bi bi-dash"></i></button>
+            </form>
+
+            <span th:text="${item.quantity}" class="fw-bold text-dark mx-1" style="min-width: 15px; text-align: center;"></span>
+
+            <form th:action="@{/cart/update}" method="post" class="m-0">
+              <input type="hidden" name="itemId" th:value="${item.id}">
+              <input type="hidden" name="action" value="increase">
+              <button type="submit" class="qty-btn"><i class="bi bi-plus"></i></button>
+            </form>
+          </div>
+
+          <div class="item-price" th:text="'LKR ' + ${item.book.price}">LKR 0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 mt-4 mt-lg-0">
+      <div class="summary-card shadow-lg" th:if="${!cartItems.empty}">
+        <h4 class="font-playfair mb-4 border-bottom border-secondary pb-3">Order Summary</h4>
+
+        <div class="d-flex justify-content-between mb-3 text-white-50">
+          <span>Subtotal</span>
+          <span th:text="'LKR ' + ${cartTotal}">LKR 0.00</span>
+        </div>
+        <div class="d-flex justify-content-between mb-3 text-white-50">
+          <span>Shipping</span>
+          <span>Free</span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-4 border-top border-secondary pt-3 fs-5 fw-bold">
+          <span>Total</span>
+          <span class="text-white" th:text="'LKR ' + ${cartTotal}">LKR 0.00</span>
+        </div>
+
+        <form th:action="@{/cart/checkout}" method="post">
+          <button type="submit" class="btn-checkout">Proceed to Checkout <i class="bi bi-arrow-right ms-2"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="bg-dark text-white-50 text-center py-4 mt-auto">
+  <small>© 2026 Nexus Bookstore · Privacy · Terms</small>
+</footer>
+
+</body>
+</html>
