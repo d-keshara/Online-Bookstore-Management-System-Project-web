@@ -5,65 +5,133 @@
   <title>Request Publication - Author Portal</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-</head>
-<body class="bg-light">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<!-- Simple Author Navbar -->
-<nav class="navbar navbar-dark bg-dark mb-4 shadow-sm">
-  <div class="container">
-    <a class="navbar-brand fw-bold" href="/author/dashboard">Nexus Author Portal</a>
-    <a href="/author/dashboard" class="btn btn-outline-light btn-sm">← Back to Dashboard</a>
+  <style>
+    :root {
+        --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
+        --paper: #faf8f4; --paper-warm: #f3efe8; --paper-card: #ffffff;
+        --accent: #c8602a; --accent-light: #f5ece4; --accent-dark: #9e4a1e;
+        --border: rgba(0,0,0,0.09); --border-strong: rgba(0,0,0,0.18);
+        --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --shadow-hover: 0 12px 36px rgba(0,0,0,0.13);
+        --radius-lg: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); font-size: 15px; }
+
+    /* ── NAVBAR (Matched to Catalog) ── */
+    .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; }
+    .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+
+    .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
+    .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
+    .brand-portal { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 400; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-top: 3px; }
+
+    .btn-nav-ghost { display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500; padding: 0.42rem 0.9rem; border-radius: 2px; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .btn-nav-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); }
+
+    /* ── FORM STYLING ── */
+    .form-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+    .form-header { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); border-bottom: 1px solid var(--border); }
+
+    .custom-alert { background: var(--accent-light); border: 1px solid rgba(200, 96, 42, 0.2); color: var(--accent-dark); border-radius: 2px; }
+    .custom-alert i { color: var(--accent); }
+
+    .form-label { font-weight: 600; color: var(--ink-soft); font-size: 0.95rem; }
+    .form-control, .form-select { border-radius: 2px; border: 1px solid var(--border-strong); background-color: var(--paper-warm); font-family: 'DM Sans', sans-serif; transition: 0.2s; }
+    .form-control:focus, .form-select:focus { border-color: var(--accent); box-shadow: none; background-color: #fff; }
+
+    .btn-submit { background: var(--ink); color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 2px; font-weight: 500; transition: 0.2s; letter-spacing: 0.5px; }
+    .btn-submit:hover { background: var(--accent); color: #fff; }
+
+    .btn-cancel { background: transparent; color: var(--ink-muted); border: 1px solid var(--border-strong); padding: 0.6rem 1.5rem; border-radius: 2px; font-weight: 500; transition: 0.2s; text-decoration: none; display: inline-block; }
+    .btn-cancel:hover { background: var(--paper-warm); color: var(--ink); border-color: var(--ink); }
+
+    .site-footer { background: var(--ink); color: rgba(255,255,255,0.45); text-align: center; padding: 2rem; font-size: 12.5px; margin-top: auto; }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+<!-- ══ PROFESSIONAL NAVBAR ══ -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="/author/dashboard">
+      <span class="brand-nexus">NEXUS</span>
+      <span class="brand-portal">AUTHOR PORTAL</span>
+    </a>
+    <a href="/author/dashboard" class="btn-nav-ghost">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
   </div>
 </nav>
 
-<div class="container mt-5 mb-5" style="max-width: 700px;">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white py-3">
-      <h4 class="mb-0 fw-bold"><i class="bi bi-journal-plus me-2"></i>Submit a New Book</h4>
-    </div>
+<!-- ══ MAIN FORM CONTENT ══ -->
+<div class="container mt-5 mb-5" style="max-width: 750px;">
 
-    <div class="card-body p-4 p-md-5">
-      <div class="alert alert-info mb-4 border-0 bg-info bg-opacity-10 text-dark">
-        <i class="bi bi-info-circle-fill me-2 text-info"></i>
+  <div class="mb-4 text-center">
+    <h2 class="font-playfair fw-bold" style="font-family: 'Playfair Display', serif; font-size: 2.2rem;">Submit a New Book</h2>
+    <p class="text-muted">Propose your next publication to the Nexus editorial team.</p>
+  </div>
+
+  <div class="form-card p-4 p-md-5">
+
+    <!-- Info Alert -->
+    <div class="custom-alert p-3 mb-4 d-flex align-items-start gap-3">
+      <i class="bi bi-info-circle-fill fs-5 mt-1"></i>
+      <div>
         <strong>How it works:</strong> Submit your book details below. Our administrative team will review your submission, determine retail pricing, upload cover art, and publish it to the storefront.
       </div>
-
-      <!-- Form submits to our new POST method -->
-      <form th:action="@{/author/books/request/save}" th:object="${book}" method="post">
-
-        <div class="mb-4">
-          <label class="form-label fw-bold">Book Title</label>
-          <input type="text" th:field="*{title}" class="form-control form-control-lg bg-light" required placeholder="Enter the official title" />
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-bold">Genre / Category</label>
-          <select th:field="*{category}" class="form-select bg-light" required>
-            <option value="" disabled selected>Select a category...</option>
-            <option value="Fiction">Fiction</option>
-            <option value="Non-Fiction">Non-Fiction</option>
-            <option value="Sci-Fi & Fantasy">Sci-Fi & Fantasy</option>
-            <option value="Mystery & Thriller">Mystery & Thriller</option>
-            <option value="Biography">Biography</option>
-            <option value="Educational">Educational</option>
-            <option value="Romance">Romance</option>
-          </select>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-bold">Book Description</label>
-          <textarea th:field="*{description}" class="form-control bg-light" rows="5" required placeholder="Write a compelling synopsis for your readers..."></textarea>
-        </div>
-
-        <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top">
-          <a href="/author/dashboard" class="btn btn-light fw-bold px-4">Cancel</a>
-          <button type="submit" class="btn btn-primary fw-bold px-4"><i class="bi bi-send-fill me-2"></i>Submit for Review</button>
-        </div>
-
-      </form>
     </div>
+
+    <!-- Form submits to our new POST method -->
+    <form th:action="@{/author/books/request/save}" th:object="${book}" method="post">
+
+      <div class="mb-4">
+        <label class="form-label">Book Title</label>
+        <input type="text" th:field="*{title}" class="form-control form-control-lg" required placeholder="Enter the official title" />
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Genre / Category</label>
+        <!-- UPDATED: Includes all 10 categories -->
+        <select th:field="*{category}" class="form-select" required>
+          <option value="" disabled selected>Select a category...</option>
+          <option value="Fiction">Fiction</option>
+          <option value="Non-Fiction">Non-Fiction</option>
+          <option value="Sci-Fi & Fantasy">Sci-Fi & Fantasy</option>
+          <option value="Mystery & Thriller">Mystery & Thriller</option>
+          <option value="Biography">Biography</option>
+          <option value="Educational">Educational</option>
+          <option value="Romance">Romance</option>
+          <!-- NEW CATEGORIES -->
+          <option value="Computers & Technology">Computers & Technology</option>
+          <option value="History">History</option>
+          <option value="Children & YA">Children & YA</option>
+        </select>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Book Description</label>
+        <textarea th:field="*{description}" class="form-control" rows="6" required placeholder="Write a compelling synopsis for your readers..."></textarea>
+      </div>
+
+      <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
+        <a href="/author/dashboard" class="btn-cancel">Cancel</a>
+        <button type="submit" class="btn-submit"><i class="bi bi-send me-2"></i> Submit for Review</button>
+      </div>
+
+    </form>
   </div>
 </div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="site-footer">
+  <p style="font-family:'Playfair Display',serif;font-size:1.2rem;color:rgba(255,255,255,0.8);margin-bottom:0.4rem;font-weight:600;">
+    NEXUS BOOKSTORE
+  </p>
+  <p>© 2026 Nexus Bookstore · Author Portal Services</p>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

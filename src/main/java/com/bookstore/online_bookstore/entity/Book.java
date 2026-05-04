@@ -35,9 +35,12 @@ public class Book {
     @Column(name = "category")
     private String category;
 
-    // NEW: The approval status for the Book Architecture!
     @Column(nullable = false)
     private String approvalStatus = "PENDING";
+
+    // --- NEW: Cover Image Field ---
+    @Column(name = "cover_image_path")
+    private String coverImagePath;
 
     public Book() {
     }
@@ -68,8 +71,10 @@ public class Book {
     public void setStock(Integer stock) { this.stock = stock; }
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
-
-    // NEW Getters and Setters
     public String getApprovalStatus() { return approvalStatus; }
     public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
+
+    // Getters and Setters for the image
+    public String getCoverImagePath() { return coverImagePath; }
+    public void setCoverImagePath(String coverImagePath) { this.coverImagePath = coverImagePath; }
 }

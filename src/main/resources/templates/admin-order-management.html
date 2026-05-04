@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Management - Nexus Bookstore</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <style>
+    .table-container { background-color: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .status-badge { font-weight: 700; font-size: 0.75rem; }
+  </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4 shadow">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/admin/dashboard"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
+    <span class="navbar-text text-white fw-bold">Order Command Center</span>
+  </div>
+</nav>
+
+<div class="container">
+  <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show shadow-sm mb-4">
+    <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <h1 class="fw-bold mb-4">Customer Orders</h1>
+
+  <div class="table-container mb-5">
+    <table class="table table-hover align-middle">
+      <thead class="table-dark">
+      <tr><th>Order ID</th><th>Customer</th><th>Revenue</th><th>Status</th><th class="text-center">Action</th></tr>
+      </thead>
+      <tbody>
+      <tr th:each="order : ${allOrders}">
+        <td><strong class="text-primary">#NX-<span th:text="${order.orderId}"></span></strong></td>
+        <td th:text="${order.user.username}"></td>
+        <td class="fw-bold text-success" th:text="'LKR ' + ${order.totalPrice}"></td>
+        <td>
+                        <span class="badge rounded-pill status-badge px-3 py-2"
+                              th:classappend="${order.status == 'CANCELLED' ? 'bg-danger' : (order.status == 'PAID' ? 'bg-success' : 'bg-info')}"
+                              th:text="${order.status == null or order.status == '' ? 'PROCESSING' : order.status}">
+                        </span>
+        </td>
+        <td class="text-center">
+          <form th:action="@{/admin/orders/update-status}" method="post" class="d-flex gap-2 justify-content-center">
+            <input type="hidden" name="orderId" th:value="${order.orderId}">
+            <select name="status" class="form-select form-select-sm" style="width: 150px;">
+              <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
+              <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">Shipped</option>
+              <option value="PAID" th:selected="${order.status == 'PAID'}">Completed/Paid</option>
+              <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Cancelled</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-dark">Update</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

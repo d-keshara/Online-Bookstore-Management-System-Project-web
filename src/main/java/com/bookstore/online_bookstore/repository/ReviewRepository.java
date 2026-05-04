@@ -17,6 +17,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     boolean existsByUserAndBook(User user, Book book);
     List<Review> findByUser(User user);
 
+
     @Modifying
     @Transactional
     @Query("DELETE FROM Review r WHERE r.reviewId = :id")

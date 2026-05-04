@@ -27,4 +27,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     Page<Book> findByAuthor_NameContainingIgnoreCase(String authorName, Pageable pageable);
 
     Page<Book> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
+
+    Page<Book> findByCategoryAndApprovalStatus(String category, String status, Pageable pageable);
 }
