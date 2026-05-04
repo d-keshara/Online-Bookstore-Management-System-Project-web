@@ -7,7 +7,7 @@ import java.util.List;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "orders") // 'order' is a reserved word in SQL, so we use 'orders'
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -15,7 +15,6 @@ public class Order {
     @Column(name = "order_id")
     private Integer orderId;
 
-    // --- CRITICAL FIX: Prevents JSON Infinite Loop ---
     @JsonIgnoreProperties({"orders", "password"})
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -30,11 +29,11 @@ public class Order {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "payment_method")
+    private String paymentMethod;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
-
-    @Transient
-    private String paymentMethod;
 
     public Integer getOrderId() {
         return orderId;

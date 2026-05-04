@@ -5,86 +5,114 @@
   <title>Author Portal - Nexus Bookstore</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-</head>
-<body class="bg-light">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+        --ink: #1a1a1a; --paper: #faf8f4; --paper-card: #ffffff;
+        --accent: #c8602a; --border: rgba(0,0,0,0.09); --radius-lg: 8px;
+    }
+    body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); display: flex; flex-direction: column; min-height: 100vh; }
+    .font-playfair { font-family: 'Playfair Display', serif; }
 
-<nav class="navbar navbar-dark bg-secondary mb-4 shadow-sm">
-  <div class="container">
-    <span class="navbar-brand fw-bold"><i class="bi bi-pen"></i> Author Portal</span>
-    <div class="d-flex align-items-center">
-      <span class="text-white me-3">Welcome, <strong th:text="${username}">Author</strong></span>
-      <a th:href="@{/catalog}" class="btn btn-outline-light btn-sm me-2">Storefront</a>
-      <form th:action="@{/logout}" method="post" class="m-0">
-        <button type="submit" class="btn btn-danger btn-sm">Logout</button>
-      </form>
+    .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .nav-brand { display: flex; align-items: center; text-decoration: none; color: #fff; }
+    .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
+    .brand-bookstore { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; letter-spacing: 1.5px; color: #3a7fc1; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-left: 0.6rem; margin-top: 3px; }
+
+    .page-layout { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; flex: 1; width: 100%; }
+    .premium-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden; }
+
+    .list-group-custom .list-group-item { border: none; border-bottom: 1px solid var(--border); padding: 1rem 1.2rem; color: var(--ink); font-weight: 500; transition: 0.2s; }
+    .list-group-custom .list-group-item:last-child { border-bottom: none; }
+    .list-group-custom .list-group-item:hover { background: var(--paper-warm); padding-left: 1.5rem; color: var(--accent); }
+    .list-group-custom .list-group-item.active { background: var(--ink); color: #fff; font-weight: 600; border-radius: 4px; border: none; }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="/author/dashboard">
+      <span class="brand-nexus">NEXUS</span><span class="brand-bookstore">AUTHOR PORTAL</span>
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <span class="text-white-50 small d-none d-md-block">Welcome, <strong class="text-white" th:text="${username}">Author</strong></span>
+      <a th:href="@{/catalog}" class="btn btn-outline-light btn-sm fw-bold rounded-1 px-3">Storefront</a>
+      <form th:action="@{/logout}" method="post" class="m-0"><button type="submit" class="btn btn-sm btn-danger fw-bold rounded-1 px-3">Logout</button></form>
     </div>
   </div>
 </nav>
 
-<div class="container">
-  <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+<div class="page-layout">
+  <div th:if="${param.success}" class="alert alert-dismissible fade show shadow-sm mb-4" style="background-color: #e8f4eb; color: #1e4620; font-weight: 600; border-bottom: 2px solid #c3e6cb;">
     <i class="bi bi-check-circle-fill me-2"></i> Profile updated successfully!
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
   </div>
 
-  <!-- NEW: Catch the success message from the book request submission -->
-  <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+  <div th:if="${successMessage}" class="alert alert-dismissible fade show shadow-sm mb-4" style="background-color: #e8f4eb; color: #1e4620; font-weight: 600; border-bottom: 2px solid #c3e6cb;">
     <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMessage}"></span>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
   </div>
 
-  <div th:if="${param.error}" class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+  <div th:if="${param.error}" class="alert alert-danger shadow-sm mb-4 fw-bold border-0 border-bottom border-danger border-2">
     <i class="bi bi-exclamation-triangle-fill me-2"></i> Error: Could not find author profile.
   </div>
 
-  <div class="row">
+  <div class="row gx-lg-5">
     <!-- Sidebar -->
     <div class="col-md-3 mb-4">
-
-      <!-- NEW: The big call-to-action button for authors -->
-      <a href="/author/books/request" class="btn btn-primary w-100 fw-bold shadow-sm mb-3 py-2">
-        <i class="bi bi-journal-plus me-2"></i> Submit New Book Request
+      <a href="/author/books/request" class="btn w-100 fw-bold shadow-sm mb-4 py-3 rounded-1 fs-6" style="background: var(--accent); color: white; transition: 0.2s;">
+        <i class="bi bi-journal-plus me-2"></i> Submit New Book
       </a>
-
-      <div class="list-group shadow-sm">
-        <a th:href="@{/author/dashboard}" class="list-group-item list-group-item-action active fw-bold border-0" style="background-color: #6c757d;">
-          <i class="bi bi-speedometer2"></i> My Dashboard
+      <div class="premium-card list-group list-group-custom">
+        <a th:href="@{/author/dashboard}" class="list-group-item active">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
         </a>
-        <a th:href="@{/author/my-books}" class="list-group-item list-group-item-action">
-          <i class="bi bi-book"></i> My Published Books
+        <a th:href="@{/author/my-books}" class="list-group-item">
+          <i class="bi bi-book me-2"></i> Published Books
         </a>
-        <a th:href="@{/author/edit-profile}" class="list-group-item list-group-item-action">
-          <i class="bi bi-person-lines-fill"></i> Edit My Bio
+        <a th:href="@{/author/edit-profile}" class="list-group-item">
+          <i class="bi bi-person-lines-fill me-2"></i> Edit Biography
         </a>
       </div>
     </div>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <div class="col-md-9">
-      <h2 class="fw-bold mb-4">Performance Overview</h2>
+      <h2 class="fw-bold font-playfair mb-4 text-dark">Performance Overview</h2>
 
-      <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-4">
-          <div class="card border-0 shadow-sm text-center p-3 h-100">
-            <h6 class="text-muted text-uppercase mb-2">Total Books Sold</h6>
-            <h2 class="text-primary fw-bold mb-0">Coming Soon</h2>
+      <div class="row g-4 mb-5">
+        <div class="col-sm-6">
+          <div class="premium-card p-4 h-100 d-flex flex-column justify-content-center border-start border-4" style="border-left-color: #3a7fc1 !important;">
+            <h6 class="text-muted text-uppercase mb-2 fw-bold" style="letter-spacing: 1px;">Total Books Sold</h6>
+            <h2 class="fw-bold font-playfair mb-0" style="color: #3a7fc1;">Coming Soon</h2>
           </div>
         </div>
-        <div class="col-sm-6 col-lg-4">
-          <div class="card border-0 shadow-sm text-center p-3 h-100">
-            <h6 class="text-muted text-uppercase mb-2">Average Rating</h6>
-            <h2 class="text-warning fw-bold mb-0"><i class="bi bi-star-fill"></i> N/A</h2>
+        <div class="col-sm-6">
+          <div class="premium-card p-4 h-100 d-flex flex-column justify-content-center border-start border-4" style="border-left-color: #e6b800 !important;">
+            <h6 class="text-muted text-uppercase mb-2 fw-bold" style="letter-spacing: 1px;">Average Rating</h6>
+            <h2 class="text-dark fw-bold font-playfair mb-0"><i class="bi bi-star-fill text-warning me-2"></i>N/A</h2>
           </div>
         </div>
       </div>
 
-      <div class="alert alert-info border-0 shadow-sm">
-        <i class="bi bi-info-circle-fill me-2"></i> Your detailed analytics and sales charts will appear here soon!
+      <div class="premium-card p-4 bg-light border-0" style="border-left: 4px solid var(--ink) !important;">
+        <div class="d-flex gap-3 align-items-center">
+          <i class="bi bi-graph-up-arrow display-4 text-muted opacity-50"></i>
+          <div>
+            <h5 class="fw-bold mb-1">Analytics Dashboard</h5>
+            <p class="text-muted mb-0">Your detailed sales charts, revenue breakdowns, and reader demographics will appear here as your books gain traction!</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
+<footer class="bg-dark text-white-50 text-center py-4 mt-auto">
+  <small>© 2026 Nexus Bookstore. Designed by WD130 Group</small>
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
