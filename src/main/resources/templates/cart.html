@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+  
   <style>
     :root {
         --ink: #1a1a1a; --ink-muted: #888;
@@ -39,8 +39,8 @@
     .item-price { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--accent); }
 
     .summary-card { background: var(--ink); color: #fff; border-radius: var(--radius-lg); padding: 2rem; position: sticky; top: 100px; }
-    .btn-checkout { background: var(--accent); color: #fff; width: 100%; padding: 0.8rem; border: none; border-radius: 4px; font-weight: 600; letter-spacing: 0.5px; transition: 0.2s; }
-    .btn-checkout:hover { background: var(--accent-dark); }
+    .btn-checkout { background: var(--accent); color: #fff; width: 100%; padding: 0.8rem; border: none; border-radius: 4px; font-weight: 600; letter-spacing: 0.5px; transition: 0.2s; text-decoration: none; display: block; text-align: center; }
+    .btn-checkout:hover { background: var(--accent-dark); color: white; }
 
     .btn-remove { background: none; border: none; color: #b83232; font-size: 0.85rem; text-decoration: underline; padding: 0; }
 
@@ -78,7 +78,7 @@
         </div>
 
         <div class="item-details">
-          <div class="book-category-tag text-uppercase" style="font-size: 10px; color: var(--accent); font-weight: 600;" th:text="${item.book.category}">Category</div>
+          <div class="text-uppercase" style="font-size: 10px; color: var(--accent); font-weight: 600;" th:text="${item.book.category}">Category</div>
           <div class="item-title" th:text="${item.book.title}">Title</div>
           <div class="item-author" th:text="${item.book.author != null ? item.book.author.name : 'Unknown'}">Author</div>
 
@@ -91,22 +91,18 @@
         <div class="text-end d-flex flex-column align-items-end">
           <div class="d-flex align-items-center gap-2 mb-2">
             <span class="text-muted small">Qty:</span>
-
             <form th:action="@{/cart/update}" method="post" class="m-0">
               <input type="hidden" name="itemId" th:value="${item.id}">
               <input type="hidden" name="action" value="decrease">
               <button type="submit" class="qty-btn"><i class="bi bi-dash"></i></button>
             </form>
-
             <span th:text="${item.quantity}" class="fw-bold text-dark mx-1" style="min-width: 15px; text-align: center;"></span>
-
             <form th:action="@{/cart/update}" method="post" class="m-0">
               <input type="hidden" name="itemId" th:value="${item.id}">
               <input type="hidden" name="action" value="increase">
               <button type="submit" class="qty-btn"><i class="bi bi-plus"></i></button>
             </form>
           </div>
-
           <div class="item-price" th:text="'LKR ' + ${item.book.price}">LKR 0.00</div>
         </div>
       </div>
@@ -115,7 +111,6 @@
     <div class="col-lg-4 mt-4 mt-lg-0">
       <div class="summary-card shadow-lg" th:if="${!cartItems.empty}">
         <h4 class="font-playfair mb-4 border-bottom border-secondary pb-3">Order Summary</h4>
-
         <div class="d-flex justify-content-between mb-3 text-white-50">
           <span>Subtotal</span>
           <span th:text="'LKR ' + ${cartTotal}">LKR 0.00</span>
@@ -124,12 +119,10 @@
           <span>Shipping</span>
           <span>Free</span>
         </div>
-
         <div class="d-flex justify-content-between mb-4 border-top border-secondary pt-3 fs-5 fw-bold">
           <span>Total</span>
           <span class="text-white" th:text="'LKR ' + ${cartTotal}">LKR 0.00</span>
         </div>
-
         <form th:action="@{/cart/checkout}" method="post">
           <button type="submit" class="btn-checkout">Proceed to Checkout <i class="bi bi-arrow-right ms-2"></i></button>
         </form>

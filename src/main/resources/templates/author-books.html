@@ -24,7 +24,7 @@
         .brand-portal { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-top: 3px; }
 
         .page-layout { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; }
-
+        
         .sidebar-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
         .nav-link-custom { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1rem; color: var(--ink-soft); font-weight: 500; border-radius: 6px; transition: 0.2s; text-decoration: none; margin-bottom: 0.5rem; }
         .nav-link-custom:hover { background: var(--paper); color: var(--accent); }
@@ -38,7 +38,7 @@
         .book-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem; color: var(--ink); margin-bottom: 0.3rem; }
         .book-category { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 0.8rem; }
         .book-price { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-top: auto; }
-
+        
         .btn-manage { background: var(--paper); border: 1px solid var(--border); color: var(--ink-soft); font-weight: 600; font-size: 0.85rem; width: 100%; padding: 0.5rem; border-radius: 4px; transition: 0.2s; }
         .btn-manage:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
     </style>
@@ -60,7 +60,7 @@
 
 <div class="page-layout">
     <div class="row gx-lg-5">
-
+        
         <div class="col-lg-3 mb-4">
             <div class="sidebar-card">
                 <nav class="d-flex flex-column">
@@ -94,7 +94,7 @@
             <div class="row g-4">
                 <div class="col-md-6 col-lg-4" th:each="book : ${author.books}">
                     <div class="book-card shadow-sm">
-
+                        
                         <div class="book-cover-placeholder">
                             <img th:if="${book.coverImagePath != null}" th:src="@{${book.coverImagePath}}" style="width: 100%; height: 100%; object-fit: cover;" alt="Cover">
                             <i th:if="${book.coverImagePath == null}" class="bi bi-journal-text" style="font-size: 3rem; color: var(--ink-muted); opacity: 0.5;"></i>
@@ -103,7 +103,7 @@
                         <div class="book-card-body">
                             <div class="book-category" th:text="${book.category != null ? book.category : 'General'}">Category</div>
                             <div class="book-title" th:text="${book.title}">Book Title</div>
-
+                            
                             <div class="d-flex justify-content-between align-items-end mt-4 mb-3">
                                 <div class="book-price" th:text="'LKR ' + ${book.price}">LKR 0.00</div>
                                 <span class="badge" style="background: #e8f4eb; color: #1e4620; border: 1px solid #c3e6cb;" th:if="${book.stock != null and book.stock > 0}">Live</span>
