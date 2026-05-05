@@ -1,0 +1,6 @@
+NEXUS BOOKSTORE - ORDER RECEIPT
+----------------------------------
+Order ID: NX-61
+Total Paid: LKR 600.0
+Status: Payment Verified
+Thank you for shopping with us!

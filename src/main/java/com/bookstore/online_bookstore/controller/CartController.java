@@ -8,8 +8,10 @@ import com.bookstore.online_bookstore.repository.CartItemRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
 import com.bookstore.online_bookstore.service.CartService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
@@ -81,5 +83,18 @@ public class CartController {
     public String removeFromCart(@RequestParam("itemId") Integer itemId) {
         cartItemRepository.deleteById(itemId);
         return "redirect:/cart";
+    }
+
+    @Transactional
+    @PostMapping("/checkout")
+    public String checkoutCart(Principal principal) {
+        if (principal == null) return "redirect:/login";
+        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        if (user == null) return "redirect:/login";
+
+        List<CartItem> cartItems = cartItemRepository.findByUser(user);
+        if (cartItems.isEmpty()) return "redirect:/cart?empty";
+
+        return "redirect:/orders/checkout-payment";
     }
 }

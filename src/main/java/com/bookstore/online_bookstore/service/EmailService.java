@@ -19,27 +19,24 @@ public class EmailService {
 
     public void sendOrderConfirmation(String toEmail, String username, Integer orderId, BigDecimal totalAmount, String attachmentFilePath) {
         try {
-            // MimeMessage allows for attachments and rich content
             MimeMessage message = mailSender.createMimeMessage();
-
-            // The "true" flag tells Spring this is a multipart message (meaning it has an attachment)
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             helper.setFrom("nexusbookstoremailserver@gmail.com");
             helper.setTo(toEmail);
-            helper.setSubject("Nexus Bookstore - Order Confirmation #" + orderId);
+            helper.setSubject("Nexus Bookstore - Order Confirmation #NX-" + orderId);
 
-            String body = "Hi "+username+"!\n\nYour order has been placed successfully.\n"
-                    + "Order ID: " + orderId + "\n"
+            String body = "Hi " + username + "!\n\nYour order has been placed successfully.\n"
+                    + "Order ID: NX-" + orderId + "\n"
                     + "Total: LKR " + totalAmount + "\n\n"
                     + "Please find your official receipt attached to this email.\n\n"
                     + "Thank you for shopping with Nexus!";
 
             helper.setText(body);
 
-            // Fetch the file from the local "files" folder and attach it
+            // Fetch the physical file from your local folder and attach it
             FileSystemResource file = new FileSystemResource(new File(attachmentFilePath));
-            helper.addAttachment("Receipt_Order_" + orderId + ".txt", file);
+            helper.addAttachment("receipt_order_" + orderId + ".txt", file);
 
             mailSender.send(message);
             System.out.println("Email sent successfully with attachment to: " + toEmail);

@@ -17,9 +17,9 @@
         }
 
         body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); display: flex; flex-direction: column; min-height: 100vh; }
+        
         .site-nav { background: #1a1a1a; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; }
-
+        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
         .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
         .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; }
         .brand-bookstore { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 400; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-top: 3px; }
@@ -44,7 +44,8 @@
         .btn-buy-now { background: var(--accent); color: #fff; border: none; font-weight: 600; padding: 0.75rem; border-radius: 4px; transition: 0.2s; box-shadow: 0 4px 10px rgba(200,96,42,0.2); font-size: 0.95rem; }
         .btn-buy-now:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 6px 12px rgba(200,96,42,0.3); }
 
-        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
     </style>
 </head>
 <body>
@@ -109,21 +110,17 @@
                 <div class="text-danger fw-medium bg-danger bg-opacity-10 px-2 py-1 rounded-1 border border-danger small" th:if="${book.stock <= 0}"><i class="bi bi-x-circle me-1 opacity-75"></i> Out of Stock</div>
             </div>
 
-            <!-- DYNAMIC SYNOPSIS: Handled empty descriptions properly -->
+            <!-- DYNAMIC SYNOPSIS -->
             <div class="mb-4 bg-white p-3 rounded-1 border shadow-sm">
                 <h5 class="fw-semibold mb-2 font-playfair fs-5" style="color: var(--ink);">Synopsis</h5>
-
-                <!-- Display if description exists -->
                 <p th:if="${not #strings.isEmpty(book.description)}" style="font-size: 0.95rem; line-height: 1.7; color: var(--ink-soft); margin-bottom: 0; font-weight: 400;" th:text="${book.description}"></p>
-
-                <!-- Display if description is empty or null -->
                 <p th:if="${#strings.isEmpty(book.description)}" class="text-muted fst-italic mb-0" style="font-size: 0.9rem;">No synopsis available for this title.</p>
             </div>
 
             <!-- Scaled Down Add to Cart & Buy Now Box -->
             <div class="add-to-cart-box">
                 <div sec:authorize="isAuthenticated()">
-                    <form method="post" th:action="@{/cart/add}">
+                    <form method="post" th:action="@{/cart/add}" class="m-0 w-100">
                         <input type="hidden" name="bookId" th:value="${book.bookId}">
 
                         <div class="d-flex align-items-center mb-3 pb-3 border-bottom border-light">
@@ -139,7 +136,7 @@
                             <button type="submit" class="btn btn-massive-cart w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-light text-muted border-light' : ''}">
                                 <i class="bi bi-cart-plus me-1 opacity-75"></i> Add to Cart
                             </button>
-                            <button type="submit" class="btn btn-buy-now w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-secondary border-secondary' : ''}">
+                            <button type="submit" formaction="/buy" class="btn btn-buy-now w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-secondary border-secondary' : ''}">
                                 <i class="bi bi-lightning-charge-fill text-warning me-1 opacity-75"></i> Buy Now
                             </button>
                         </div>

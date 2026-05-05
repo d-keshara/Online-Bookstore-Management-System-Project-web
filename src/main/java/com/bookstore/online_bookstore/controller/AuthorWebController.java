@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class AuthorWebController {
@@ -23,7 +25,6 @@ public class AuthorWebController {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    // We inject all three repositories/services here
     public AuthorWebController(AuthorService authorService,
                                UserRepository userRepository,
                                BookRepository bookRepository) {
@@ -32,14 +33,9 @@ public class AuthorWebController {
         this.bookRepository = bookRepository;
     }
 
-    // ==========================================
-    // ADMIN METHODS
-    // ==========================================
 
-    // 1. View all authors (Paginated)
     @GetMapping("/admin/authors")
     public String listAuthors(Model model, @RequestParam(defaultValue = "0") int page) {
-        // Fetch 10 authors per page using the existing service
         Pageable pageable = PageRequest.of(page, 10);
         Page<Author> authorPage = authorService.getAllAuthors(pageable);
 
@@ -50,21 +46,36 @@ public class AuthorWebController {
         return "authors-list";
     }
 
-    // ==========================================
-    // AUTHOR PORTAL METHODS
-    // ==========================================
 
-    // 1. Shows the Book Request Form
+    // Loads the Author Dashboard and their specific book submissions
+    @GetMapping("/author/dashboard")
+    public String showAuthorDashboard(Model model, Principal principal) {
+        if (principal == null) return "redirect:/login";
+
+        User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
+
+        if (currentUser != null && currentUser.getAuthor() != null) {
+            // Safely filters all books to find only the ones belonging to this specific author
+            List<Book> myBooks = bookRepository.findAll().stream()
+                    .filter(book -> book.getAuthor() != null &&
+                            book.getAuthor().getId().equals(currentUser.getAuthor().getId()))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("books", myBooks);
+            model.addAttribute("username", currentUser.getUsername());
+        }
+
+        return "author-dashboard";
+    }
+
     @GetMapping("/author/books/request")
     public String showRequestBookForm(Model model, Principal principal) {
         if (principal == null) return "redirect:/login";
 
-        // Send a blank book object to the form
         model.addAttribute("book", new Book());
         return "author-request-book";
     }
 
-    // 2. Handles the Form Submission
     @PostMapping("/author/books/request/save")
     public String submitBookRequest(@ModelAttribute("book") Book book,
                                     Principal principal,
@@ -72,23 +83,17 @@ public class AuthorWebController {
 
         if (principal == null) return "redirect:/login";
 
-        // Find the currently logged-in user
         User currentUser = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Get their glued author profile
         Author authorProfile = currentUser.getAuthor();
         if (authorProfile == null) {
-            return "redirect:/login"; // Security check
+            return "redirect:/login";
         }
 
-        // Set the hidden fields automatically
         book.setAuthor(authorProfile);
         book.setApprovalStatus("PENDING");
 
-        // Note: Price and Stock are left empty for the Admin to fill out later!
-
-        // Save the pending book to the database
         bookRepository.save(book);
 
         redirectAttributes.addFlashAttribute("successMessage",

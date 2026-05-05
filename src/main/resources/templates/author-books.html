@@ -1,86 +1,126 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>My Published Books - Nexus Author</title>
+    <meta charset="UTF-8">
+    <title>My Published Books — Nexus Bookstore</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --ink: #2b2b2b; --ink-soft: #4a4a4a; --paper: #faf8f4; --paper-card: #ffffff;
-            --accent: #c8602a; --border: rgba(0,0,0,0.08);
+            --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
+            --paper: #faf8f4; --paper-card: #ffffff;
+            --accent: #c8602a; --accent-light: #f5ece4; --accent-dark: #9e4a1e;
+            --border: rgba(0,0,0,0.09);
         }
-        body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
-        .font-playfair { font-family: 'Playfair Display', serif; }
 
-        .premium-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); overflow: hidden; }
+        body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); }
 
-        .table-custom th { background-color: #fcfcfc !important; color: var(--ink-soft) !important; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.8px; padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); border-top: none; }
-        .table-custom td { vertical-align: middle; border-bottom: 1px solid var(--border); padding: 1.2rem 1rem; }
+        .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; }
+        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
+        .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
+        .brand-portal { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-top: 3px; }
+
+        .page-layout { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; }
+        
+        .sidebar-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+        .nav-link-custom { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1rem; color: var(--ink-soft); font-weight: 500; border-radius: 6px; transition: 0.2s; text-decoration: none; margin-bottom: 0.5rem; }
+        .nav-link-custom:hover { background: var(--paper); color: var(--accent); }
+        .nav-link-custom.active { background: var(--accent-light); color: var(--accent-dark); font-weight: 600; }
+
+        /* Custom Book Cards */
+        .book-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: 0.2s; height: 100%; display: flex; flex-direction: column; }
+        .book-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.05); transform: translateY(-3px); border-color: var(--accent); }
+        .book-cover-placeholder { height: 160px; background: #f3efe8; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); }
+        .book-card-body { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .book-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem; color: var(--ink); margin-bottom: 0.3rem; }
+        .book-category { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 0.8rem; }
+        .book-price { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-top: auto; }
+        
+        .btn-manage { background: var(--paper); border: 1px solid var(--border); color: var(--ink-soft); font-weight: 600; font-size: 0.85rem; width: 100%; padding: 0.5rem; border-radius: 4px; transition: 0.2s; }
+        .btn-manage:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
     </style>
 </head>
 <body>
 
-<nav class="py-3 mb-5" style="background: #3a7fc1; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-    <div class="container d-flex justify-content-between align-items-center">
-        <span class="text-white fw-semibold font-playfair fs-4"><i class="bi bi-pen me-2 opacity-75"></i> Nexus Author Portal</span>
-        <a href="/author/dashboard" class="btn btn-outline-light btn-sm fw-medium px-3 rounded-1"><i class="bi bi-arrow-left me-1"></i> Dashboard</a>
+<nav class="site-nav">
+    <div class="nav-inner">
+        <div class="nav-brand">
+            <span class="brand-nexus">NEXUS</span>
+            <span class="brand-portal">AUTHOR PORTAL</span>
+        </div>
+        <div class="d-flex align-items-center gap-4">
+            <span class="text-white-50 small">Welcome, <strong class="text-white" th:text="${username}">Author</strong></span>
+            <a th:href="@{/catalog}" class="text-white text-decoration-none small fw-bold tracking-wide"><i class="bi bi-shop me-1"></i> Storefront</a>
+        </div>
     </div>
 </nav>
 
-<div class="container" style="max-width: 1000px; flex: 1;">
-    <div class="mb-4">
-        <h2 class="fw-semibold font-playfair mb-1 text-dark">My Published Portfolio</h2>
-        <p class="text-muted fw-light">Books you have successfully published to the Nexus Catalog.</p>
-    </div>
+<div class="page-layout">
+    <div class="row gx-lg-5">
+        
+        <div class="col-lg-3 mb-4">
+            <div class="sidebar-card">
+                <nav class="d-flex flex-column">
+                    <a th:href="@{/author/dashboard}" class="nav-link-custom">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a th:href="@{/author/my-books}" class="nav-link-custom active mt-2">
+                        <i class="bi bi-collection"></i> My Published Books
+                    </a>
+                </nav>
+            </div>
+        </div>
 
-    <div class="premium-card mb-5">
-        <div class="table-responsive m-0">
-            <table class="table table-hover table-custom align-middle m-0">
-                <thead>
-                <tr>
-                    <th style="width: 50%;">Manuscript Title</th>
-                    <th>Genre / Category</th>
-                    <th class="text-end">Current Retail Price</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="book : ${author.books}">
-                    <td>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bg-light rounded d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 55px; border: 1px solid rgba(0,0,0,0.05);">
-                                <i class="bi bi-book text-muted opacity-50"></i>
-                            </div>
-                            <!-- Switched to DM Sans, softened the weight, and removed caps -->
-                            <strong class="fs-6 text-dark fw-semibold" style="letter-spacing: -0.2px;" th:text="${book.title}">Book Title</strong>
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-3">
+                <div>
+                    <h3 class="font-playfair fw-bold mb-1">My Published Library</h3>
+                    <span class="text-muted small">Manage your live books available on the storefront.</span>
+                </div>
+            </div>
+
+            <!-- Empty State Fallback -->
+            <div th:if="${author.books.empty}" class="text-center py-5 border rounded" style="background: var(--paper-card);">
+                <i class="bi bi-journal-x fs-1 text-muted mb-3 d-block"></i>
+                <h5 class="fw-bold">No books published yet</h5>
+                <p class="text-muted">Head to your dashboard to submit your first book request.</p>
+                <a th:href="@{/author/dashboard}" class="btn btn-dark mt-2">Go to Dashboard</a>
+            </div>
+
+            <!-- Book Grid Layout -->
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="book : ${author.books}">
+                    <div class="book-card shadow-sm">
+                        
+                        <div class="book-cover-placeholder">
+                            <img th:if="${book.coverImagePath != null}" th:src="@{${book.coverImagePath}}" style="width: 100%; height: 100%; object-fit: cover;" alt="Cover">
+                            <i th:if="${book.coverImagePath == null}" class="bi bi-journal-text" style="font-size: 3rem; color: var(--ink-muted); opacity: 0.5;"></i>
                         </div>
-                    </td>
-                    <td>
-                        <span class="badge bg-secondary bg-opacity-10 text-muted border border-secondary px-3 py-2 rounded-1 fw-medium" style="letter-spacing: 0.5px;" th:text="${book.category}">Category</span>
-                    </td>
-                    <td class="text-end">
-                        <!-- Switched to Accent color and DM Sans for a cleaner look -->
-                        <span class="fw-semibold fs-5" style="color: var(--accent); letter-spacing: -0.5px;" th:text="'LKR ' + ${book.price}">0.00</span>
-                    </td>
-                </tr>
-                <tr th:if="${author.books == null or author.books.empty}">
-                    <td colspan="3" class="text-center py-5 text-muted" style="background: rgba(0,0,0,0.01);">
-                        <i class="bi bi-journal-x display-4 d-block mb-3 opacity-25"></i>
-                        <h5 class="font-playfair fw-semibold text-dark">No books published yet</h5>
-                        <p class="mb-4 fw-light">Your approved books will appear here.</p>
-                        <a href="/author/books/request" class="btn fw-medium text-white px-4 py-2 rounded-1 shadow-sm" style="background: var(--accent);">Submit a Book Request</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+
+                        <div class="book-card-body">
+                            <div class="book-category" th:text="${book.category != null ? book.category : 'General'}">Category</div>
+                            <div class="book-title" th:text="${book.title}">Book Title</div>
+                            
+                            <div class="d-flex justify-content-between align-items-end mt-4 mb-3">
+                                <div class="book-price" th:text="'LKR ' + ${book.price}">LKR 0.00</div>
+                                <span class="badge" style="background: #e8f4eb; color: #1e4620; border: 1px solid #c3e6cb;" th:if="${book.stock != null and book.stock > 0}">Live</span>
+                            </div>
+
+                            <a th:href="@{/details/{id}(id=${book.bookId})}" class="btn btn-manage mt-auto text-center text-decoration-none">
+                                <i class="bi bi-eye me-1"></i> View in Store
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-<footer class="bg-dark text-white-50 text-center py-4 mt-auto">
-    <small class="fw-light">© 2026 Nexus Bookstore. Author Portal.</small>
-</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

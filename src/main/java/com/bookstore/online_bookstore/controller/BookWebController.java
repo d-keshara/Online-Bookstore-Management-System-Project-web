@@ -147,7 +147,6 @@ public class BookWebController {
             review.setRating(rating);
             review.setComment(comment);
 
-            // 🌟 ADDED: The timestamp logic to fix the database error! 🌟
             review.setCreatedAt(LocalDateTime.now());
 
             reviewRepository.save(review);
