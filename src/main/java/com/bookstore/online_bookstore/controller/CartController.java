@@ -71,10 +71,9 @@ public class CartController {
                 cartItemRepository.save(newItem);
             }
         }
-        return "redirect:/catalog?added";
+        return "redirect:/cart";
     }
 
-    // 🌟 NEW: Handles + and - quantity buttons! 🌟
     @PostMapping("/update")
     public String updateQuantity(@RequestParam("itemId") Integer itemId, @RequestParam("action") String action) {
         CartItem item = cartItemRepository.findById(itemId).orElse(null);
@@ -87,7 +86,6 @@ public class CartController {
                     item.setQuantity(item.getQuantity() - 1);
                     cartItemRepository.save(item);
                 } else {
-                    // If quantity hits 0, remove it from the cart
                     cartItemRepository.delete(item);
                 }
             }
@@ -111,25 +109,6 @@ public class CartController {
         List<CartItem> cartItems = cartItemRepository.findByUser(user);
         if (cartItems.isEmpty()) return "redirect:/cart?empty";
 
-        try {
-            OrderRequestDTO orderRequest = new OrderRequestDTO();
-            orderRequest.setUserId(Integer.valueOf(user.getId().toString()));
-
-            List<OrderRequestDTO.CartItemDTO> orderItems = new ArrayList<>();
-            for (CartItem item : cartItems) {
-                OrderRequestDTO.CartItemDTO dto = new OrderRequestDTO.CartItemDTO();
-                dto.setBookId(item.getBook().getBookId());
-                dto.setQuantity(item.getQuantity());
-                orderItems.add(dto);
-            }
-            orderRequest.setItems(orderItems);
-
-            orderService.placeOrder(orderRequest);
-            cartItemRepository.deleteByUser(user);
-
-            return "redirect:/my-orders?success";
-        } catch (Exception e) {
-            return "redirect:/cart?error=" + e.getMessage();
-        }
+        return "redirect:/orders/checkout-payment";
     }
 }

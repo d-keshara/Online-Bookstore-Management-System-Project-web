@@ -23,10 +23,6 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    public List<Order> getOrdersByUsername(String username) {
-        return orderRepository.findByUserUsernameOrderByOrderDateDesc(username);
-    }
-
     @Autowired
     private EmailService emailService;
 
@@ -38,6 +34,10 @@ public class OrderService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    public List<Order> getOrdersByUsername(String username) {
+        return orderRepository.findByUserUsernameOrderByOrderDateDesc(username);
+    }
 
     @Transactional
     public Order placeOrder(OrderRequestDTO orderRequest) {
@@ -58,13 +58,6 @@ public class OrderService {
         BigDecimal totalOrderPrice = BigDecimal.ZERO;
 
         for (OrderRequestDTO.CartItemDTO cartItem : orderRequest.getItems()) {
-            if (cartItem.getBookId() == null) {
-                throw new RuntimeException("Each order item must include a book ID.");
-            }
-            if (cartItem.getQuantity() == null || cartItem.getQuantity() <= 0) {
-                throw new RuntimeException("Item quantity must be greater than zero.");
-            }
-
             Book book = bookRepository.findById(cartItem.getBookId())
                     .orElseThrow(() -> new RuntimeException("Book not found ID: " + cartItem.getBookId()));
 
@@ -72,15 +65,10 @@ public class OrderService {
             if (availableStock < cartItem.getQuantity()) {
                 throw new RuntimeException("Out of stock! Only " + book.getStock() + " copies left of: " + book.getTitle());
             }
-            if (book.getPrice() == null) {
-                throw new RuntimeException("Book price is missing for book ID: " + cartItem.getBookId());
-            }
 
-            // Deduct stock
             book.setStock(availableStock - cartItem.getQuantity());
             bookRepository.save(book);
 
-            // Build the real OrderItem from the DTO
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setBookId(cartItem.getBookId());
@@ -97,10 +85,8 @@ public class OrderService {
         order.setTotalPrice(totalOrderPrice);
         Order savedOrder = orderRepository.save(order);
 
-        // Capture the file path returned by the receipt generator
         String receiptFilePath = generateReceiptFile(savedOrder);
 
-        // Send the email and pass the file path!
         try {
             if (receiptFilePath != null) {
                 emailService.sendOrderConfirmation(
@@ -110,17 +96,13 @@ public class OrderService {
                         savedOrder.getTotalPrice(),
                         receiptFilePath
                 );
-            } else {
-                System.err.println("Email skipped because receipt file path was null.");
             }
         } catch (Exception e) {
-            System.err.println("Receipt file created, but Email failed: " + e.getMessage());
+            System.err.println(e.getMessage());
         }
 
         return savedOrder;
     }
-
-    //receipt generation
 
     private String generateReceiptFile(Order order) {
         File folder = new File("files");
@@ -137,8 +119,9 @@ public class OrderService {
             printWriter.println("==========================================");
             printWriter.println("        NEXUS BOOKSTORE RECEIPT          ");
             printWriter.println("==========================================");
-            printWriter.println("Order ID   : " + order.getOrderId());
+            printWriter.println("Order ID   : NX-" + order.getOrderId());
             printWriter.println("Date       : " + order.getOrderDate());
+            printWriter.println("Payment    : " + (order.getPaymentMethod() != null ? order.getPaymentMethod() : "N/A"));
             printWriter.println("------------------------------------------");
 
             for (OrderItem item : order.getItems()) {
@@ -159,12 +142,9 @@ public class OrderService {
             printWriter.println("        Developed by Group WD130          ");
             printWriter.println("==========================================");
 
-            System.out.println(">>> Receipt generated successfully: " + fileName);
-
             return fileName;
 
         } catch (IOException e) {
-            System.out.println("Error generating receipt file: " + e.getMessage());
             return null;
         }
     }

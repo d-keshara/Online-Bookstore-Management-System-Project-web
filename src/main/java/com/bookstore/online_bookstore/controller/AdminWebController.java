@@ -177,4 +177,43 @@ public class AdminWebController {
         ra.addFlashAttribute("successMessage", "Invite code revoked successfully.");
         return "redirect:/admin/dashboard";
     }
+
+    // Shows the Publish Review Page
+    @GetMapping("/requests/review/{id}")
+    public String showPublishReviewPage(@PathVariable("id") Integer id, Model model) {
+        Book book = bookRepository.findById(id).orElse(null);
+
+        if (book == null) {
+            return "redirect:/admin/requests?error=BookNotFound";
+        }
+
+        model.addAttribute("book", book);
+        return "admin-approve-book";
+    }
+
+    // Approves the book and sets price/stock
+    @PostMapping("/requests/approve/{id}")
+    public String approveBookRequest(@PathVariable("id") Integer id,
+                                     @RequestParam("price") java.math.BigDecimal price,
+                                     @RequestParam("stock") Integer stock,
+                                     RedirectAttributes ra) {
+        bookRepository.findById(id).ifPresent(book -> {
+            book.setPrice(price);
+            book.setStock(stock);
+            book.setApprovalStatus("APPROVED");
+            bookRepository.save(book);
+        });
+        ra.addFlashAttribute("successMessage", "Book Published Successfully!");
+        return "redirect:/admin/requests";
+    }
+
+    @PostMapping("/requests/decline/{id}")
+    public String declineBookRequest(@PathVariable("id") Integer id, RedirectAttributes ra) {
+        bookRepository.findById(id).ifPresent(book -> {
+            book.setApprovalStatus("REJECTED");
+            bookRepository.save(book);
+        });
+        ra.addFlashAttribute("successMessage", "Book request was successfully declined and rejected.");
+        return "redirect:/admin/requests";
+    }
 }

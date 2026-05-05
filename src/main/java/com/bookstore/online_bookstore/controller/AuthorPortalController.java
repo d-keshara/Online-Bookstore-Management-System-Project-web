@@ -24,12 +24,6 @@ public class AuthorPortalController {
         this.authorRepository = authorRepository;
     }
 
-    @GetMapping("/dashboard")
-    public String showAuthorDashboard(Model model, Principal principal) {
-        model.addAttribute("username", principal.getName());
-        return "author-dashboard";
-    }
-
     @GetMapping("/my-books")
     public String showMyBooks(Model model, Principal principal) {
         User user = userRepository.findByUsername(principal.getName())

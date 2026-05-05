@@ -63,7 +63,7 @@
             </td>
 
             <td>
-                <!-- 🌟 UPDATED STATUS BADGES 🌟 -->
+                <!-- STATUS BADGES -->
                 <span th:if="${order.status == null or order.status == '' or order.status == 'PROCESSING'}" class="status-badge bg-info bg-opacity-10 text-info border border-info">
                     <i class="bi bi-gear-fill me-1"></i> Processing
                 </span>
@@ -80,7 +80,6 @@
                     <i class="bi bi-truck me-1"></i> Shipped
                 </span>
 
-                <!-- 🌟 NEW: Cancelled Badge 🌟 -->
                 <span th:if="${order.status == 'CANCELLED'}" class="status-badge bg-danger bg-opacity-10 text-danger border border-danger">
                     <i class="bi bi-x-circle-fill me-1"></i> Cancelled
                 </span>
@@ -88,13 +87,14 @@
 
             <td class="text-center">
                 <div class="d-flex gap-2 justify-content-center">
-                    <a th:href="@{'/api/orders/receipt/' + ${order.orderId}}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">
+                    <!-- 🌟 FIXED RECEIPT URL 🌟 -->
+                    <a th:href="@{'/orders/receipt/' + ${order.orderId}}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">
                         <i class="bi bi-download me-1"></i> Receipt
                     </a>
 
-                    <!-- 🌟 NEW: Cancel Button (Only for Processing/Pending orders) 🌟 -->
+                    <!-- 🌟 FIXED CANCEL URL 🌟 -->
                     <form th:if="${order.status == null or order.status == '' or order.status == 'PROCESSING' or order.status == 'PENDING'}"
-                          th:action="@{'/admin/orders/cancel/' + ${order.orderId}}" method="post" class="m-0">
+                          th:action="@{'/orders/cancel/' + ${order.orderId}}" method="post" class="m-0">
                         <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-sm"
                                 onclick="return confirm('Are you sure you want to cancel this order?')">
                             Cancel

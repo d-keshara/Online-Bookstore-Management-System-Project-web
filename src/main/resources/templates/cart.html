@@ -17,7 +17,6 @@
     }
     body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); }
 
-    /* NAVBAR */
     .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; }
     .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
     .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
@@ -27,7 +26,6 @@
     .btn-nav-ghost { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 12.5px; font-weight: 500; padding: 0.42rem 0.9rem; border: 1px solid transparent; color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.15s; }
     .btn-nav-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); }
 
-    /* CART LAYOUT */
     .page-layout { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; min-height: 60vh; }
     .cart-title { font-family: 'Playfair Display', serif; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 2rem; }
 
@@ -46,7 +44,6 @@
 
     .btn-remove { background: none; border: none; color: #b83232; font-size: 0.85rem; text-decoration: underline; padding: 0; }
 
-    /* Qty Adjuster styles */
     .qty-btn { background: transparent; border: 1px solid var(--border); color: var(--ink); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: 0.15s; }
     .qty-btn:hover { background: var(--paper-warm); }
   </style>
@@ -91,7 +88,6 @@
           </form>
         </div>
 
-        <!-- 🌟 UPDATED: Added + and - quantity controls 🌟 -->
         <div class="text-end d-flex flex-column align-items-end">
           <div class="d-flex align-items-center gap-2 mb-2">
             <span class="text-muted small">Qty:</span>

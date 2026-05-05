@@ -18,7 +18,6 @@
 
         body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); font-size: 16px; display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* NAVBAR */
         .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; }
         .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
         .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
@@ -28,7 +27,6 @@
         .btn-nav-ghost { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 12.5px; font-weight: 500; padding: 0.42rem 0.9rem; border: 1px solid transparent; color: rgba(255,255,255,0.8); text-decoration: none; transition: 0.15s; }
         .btn-nav-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); }
 
-        /* PAGE SPECIFIC STYLING */
         .page-layout { max-width: 1100px; margin: 4rem auto; padding: 0 2rem; flex: 1; }
         .book-cover-large { background: var(--paper-warm); height: 550px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; border: 1px solid var(--border); }
         .book-cover-large img { width: 100%; height: 100%; object-fit: cover; }
@@ -42,7 +40,6 @@
         .btn-buy-now { background: var(--accent); color: #fff; border: none; font-weight: 600; letter-spacing: 0.5px; transition: 0.2s; }
         .btn-buy-now:hover { background: var(--accent-dark); color: #fff; }
 
-        /* Hide Number Input Arrows */
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
     </style>
@@ -59,20 +56,17 @@
     </div>
 </nav>
 
-<!-- ══ NOTIFICATIONS ══ -->
 <div th:if="${param.added != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: var(--accent-light); color: var(--accent-dark); font-weight: 600; padding: 0.8rem;" role="alert">
     <i class="bi bi-bag-check-fill me-2 fs-5 align-text-bottom"></i> Book successfully added to your cart!
     <a th:href="@{/cart}" class="ms-3 fw-bold text-decoration-underline" style="color: var(--accent-dark);">View Cart</a>
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
-<!-- NEW: Review Success Message -->
 <div th:if="${param.review_success != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #e8f4eb; color: #1e4620; font-weight: 600; padding: 0.8rem;" role="alert">
     <i class="bi bi-star-fill me-2 fs-5 align-text-bottom text-warning"></i> Review posted successfully! Thank you for your feedback.
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
-<!-- NEW: Review Duplicate Error Message -->
 <div th:if="${param.review_error != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #fde8e8; color: #721c24; font-weight: 600; padding: 0.8rem;" role="alert">
     <i class="bi bi-exclamation-triangle-fill me-2 fs-5 align-text-bottom"></i> You have already submitted a review for this book!
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -108,7 +102,7 @@
             <div class="add-to-cart-box">
                 <div sec:authorize="isAuthenticated()">
 
-                    <form method="post" class="m-0 w-100">
+                    <form th:action="@{/cart/add}" method="post" class="m-0 w-100">
                         <input type="hidden" name="bookId" th:value="${book.bookId}">
                         <div class="d-flex align-items-center mb-4">
                             <label class="fw-bold me-3 text-muted">Quantity:</label>
@@ -124,10 +118,10 @@
                         </div>
 
                         <div class="d-flex gap-3">
-                            <button type="submit" formaction="/cart/add" class="btn btn-massive-cart w-100 py-3 fs-5 shadow-sm rounded-1" th:disabled="${book.stock <= 0}">
+                            <button type="submit" class="btn btn-massive-cart w-100 py-3 fs-5 shadow-sm rounded-1" th:disabled="${book.stock <= 0}">
                                 <i class="bi bi-cart-plus me-2"></i> Add to Cart
                             </button>
-                            <button type="submit" formaction="/buy" class="btn btn-buy-now w-100 py-3 fs-5 shadow-sm rounded-1" th:disabled="${book.stock <= 0}">
+                            <button type="submit" class="btn btn-buy-now w-100 py-3 fs-5 shadow-sm rounded-1" th:disabled="${book.stock <= 0}">
                                 <i class="bi bi-lightning-charge me-2"></i> Buy Now
                             </button>
                         </div>
@@ -141,7 +135,6 @@
                 </div>
             </div>
 
-            <!-- 🌟 UPDATED: Dynamic Reviews Section reads from ${reviews} variable 🌟 -->
             <div class="mt-5 pt-4 border-top">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="font-playfair fw-bold mb-0">Customer Reviews</h4>
@@ -150,7 +143,6 @@
                     </button>
                 </div>
 
-                <!-- If NO reviews exist -->
                 <div th:if="${reviews == null or reviews.empty}" class="p-4 rounded" style="background: var(--paper-warm); border: 1px dashed var(--border-strong);">
                     <div class="text-muted fst-italic text-center">
                         <i class="bi bi-stars text-warning fs-3 mb-2 d-block"></i>
@@ -158,7 +150,6 @@
                     </div>
                 </div>
 
-                <!-- If reviews DO exist -->
                 <div th:if="${reviews != null and !reviews.empty}" class="d-flex flex-column gap-3">
                     <div th:each="review : ${reviews}" class="p-4 rounded shadow-sm" style="background: var(--paper-card); border: 1px solid var(--border);">
                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -166,7 +157,6 @@
                                 <strong style="color: var(--ink);" th:text="${review.user != null ? review.user.username : 'Verified Reader'}">User</strong>
                             </div>
                             <div class="text-warning fs-6">
-                                <!-- Dynamic Star Rating Display -->
                                 <i th:class="${review.rating >= 1 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
                                 <i th:class="${review.rating >= 2 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
                                 <i th:class="${review.rating >= 3 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
@@ -183,10 +173,9 @@
     </div>
 </div>
 
-<!-- The Sleek Review Modal (Popup) -->
 <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background: var(--paper-card); border: none; border-radius: var(--radius-lg); box-shadow: var(--shadow-hover);">
+        <div class="modal-content" style="background: var(--paper-card); border: none; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
             <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
                 <h4 class="modal-title font-playfair fw-bold" id="reviewModalLabel" style="color: var(--ink);">Write a Review</h4>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
