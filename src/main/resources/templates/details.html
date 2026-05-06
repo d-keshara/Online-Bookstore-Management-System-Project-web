@@ -112,9 +112,9 @@
 
             <!-- DYNAMIC SYNOPSIS -->
             <div class="mb-4 bg-white p-3 rounded-1 border shadow-sm">
-                <h5 class="fw-semibold mb-2 font-playfair fs-5" style="color: var(--ink);">Synopsis</h5>
+                <h5 class="fw-semibold mb-2 font-playfair fs-5" style="color: var(--ink);">Details</h5>
                 <p th:if="${not #strings.isEmpty(book.description)}" style="font-size: 0.95rem; line-height: 1.7; color: var(--ink-soft); margin-bottom: 0; font-weight: 400;" th:text="${book.description}"></p>
-                <p th:if="${#strings.isEmpty(book.description)}" class="text-muted fst-italic mb-0" style="font-size: 0.9rem;">No synopsis available for this title.</p>
+                <p th:if="${#strings.isEmpty(book.description)}" class="text-muted fst-italic mb-0" style="font-size: 0.9rem;">No Details available for this title.</p>
             </div>
 
             <!-- Scaled Down Add to Cart & Buy Now Box -->
@@ -136,7 +136,8 @@
                             <button type="submit" class="btn btn-massive-cart w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-light text-muted border-light' : ''}">
                                 <i class="bi bi-cart-plus me-1 opacity-75"></i> Add to Cart
                             </button>
-                            <button type="submit" formaction="/buy" class="btn btn-buy-now w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-secondary border-secondary' : ''}">
+                            <!-- Buy Now button updated to use default form action -->
+                            <button type="submit" class="btn btn-buy-now w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-secondary border-secondary' : ''}">
                                 <i class="bi bi-lightning-charge-fill text-warning me-1 opacity-75"></i> Buy Now
                             </button>
                         </div>
