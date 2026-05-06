@@ -34,4 +34,5 @@ build/
 
 /files/
 src/main/resources/static/images/*
-/receipts/
+/receipts/*
+!/receipts/.gitkeep
