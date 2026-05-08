@@ -60,7 +60,7 @@
 
 <div class="page-layout">
     <div class="row gx-lg-5">
-        
+
         <div class="col-lg-3 mb-4">
             <div class="sidebar-card">
                 <nav class="d-flex flex-column">
@@ -82,7 +82,6 @@
                 </div>
             </div>
 
-            <!-- Empty State Fallback -->
             <div th:if="${author.books.empty}" class="text-center py-5 border rounded" style="background: var(--paper-card);">
                 <i class="bi bi-journal-x fs-1 text-muted mb-3 d-block"></i>
                 <h5 class="fw-bold">No books published yet</h5>
@@ -90,11 +89,11 @@
                 <a th:href="@{/author/dashboard}" class="btn btn-dark mt-2">Go to Dashboard</a>
             </div>
 
-            <!-- Book Grid Layout -->
             <div class="row g-4">
                 <div class="col-md-6 col-lg-4" th:each="book : ${author.books}">
-                    <div class="book-card shadow-sm">
-                        
+
+                    <div class="book-card shadow-sm" th:style="${book.approvalStatus == 'DECLINED' or book.approvalStatus == 'REJECTED'} ? 'background-color: #f8f9fa; opacity: 0.7; filter: grayscale(100%); border-color: #ddd;' : ''">
+
                         <div class="book-cover-placeholder">
                             <img th:if="${book.coverImagePath != null}" th:src="@{${book.coverImagePath}}" style="width: 100%; height: 100%; object-fit: cover;" alt="Cover">
                             <i th:if="${book.coverImagePath == null}" class="bi bi-journal-text" style="font-size: 3rem; color: var(--ink-muted); opacity: 0.5;"></i>
@@ -103,15 +102,21 @@
                         <div class="book-card-body">
                             <div class="book-category" th:text="${book.category != null ? book.category : 'General'}">Category</div>
                             <div class="book-title" th:text="${book.title}">Book Title</div>
-                            
+
                             <div class="d-flex justify-content-between align-items-end mt-4 mb-3">
-                                <div class="book-price" th:text="'LKR ' + ${book.price}">LKR 0.00</div>
-                                <span class="badge" style="background: #e8f4eb; color: #1e4620; border: 1px solid #c3e6cb;" th:if="${book.stock != null and book.stock > 0}">Live</span>
+                                <div class="book-price" th:text="${book.price != null ? 'LKR ' + book.price : 'LKR 0.00'}">LKR 0.00</div>
+
+                                <span class="badge" style="background: #e8f4eb; color: #1e4620; border: 1px solid #c3e6cb;" th:if="${book.approvalStatus == 'APPROVED'}">Live</span>
+                                <span class="badge bg-warning bg-opacity-25 text-dark border border-warning" th:if="${book.approvalStatus == 'PENDING'}">Pending</span>
+                                <span class="badge bg-secondary text-white border border-secondary" th:if="${book.approvalStatus == 'DECLINED' or book.approvalStatus == 'REJECTED'}">Declined</span>
                             </div>
 
-                            <a th:href="@{/details/{id}(id=${book.bookId})}" class="btn btn-manage mt-auto text-center text-decoration-none">
+                            <a th:if="${book.approvalStatus == 'APPROVED'}" th:href="@{/details(id=${book.bookId})}" class="btn btn-manage mt-auto text-center text-decoration-none">
                                 <i class="bi bi-eye me-1"></i> View in Store
                             </a>
+                            <button th:unless="${book.approvalStatus == 'APPROVED'}" class="btn btn-manage mt-auto text-center" disabled>
+                                <i class="bi bi-eye-slash me-1"></i> Not in Store
+                            </button>
                         </div>
                     </div>
                 </div>

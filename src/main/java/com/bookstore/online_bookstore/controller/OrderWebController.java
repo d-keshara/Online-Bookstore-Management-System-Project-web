@@ -1,9 +1,12 @@
 package com.bookstore.online_bookstore.controller;
 
 import com.bookstore.online_bookstore.entity.Order;
+import com.bookstore.online_bookstore.entity.OrderItem;
 import com.bookstore.online_bookstore.entity.User;
+import com.bookstore.online_bookstore.entity.CartItem;
 import com.bookstore.online_bookstore.repository.OrderRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
+import com.bookstore.online_bookstore.repository.CartItemRepository;
 import com.bookstore.online_bookstore.service.CartService;
 import com.bookstore.online_bookstore.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/orders")
@@ -37,6 +42,8 @@ public class OrderWebController {
     private CartService cartService;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
     private String generateReceiptText(Order order) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -74,6 +81,25 @@ public class OrderWebController {
         order.setUser(user);
         order.setPaymentMethod(paymentMethod);
         order.setTotalPrice(BigDecimal.valueOf(cartService.calculateTotal(user)));
+
+        // 🔥 THE FIX: Transfer the user's cart items into the actual order before saving
+        List<CartItem> cartItems = cartItemRepository.findByUser(user);
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        for (CartItem cItem : cartItems) {
+            OrderItem oItem = new OrderItem();
+            oItem.setOrder(order);
+            oItem.setBookId(cItem.getBook().getBookId()); // Now the DB knows exactly which book sold!
+            oItem.setQuantity(cItem.getQuantity());
+
+            BigDecimal itemPrice = cItem.getBook().getPrice().multiply(BigDecimal.valueOf(cItem.getQuantity()));
+            oItem.setPrice(itemPrice);
+
+            orderItems.add(oItem);
+        }
+
+        // Attach the items to the order. CascadeType.ALL in your Order entity will save them to MySQL automatically.
+        order.setItems(orderItems);
 
         if ("COD".equals(paymentMethod)) {
             order.setStatus("PROCESSING");
