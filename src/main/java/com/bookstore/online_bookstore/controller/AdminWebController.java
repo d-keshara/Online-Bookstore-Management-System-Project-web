@@ -54,6 +54,12 @@ public class AdminWebController {
                 .collect(Collectors.toList());
         model.addAttribute("unusedTokens", availableTokens);
 
+        // 🔥 PENDING COUNT FOR RED BADGE
+        long pendingCount = bookRepository.findAll().stream()
+                .filter(book -> "PENDING".equals(book.getApprovalStatus()))
+                .count();
+        model.addAttribute("pendingCount", pendingCount);
+
         return "admin-dashboard";
     }
 
@@ -178,7 +184,6 @@ public class AdminWebController {
         return "redirect:/admin/dashboard";
     }
 
-    // Shows the Publish Review Page
     @GetMapping("/requests/review/{id}")
     public String showPublishReviewPage(@PathVariable("id") Integer id, Model model) {
         Book book = bookRepository.findById(id).orElse(null);
@@ -191,7 +196,6 @@ public class AdminWebController {
         return "admin-approve-book";
     }
 
-    // Approves the book and sets price/stock
     @PostMapping("/requests/approve/{id}")
     public String approveBookRequest(@PathVariable("id") Integer id,
                                      @RequestParam("price") java.math.BigDecimal price,
@@ -210,10 +214,10 @@ public class AdminWebController {
     @PostMapping("/requests/decline/{id}")
     public String declineBookRequest(@PathVariable("id") Integer id, RedirectAttributes ra) {
         bookRepository.findById(id).ifPresent(book -> {
-            book.setApprovalStatus("REJECTED");
+            book.setApprovalStatus("DECLINED");
             bookRepository.save(book);
         });
-        ra.addFlashAttribute("successMessage", "Book request was successfully declined and rejected.");
+        ra.addFlashAttribute("successMessage", "Book request was declined and marked accordingly.");
         return "redirect:/admin/requests";
     }
 }

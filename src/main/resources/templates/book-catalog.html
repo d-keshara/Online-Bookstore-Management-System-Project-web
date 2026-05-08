@@ -108,13 +108,11 @@
         </form>
 
         <div class="nav-actions">
-            <!-- GUEST VIEW -->
             <div sec:authorize="isAnonymous()">
                 <a th:href="@{/login}" class="btn-nav btn-nav-ghost"><i class="bi bi-person"></i> Sign In</a>
                 <a th:href="@{/register}" class="btn-nav btn-nav-accent ms-1">Sign Up</a>
             </div>
 
-            <!-- LOGGED IN VIEW -->
             <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-1">
                 <a th:href="@{/cart}" class="btn-nav btn-nav-ghost"><i class="bi bi-cart3 fs-5"></i> Cart</a>
                 <a th:href="@{/my-orders}" class="btn-nav btn-nav-ghost"><i class="bi bi-box-seam fs-5"></i> Orders</a>
@@ -135,7 +133,6 @@
     </div>
 </nav>
 
-<!-- ══ NOTIFICATIONS ══ -->
 <div th:if="${orderSuccess}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #e8f4eb; color: #1e4620; font-weight: 600; padding: 1rem; border-bottom: 2px solid #c3e6cb !important;" role="alert">
     <i class="bi bi-check-circle-fill me-2 fs-5 align-text-bottom"></i>
     <span th:text="${orderSuccess}"></span>
@@ -149,7 +146,6 @@
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
-<!-- ══ 10 CATEGORIES BAR ══ -->
 <div class="cat-bar-wrapper">
     <div class="cat-bar">
         <a class="cat-pill" th:href="@{/catalog(sort=${currentSort})}" th:classappend="${selectedCategory == null || selectedCategory == ''} ? 'active'"><i class="bi bi-grid me-1"></i> All Books</a>
@@ -166,7 +162,6 @@
     </div>
 </div>
 
-<!-- ══ DYNAMIC HERO STRIP ══ -->
 <div class="hero-strip shadow-sm">
     <h1>
         <span th:if="${selectedCategory != null and selectedCategory != ''}" th:text="${selectedCategory}">Category Name</span>
@@ -190,7 +185,6 @@
         </div>
     </div>
 
-    <!-- BOOK GRID -->
     <div class="book-grid" th:if="${books != null and !books.empty}">
         <div class="book-card" th:each="book : ${books}">
 
@@ -241,7 +235,6 @@
         <a th:href="@{/catalog}" class="btn btn-dark mt-3 px-4 py-2 rounded-1">Clear Filters</a>
     </div>
 
-    <!-- BLACK THEMED PAGINATION -->
     <nav th:if="${totalPages != null and totalPages > 1}" class="mt-5 pt-4">
         <ul class="pagination justify-content-center shadow-sm rounded overflow-hidden">
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
@@ -263,9 +256,7 @@
     </nav>
 </div>
 
-<!-- ══ PREMIUM ENHANCED FOOTER ══ -->
 <footer class="mt-auto position-relative" style="background: var(--ink); color: rgba(255,255,255,0.7); font-size: 15px; padding-top: 5rem; padding-bottom: 2rem; margin-top: 5rem;">
-    <!-- Decorative Top Accent Line -->
     <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, var(--accent) 0%, #e67e22 50%, var(--accent) 100%);"></div>
 
     <div class="container" style="max-width: 1200px;">
@@ -331,6 +322,104 @@
         </div>
     </div>
 </footer>
+
+<button id="ai-chat-toggle-btn" onclick="toggleAIChat()" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: white; font-weight: bold; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1051; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, box-shadow 0.2s;">
+    <i class="bi bi-robot"></i>
+</button>
+
+<div id="ai-chat-widget" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 340px; background: var(--paper-card); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); flex-direction: column; overflow: hidden; z-index: 1050;">
+
+    <div style="background: var(--ink); color: white; padding: 12px 15px; font-family: 'Playfair Display', serif; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+        <span><i class="bi bi-stars text-warning me-2"></i> Nexus AI Librarian</span>
+        <button onclick="toggleAIChat()" style="background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 1.2rem; transition: 0.2s;">&times;</button>
+    </div>
+
+    <div id="ai-chat-box" style="height: 280px; overflow-y: auto; padding: 15px; font-size: 0.9rem; color: var(--ink-soft); background: var(--paper);">
+        <p class="mb-2"><strong style="color: var(--accent);">Librarian:</strong> Welcome! I'm the Nexus AI. I can help you find books currently in our catalog. What are you looking for?</p>
+    </div>
+
+    <div style="display: flex; border-top: 1px solid var(--border); background: white; padding: 5px;">
+        <input type="text" id="ai-user-input" placeholder="Ask about our books..." style="flex: 1; border: none; padding: 10px; outline: none; font-family: 'DM Sans', sans-serif;" onkeypress="if(event.key === 'Enter') askPhi3()">
+        <button onclick="askPhi3()" style="background: var(--accent); color: white; border: none; border-radius: 4px; padding: 0 15px; cursor: pointer; font-weight: bold; transition: 0.2s;"><i class="bi bi-send"></i></button>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 1. Secretly grab the books from Thymeleaf and put them into a JS Array
+    let storeInventory = [];
+    /*[# th:if="${books != null}"]*/
+        /*[# th:each="book : ${books}"]*/
+            storeInventory.push(/*[[${book.title} + ' (Category: ' + ${book.category} + ')']]*/);
+        /*[/]*/
+    /*[/]*/
+    let inventoryString = storeInventory.length > 0 ? storeInventory.join(', ') : 'No books currently in stock.';
+    /*]]>*/
+
+    // Toggle Chat Window Visibility
+    function toggleAIChat() {
+        const widget = document.getElementById('ai-chat-widget');
+        const btn = document.getElementById('ai-chat-toggle-btn');
+
+        if (widget.style.display === 'none' || widget.style.display === '') {
+            widget.style.display = 'flex';
+            btn.innerHTML = '<i class="bi bi-x-lg"></i>'; // Change icon to X
+            btn.style.background = 'var(--ink)';
+        } else {
+            widget.style.display = 'none';
+            btn.innerHTML = '<i class="bi bi-robot"></i>'; // Change icon back to Robot
+            btn.style.background = 'var(--accent)';
+        }
+    }
+
+    async function askPhi3() {
+        const inputField = document.getElementById('ai-user-input');
+        const chatBox = document.getElementById('ai-chat-box');
+        const question = inputField.value.trim();
+        if (!question) return;
+
+        // Print the user's question
+        chatBox.innerHTML += `<p class="mb-2"><strong>You:</strong> ${question}</p>`;
+        inputField.value = '';
+
+        // Show a loading indicator
+        chatBox.innerHTML += `<p id="ai-loading" class="mb-2 text-muted fst-italic small">Checking inventory...</p>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+// Construct the super-prompt with our injected database knowledge
+    const systemPrompt = `You are an expert AI Librarian for Nexus Bookstore.
+    IMPORTANT FACT: You ONLY sell the books in this exact list: [${inventoryString}].
+    If a customer asks for a recommendation or a specific topic, enthusiastically suggest a relevant book FROM THIS LIST ONLY.
+    If they ask for a book you don't have, politely suggest the closest match from the list.
+    RULE 1: NEVER apologize or say "I'm sorry".
+    RULE 2: NEVER invent fake books, aisles, or physical locations.
+    RULE 3: Keep your answer under 50 words.
+    Customer asks: ${question}`;
+
+        try {
+            const response = await fetch('http://localhost:11434/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'phi3:mini',
+                    prompt: systemPrompt,
+                    stream: false
+                })
+            });
+
+            const data = await response.json();
+
+            // Print Phi-3's answer
+            document.getElementById('ai-loading').remove();
+            chatBox.innerHTML += `<p class="mb-3 border-bottom pb-2"><strong style="color: var(--accent);">Librarian:</strong> ${data.response}</p>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+        } catch (error) {
+            document.getElementById('ai-loading').remove();
+            chatBox.innerHTML += `<p class="mb-2 text-danger"><strong>System:</strong> Cannot connect to AI. Please ensure Ollama is running.</p>`;
+        }
+    }
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

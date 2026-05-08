@@ -3,8 +3,13 @@ package com.bookstore.online_bookstore.controller;
 import com.bookstore.online_bookstore.entity.Author;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.User;
+import com.bookstore.online_bookstore.entity.Order;
+import com.bookstore.online_bookstore.entity.OrderItem;
+import com.bookstore.online_bookstore.entity.Review;
 import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
+import com.bookstore.online_bookstore.repository.OrderRepository;
+import com.bookstore.online_bookstore.repository.ReviewRepository;
 import com.bookstore.online_bookstore.service.AuthorService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,15 +30,20 @@ public class AuthorWebController {
     private final AuthorService authorService;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final OrderRepository orderRepository;
+    private final ReviewRepository reviewRepository;
 
     public AuthorWebController(AuthorService authorService,
                                UserRepository userRepository,
-                               BookRepository bookRepository) {
+                               BookRepository bookRepository,
+                               OrderRepository orderRepository,
+                               ReviewRepository reviewRepository) {
         this.authorService = authorService;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+        this.orderRepository = orderRepository;
+        this.reviewRepository = reviewRepository;
     }
-
 
     @GetMapping("/admin/authors")
     public String listAuthors(Model model, @RequestParam(defaultValue = "0") int page) {
@@ -46,8 +57,6 @@ public class AuthorWebController {
         return "authors-list";
     }
 
-
-    // Loads the Author Dashboard and their specific book submissions
     @GetMapping("/author/dashboard")
     public String showAuthorDashboard(Model model, Principal principal) {
         if (principal == null) return "redirect:/login";
@@ -55,14 +64,59 @@ public class AuthorWebController {
         User currentUser = userRepository.findByUsername(principal.getName()).orElse(null);
 
         if (currentUser != null && currentUser.getAuthor() != null) {
-            // Safely filters all books to find only the ones belonging to this specific author
             List<Book> myBooks = bookRepository.findAll().stream()
                     .filter(book -> book.getAuthor() != null &&
                             book.getAuthor().getId().equals(currentUser.getAuthor().getId()))
                     .collect(Collectors.toList());
 
-            model.addAttribute("books", myBooks);
+            int totalBooksSold = 0;
+            double totalRating = 0.0;
+            int totalReviews = 0;
+            List<String> chartLabels = new ArrayList<>();
+            List<Integer> chartData = new ArrayList<>();
+
+            List<Order> allOrders = orderRepository.findAll();
+
+            for (Book book : myBooks) {
+                if ("APPROVED".equals(book.getApprovalStatus())) {
+
+                    String shortTitle = book.getTitle();
+                    if (shortTitle != null && shortTitle.length() > 15) {
+                        shortTitle = shortTitle.substring(0, 15) + "...";
+                    }
+                    chartLabels.add(shortTitle);
+
+                    int bookSales = 0;
+                    for (Order order : allOrders) {
+                        if (order.getItems() != null) {
+                            for (OrderItem item : order.getItems()) {
+                                if (item.getBookId() != null && item.getBookId().equals(book.getBookId())) {
+                                    int qty = (item.getQuantity() != null && item.getQuantity() > 0) ? item.getQuantity() : 1;
+                                    bookSales += qty;
+                                }
+                            }
+                        }
+                    }
+
+                    chartData.add(bookSales);
+                    totalBooksSold += bookSales;
+
+                    List<Review> reviews = reviewRepository.findByBook_BookId(book.getBookId());
+                    for (Review r : reviews) {
+                        totalRating += r.getRating();
+                        totalReviews++;
+                    }
+                }
+            }
+
+            double averageRating = totalReviews > 0 ? totalRating / totalReviews : 0.0;
+
+            model.addAttribute("books", myBooks); // We still pass all books so they show in the table!
             model.addAttribute("username", currentUser.getUsername());
+            model.addAttribute("totalBooksSold", totalBooksSold);
+            model.addAttribute("averageRating", String.format("%.1f", averageRating));
+            model.addAttribute("chartLabels", chartLabels);
+            model.addAttribute("chartData", chartData);
         }
 
         return "author-dashboard";
