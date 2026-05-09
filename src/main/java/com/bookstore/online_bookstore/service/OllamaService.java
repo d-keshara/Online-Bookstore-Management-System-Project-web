@@ -111,4 +111,29 @@ public class OllamaService {
             return "Error generating email. Please write manually.";
         }
     }
+    
+    // Review Summarizer
+    public String summarizeBookReviews(String reviewsText) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Forces the AI to stop chatting and just give the answer.
+        String prompt = "You are a strict data summarizer. Read the following book reviews and output exactly ONE direct sentence summarizing the overall customer consensus. Do NOT use conversational filler like 'Here is the summary' or 'I would be happy to'. Do NOT invent or hallucinate details. If the reviews are very short, just say 'Customers generally left positive feedback.' \n\nReviews to summarize: " + reviewsText;
+
+        String requestJson = String.format("{\"model\": \"%s\", \"prompt\": \"%s\", \"stream\": false}",
+                MODEL_NAME, prompt.replace("\"", "\\\"").replace("\n", " "));
+
+        HttpEntity<String> request = new HttpEntity<>(requestJson, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(OLLAMA_API_URL, request, String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+            return root.path("response").asText().trim();
+        } catch (Exception e) {
+            return "Unable to generate summary at this time.";
+        }
+    }
+
 }
