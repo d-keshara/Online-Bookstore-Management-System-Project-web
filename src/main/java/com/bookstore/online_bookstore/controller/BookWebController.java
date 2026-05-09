@@ -67,7 +67,7 @@ public class BookWebController {
         } else {
             bookPage = bookRepository.findByApprovalStatus("APPROVED", pageable);
         }
-        
+
 
         model.addAttribute("books", bookPage);
         model.addAttribute("currentPage", page);
@@ -147,7 +147,7 @@ public class BookWebController {
             review.setCreatedAt(LocalDateTime.now());
 
             // AUTO-MODERATOR: Check for extreme profanity
-            String[] badWords = {"fuck", "shit", "bitch", "asshole", "cunt"};
+            String[] badWords = {"garbage", "trash", "scam", "worst", "terrible"};
             boolean hasBadWords = false;
             for (String word : badWords) {
                 if (comment.toLowerCase().contains(word)) {
