@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,18 +26,21 @@ public class AdminWebController {
     private final AuthorRepository authorRepository;
     private final UserRepository userRepository;
     private final InviteTokenRepository inviteTokenRepository;
+    private final ReviewRepository reviewRepository;
 
     @Autowired
     public AdminWebController(BookRepository bookRepository,
                               OrderRepository orderRepository,
                               AuthorRepository authorRepository,
                               UserRepository userRepository,
-                              InviteTokenRepository inviteTokenRepository) {
+                              InviteTokenRepository inviteTokenRepository,
+                              ReviewRepository reviewRepository) {
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
         this.authorRepository = authorRepository;
         this.userRepository = userRepository;
         this.inviteTokenRepository = inviteTokenRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     // MAIN DASHBOARD
@@ -54,11 +56,16 @@ public class AdminWebController {
                 .collect(Collectors.toList());
         model.addAttribute("unusedTokens", availableTokens);
 
-        // 🔥 PENDING COUNT FOR RED BADGE
         long pendingCount = bookRepository.findAll().stream()
                 .filter(book -> "PENDING".equals(book.getApprovalStatus()))
                 .count();
         model.addAttribute("pendingCount", pendingCount);
+
+        // Fetch all NEGATIVE or HIDDEN reviews
+        List<Review> urgentReviews = reviewRepository.findAll().stream()
+                .filter(review -> "NEGATIVE".equalsIgnoreCase(review.getSentiment()) || review.isHidden())
+                .collect(Collectors.toList());
+        model.addAttribute("urgentReviews", urgentReviews);
 
         return "admin-dashboard";
     }
@@ -187,11 +194,7 @@ public class AdminWebController {
     @GetMapping("/requests/review/{id}")
     public String showPublishReviewPage(@PathVariable("id") Integer id, Model model) {
         Book book = bookRepository.findById(id).orElse(null);
-
-        if (book == null) {
-            return "redirect:/admin/requests?error=BookNotFound";
-        }
-
+        if (book == null) return "redirect:/admin/requests?error=BookNotFound";
         model.addAttribute("book", book);
         return "admin-approve-book";
     }
@@ -214,10 +217,39 @@ public class AdminWebController {
     @PostMapping("/requests/decline/{id}")
     public String declineBookRequest(@PathVariable("id") Integer id, RedirectAttributes ra) {
         bookRepository.findById(id).ifPresent(book -> {
-            book.setApprovalStatus("DECLINED");
+            book.setApprovalStatus("REJECTED");
             bookRepository.save(book);
         });
-        ra.addFlashAttribute("successMessage", "Book request was declined and marked accordingly.");
+        ra.addFlashAttribute("successMessage", "Book request was successfully declined and rejected.");
         return "redirect:/admin/requests";
+    }
+
+    // ADMIN REVIEW MANAGEMENT ENDPOINTS
+    @PostMapping("/reviews/delete/{id}")
+    public String deleteReview(@PathVariable Integer id, RedirectAttributes ra) {
+        reviewRepository.deleteById(id);
+        ra.addFlashAttribute("successMessage", "Review was permanently deleted from the database.");
+        return "redirect:/admin/dashboard";
+    }
+
+    @PostMapping("/reviews/unhide/{id}")
+    public String unhideReview(@PathVariable Integer id, RedirectAttributes ra) {
+        reviewRepository.findById(id).ifPresent(review -> {
+            review.setHidden(false);
+            reviewRepository.save(review);
+        });
+        ra.addFlashAttribute("successMessage", "Review has been unhidden and is now public.");
+        return "redirect:/admin/dashboard";
+    }
+
+    // NEW: Manual Hide Endpoint
+    @PostMapping("/reviews/hide/{id}")
+    public String hideReview(@PathVariable Integer id, RedirectAttributes ra) {
+        reviewRepository.findById(id).ifPresent(review -> {
+            review.setHidden(true);
+            reviewRepository.save(review);
+        });
+        ra.addFlashAttribute("successMessage", "Review has been manually hidden from the public.");
+        return "redirect:/admin/dashboard";
     }
 }

@@ -53,7 +53,6 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-<!-- ══ PROFESSIONAL NAVBAR ══ -->
 <nav class="site-nav">
   <div class="nav-inner">
     <a class="nav-brand" href="/author/dashboard">
@@ -66,7 +65,6 @@
   </div>
 </nav>
 
-<!-- ══ MAIN FORM CONTENT ══ -->
 <div class="container mt-5 mb-5" style="max-width: 750px;">
 
   <div class="mb-4 text-center">
@@ -76,7 +74,6 @@
 
   <div class="form-card p-4 p-md-5">
 
-    <!-- Info Alert -->
     <div class="custom-alert p-3 mb-4 d-flex align-items-start gap-3">
       <i class="bi bi-info-circle-fill fs-5 mt-1"></i>
       <div>
@@ -84,7 +81,6 @@
       </div>
     </div>
 
-    <!-- Form submits to our new POST method -->
     <form th:action="@{/author/books/request/save}" th:object="${book}" method="post">
 
       <div class="mb-4">
@@ -94,7 +90,6 @@
 
       <div class="mb-4">
         <label class="form-label">Genre / Category</label>
-        <!-- UPDATED: Includes all 10 categories -->
         <select th:field="*{category}" class="form-select" required>
           <option value="" disabled selected>Select a category...</option>
           <option value="Fiction">Fiction</option>
@@ -104,7 +99,6 @@
           <option value="Biography">Biography</option>
           <option value="Educational">Educational</option>
           <option value="Romance">Romance</option>
-          <!-- NEW CATEGORIES -->
           <option value="Computers & Technology">Computers & Technology</option>
           <option value="History">History</option>
           <option value="Children & YA">Children & YA</option>
@@ -112,8 +106,14 @@
       </div>
 
       <div class="mb-4">
-        <label class="form-label">Book Description</label>
-        <textarea th:field="*{description}" class="form-control" rows="6" required placeholder="Write a compelling synopsis for your readers..."></textarea>
+        <label class="form-label fw-bold">Book Synopsis</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted small">Write a brief description of your book.</span>
+          <button type="button" id="aiEnhanceBtn" class="btn btn-sm text-white fw-bold shadow-sm" style="background: linear-gradient(45deg, #6b21a8, #c8602a);">
+            <i class="bi bi-stars"></i> Enhance with AI
+          </button>
+        </div>
+        <textarea th:field="*{description}" class="form-control" id="synopsisInput" rows="6" required placeholder="Type your rough draft here..."></textarea>
       </div>
 
       <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
@@ -125,13 +125,54 @@
   </div>
 </div>
 
-<!-- ══ FOOTER ══ -->
 <footer class="site-footer">
   <p style="font-family:'Playfair Display',serif;font-size:1.2rem;color:rgba(255,255,255,0.8);margin-bottom:0.4rem;font-weight:600;">
     NEXUS BOOKSTORE
   </p>
   <p>© 2026 Nexus Bookstore · Author Portal Services</p>
 </footer>
+
+<script>
+  document.getElementById('aiEnhanceBtn').addEventListener('click', async function() {
+      const synopsisBox = document.getElementById('synopsisInput');
+      const draftText = synopsisBox.value;
+      const btn = this;
+
+      if (draftText.trim().length < 10) {
+          alert("Please write at least a few words so the AI has something to work with!");
+          return;
+      }
+
+      // Change button state to loading
+      const originalBtnHtml = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Thinking...';
+      btn.disabled = true;
+
+      try {
+          // Send to your Spring Boot AI endpoint
+          const response = await fetch('/api/ai/enhance-synopsis', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ draft: draftText })
+          });
+
+          const data = await response.json();
+
+          if (data.enhanced) {
+              // Instantly update the text box with the AI rewrite!
+              synopsisBox.value = data.enhanced;
+          } else {
+              alert("AI Error: " + data.error);
+          }
+      } catch (error) {
+          alert("Connection error. Make sure your local Ollama is running and your Spring Boot API is set up!");
+      } finally {
+          // Restore button state
+          btn.innerHTML = originalBtnHtml;
+          btn.disabled = false;
+      }
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

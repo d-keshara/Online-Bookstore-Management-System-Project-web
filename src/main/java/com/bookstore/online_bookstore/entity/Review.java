@@ -17,6 +17,12 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
+    private String sentiment;
+
+    // 🔥 NEW: Tracks if the review is hidden due to bad words
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean isHidden;
+
     private LocalDateTime createdAt;
 
     @ManyToOne
