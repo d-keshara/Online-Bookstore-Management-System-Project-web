@@ -8,6 +8,7 @@ import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.ReviewRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
 import com.bookstore.online_bookstore.service.OrderService;
+import com.bookstore.online_bookstore.service.OllamaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
-import java.time.LocalDateTime; // 🌟 IMPORTED DATE/TIME
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class BookWebController {
@@ -30,31 +32,30 @@ public class BookWebController {
     private final UserRepository userRepository;
     private final OrderService orderService;
     private final ReviewRepository reviewRepository;
+    private final OllamaService ollamaService;
 
     public BookWebController(BookRepository bookRepository,
                              UserRepository userRepository,
                              OrderService orderService,
-                             ReviewRepository reviewRepository) {
+                             ReviewRepository reviewRepository,
+                             OllamaService ollamaService) {
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.orderService = orderService;
         this.reviewRepository = reviewRepository;
+        this.ollamaService = ollamaService;
     }
 
     @GetMapping("/catalog")
-    public String viewCatalog(Model model,
+    public String viewCatalog(Model model, Principal principal,
                               @RequestParam(required = false) String keyword,
                               @RequestParam(required = false) String category,
                               @RequestParam(required = false, defaultValue = "newest") String sort,
                               @RequestParam(defaultValue = "0") int page) {
 
         Sort jpaSort = Sort.by(Sort.Direction.DESC, "bookId");
-
-        if ("price_asc".equals(sort)) {
-            jpaSort = Sort.by(Sort.Direction.ASC, "price");
-        } else if ("price_desc".equals(sort)) {
-            jpaSort = Sort.by(Sort.Direction.DESC, "price");
-        }
+        if ("price_asc".equals(sort)) jpaSort = Sort.by(Sort.Direction.ASC, "price");
+        else if ("price_desc".equals(sort)) jpaSort = Sort.by(Sort.Direction.DESC, "price");
 
         Pageable pageable = PageRequest.of(page, 10, jpaSort);
         Page<Book> bookPage;
@@ -66,6 +67,7 @@ public class BookWebController {
         } else {
             bookPage = bookRepository.findByApprovalStatus("APPROVED", pageable);
         }
+        
 
         model.addAttribute("books", bookPage);
         model.addAttribute("currentPage", page);
@@ -88,11 +90,9 @@ public class BookWebController {
         if (book != null && user != null) {
             OrderRequestDTO orderRequest = new OrderRequestDTO();
             orderRequest.setUserId(Integer.valueOf(user.getId().toString()));
-
             OrderRequestDTO.CartItemDTO cartItem = new OrderRequestDTO.CartItemDTO();
             cartItem.setBookId(bookId);
             cartItem.setQuantity(1);
-
             List<OrderRequestDTO.CartItemDTO> cartItems = new ArrayList<>();
             cartItems.add(cartItem);
             orderRequest.setItems(cartItems);
@@ -110,15 +110,15 @@ public class BookWebController {
     @GetMapping("/details")
     public String viewBookDetails(@RequestParam("id") Integer id, Model model) {
         Book book = bookRepository.findById(id).orElse(null);
+        if (book == null) return "redirect:/catalog?error=BookNotFound";
 
-        if (book == null) {
-            return "redirect:/catalog?error=BookNotFound";
-        }
-
-        List<Review> reviews = reviewRepository.findByBook_BookId(book.getBookId());
+        // FILTER: Only send reviews to the public page that are NOT hidden
+        List<Review> publicReviews = reviewRepository.findByBook_BookId(book.getBookId()).stream()
+                .filter(review -> !review.isHidden())
+                .collect(Collectors.toList());
 
         model.addAttribute("book", book);
-        model.addAttribute("reviews", reviews);
+        model.addAttribute("reviews", publicReviews);
 
         return "details";
     }
@@ -135,9 +135,7 @@ public class BookWebController {
         Book book = bookRepository.findById(bookId).orElse(null);
 
         if (user != null && book != null) {
-            boolean alreadyReviewed = reviewRepository.existsByUserAndBook(user, book);
-
-            if (alreadyReviewed) {
+            if (reviewRepository.existsByUserAndBook(user, book)) {
                 return "redirect:/details?id=" + bookId + "&review_error=true";
             }
 
@@ -146,14 +144,31 @@ public class BookWebController {
             review.setUser(user);
             review.setRating(rating);
             review.setComment(comment);
-
             review.setCreatedAt(LocalDateTime.now());
 
-            reviewRepository.save(review);
+            // AUTO-MODERATOR: Check for extreme profanity
+            String[] badWords = {"fuck", "shit", "bitch", "asshole", "cunt"};
+            boolean hasBadWords = false;
+            for (String word : badWords) {
+                if (comment.toLowerCase().contains(word)) {
+                    hasBadWords = true;
+                    break;
+                }
+            }
 
+            // Hide it if it has bad words, otherwise ask AI for sentiment
+            if (hasBadWords) {
+                review.setHidden(true);
+                review.setSentiment("NEGATIVE"); // Force flag it for the admin
+            } else {
+                review.setHidden(false);
+                String aiSentiment = ollamaService.analyzeSentiment(comment);
+                review.setSentiment(aiSentiment);
+            }
+
+            reviewRepository.save(review);
             return "redirect:/details?id=" + bookId + "&review_success=true";
         }
-
         return "redirect:/catalog";
     }
 }
