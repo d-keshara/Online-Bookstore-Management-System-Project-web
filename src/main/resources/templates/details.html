@@ -27,15 +27,15 @@
         .btn-nav-ghost { color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.2); padding: 0.35rem 0.85rem; border-radius: 4px; text-decoration: none; font-size: 12.5px; font-weight: 500; transition: 0.2s; }
         .btn-nav-ghost:hover { color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
 
-        .page-layout { max-width: 1100px; margin: 3rem auto; padding: 0 2rem; flex: 1; }
+        /* 🔥 Slightly increased max-width to make the book picture slightly wider */
+        .page-layout { max-width: 1150px; margin: 3rem auto; padding: 0 2rem; flex: 1; }
 
-        /* Scaled down book cover */
-        .book-cover-large { background: var(--paper-warm); height: 480px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; position: relative; }
+        /* 🔥 Increased height proportionally for the wider book cover */
+        .book-cover-large { background: var(--paper-warm); height: 520px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; position: relative; }
         .book-cover-large img { width: 100%; height: 100%; object-fit: cover; }
 
         .font-playfair { font-family: 'Playfair Display', serif; }
 
-        /* Scaled down cart box */
         .add-to-cart-box { background: var(--paper-card); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; margin-top: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
 
         .btn-massive-cart { background: var(--paper-warm); color: var(--ink); border: 1px solid var(--border-strong); font-weight: 500; padding: 0.75rem; border-radius: 4px; transition: 0.2s; font-size: 0.95rem; }
@@ -60,7 +60,6 @@
     </div>
 </nav>
 
-<!-- ══ NOTIFICATIONS (Reviews & Cart) ══ -->
 <div th:if="${param.review_success != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #e8f4eb; color: #1e4620; font-weight: 500; padding: 0.8rem; border-bottom: 1px solid #c3e6cb !important;" role="alert">
     <i class="bi bi-star-fill text-warning me-2 align-text-bottom"></i> Review posted successfully! Thank you for sharing your thoughts.
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -90,7 +89,6 @@
         </div>
 
         <div class="col-md-7 pt-1">
-            <!-- Scaled Down Book Header Information -->
             <div class="badge text-uppercase mb-2 px-2 py-1 fw-semibold" style="background: var(--paper-warm); color: var(--accent); letter-spacing: 0.5px; border: 1px solid var(--border); font-size: 0.7rem;" th:text="${book.category}">Category</div>
 
             <h1 class="font-playfair fw-semibold fs-2 mb-1" style="color: var(--ink); line-height: 1.2;" th:text="${book.title}">Book Title</h1>
@@ -110,14 +108,12 @@
                 <div class="text-danger fw-medium bg-danger bg-opacity-10 px-2 py-1 rounded-1 border border-danger small" th:if="${book.stock <= 0}"><i class="bi bi-x-circle me-1 opacity-75"></i> Out of Stock</div>
             </div>
 
-            <!-- DYNAMIC SYNOPSIS -->
             <div class="mb-4 bg-white p-3 rounded-1 border shadow-sm">
                 <h5 class="fw-semibold mb-2 font-playfair fs-5" style="color: var(--ink);">Details</h5>
                 <p th:if="${not #strings.isEmpty(book.description)}" style="font-size: 0.95rem; line-height: 1.7; color: var(--ink-soft); margin-bottom: 0; font-weight: 400;" th:text="${book.description}"></p>
                 <p th:if="${#strings.isEmpty(book.description)}" class="text-muted fst-italic mb-0" style="font-size: 0.9rem;">No Details available for this title.</p>
             </div>
 
-            <!-- Scaled Down Add to Cart & Buy Now Box -->
             <div class="add-to-cart-box">
                 <div sec:authorize="isAuthenticated()">
                     <form method="post" th:action="@{/cart/add}" class="m-0 w-100">
@@ -136,7 +132,6 @@
                             <button type="submit" class="btn btn-massive-cart w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-light text-muted border-light' : ''}">
                                 <i class="bi bi-cart-plus me-1 opacity-75"></i> Add to Cart
                             </button>
-                            <!-- Buy Now button updated to use default form action -->
                             <button type="submit" class="btn btn-buy-now w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-secondary border-secondary' : ''}">
                                 <i class="bi bi-lightning-charge-fill text-warning me-1 opacity-75"></i> Buy Now
                             </button>
@@ -156,7 +151,6 @@
                 </div>
             </div>
 
-            <!-- Reviews Section -->
             <div class="mt-4 pt-4 border-top border-light">
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-light">
                     <h4 class="font-playfair fw-semibold mb-0 text-dark fs-5">Customer Reviews</h4>
@@ -166,6 +160,18 @@
                     <a th:href="@{/login}" class="btn btn-outline-secondary fw-medium px-3 py-1 rounded-1 bg-white" style="font-size: 0.85rem;" sec:authorize="isAnonymous()">
                         Login to Review
                     </a>
+                </div>
+
+                <div class="card border-0 mb-4 shadow-sm" style="background: linear-gradient(to right, #f8f9fa, #e9ecef); border-left: 4px solid var(--accent) !important;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0 text-dark font-playfair"><i class="bi bi-stars text-warning me-2"></i>AI Review Consensus</h6>
+                            <button id="btn-summarize" class="btn btn-sm btn-dark fw-bold rounded-pill px-3 shadow-sm" th:onclick="'generateSummary(' + ${book.bookId} + ')'">
+                                Generate Summary
+                            </button>
+                        </div>
+                        <p id="ai-summary-output" class="text-muted small mb-0 fst-italic" style="display: none;"></p>
+                    </div>
                 </div>
 
                 <div th:if="${reviews == null or reviews.empty}" class="p-4 rounded-1 text-center" style="background: var(--paper-warm); border: 1px dashed var(--border-strong);">
@@ -202,7 +208,6 @@
     </div>
 </div>
 
-<!-- REVIEW MODAL -->
 <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="background: var(--paper-card); border-radius: 8px; overflow: hidden;">
@@ -244,7 +249,6 @@
     </div>
 </div>
 
-<!-- PREMIUM ENHANCED FOOTER -->
 <footer class="mt-auto position-relative" style="background: #1a1a1a; color: rgba(255,255,255,0.6); font-size: 14.5px; padding-top: 5rem; padding-bottom: 2rem; margin-top: 5rem;">
     <div class="position-absolute top-0 start-0 w-100" style="height: 3px; background: linear-gradient(90deg, var(--accent) 0%, #e67e22 50%, var(--accent) 100%); opacity: 0.8;"></div>
     <div class="container" style="max-width: 1200px;">
@@ -304,5 +308,33 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    async function generateSummary(bookId) {
+        const btn = document.getElementById('btn-summarize');
+        const output = document.getElementById('ai-summary-output');
+
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analyzing...';
+        btn.disabled = true;
+        output.style.display = 'block';
+        output.innerText = "Reading all customer reviews...";
+
+        try {
+            const response = await fetch('/api/ai/review-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookId: bookId })
+            });
+            const data = await response.json();
+
+            output.innerHTML = `<strong class="text-dark">Overall:</strong> ${data.summary}`;
+        } catch (error) {
+            output.innerText = 'Error connecting to Nexus AI.';
+        } finally {
+            btn.innerHTML = 'Summary Generated';
+        }
+    }
+</script>
+
 </body>
 </html>
