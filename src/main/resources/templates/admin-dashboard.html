@@ -2,230 +2,397 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - Nexus Bookstore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Nexus Bookstore</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --ink: #1a1a1a; --ink-soft: #3d3d3d; --paper: #faf8f4; --paper-card: #ffffff;
-            --accent: #c8602a; --border: rgba(0,0,0,0.09); --radius-lg: 8px;
+            --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
+            --paper: #faf8f4; --paper-card: #ffffff;
+            --accent: #c8602a; --accent-dark: #9e4a1e;
         }
-        body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); display: flex; flex-direction: column; min-height: 100vh; }
-        .font-playfair { font-family: 'Playfair Display', serif; }
 
-        .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
-        .nav-brand { display: flex; align-items: center; text-decoration: none; color: #fff; }
-        .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
-        .brand-bookstore { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-left: 0.6rem; margin-top: 3px; }
+        body {
+            background: linear-gradient(135deg, #f0f2f5 0%, #e2e8f0 100%);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 3rem 1rem;
+        }
 
-        .page-layout { max-width: 1280px; margin: 3rem auto; padding: 0 2rem; flex: 1; width: 100%; }
-        .premium-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden; }
+        /* ✨ Premium Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .table-custom th { background-color: var(--ink) !important; color: white !important; font-weight: 500; border-bottom: none; padding: 1.2rem 1rem; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
-        .table-custom td { vertical-align: middle; border-bottom: 1px solid var(--border); padding: 1.2rem 1rem; color: var(--ink-soft); }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
 
-        .btn-custom-dark { background: var(--ink); color: #fff; font-weight: 600; border-radius: 4px; border: none; transition: 0.2s; }
-        .btn-custom-dark:hover { background: #333; color: #fff; }
-        .btn-custom-accent { background: var(--accent); color: #fff; font-weight: 600; border-radius: 4px; border: none; transition: 0.2s; }
-        .btn-custom-accent:hover { background: #9e4a1e; color: #fff; }
+        @keyframes pulseAlert {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
 
-        .data-id { font-family: 'Courier New', Courier, monospace; font-weight: 700; color: #888; font-size: 1.05rem; }
-        .data-title { font-family: 'DM Sans', sans-serif; font-weight: 600; color: var(--ink); font-size: 1.05rem; letter-spacing: -0.2px; }
-        .data-price { font-family: 'DM Sans', sans-serif; font-weight: 600; color: var(--accent); font-size: 1.05rem; letter-spacing: -0.3px; }
+        .dashboard-wrapper {
+            width: 100%;
+            max-width: 1350px;
+            display: flex;
+            gap: 2rem;
+            margin: auto;
+        }
+
+       /* 🟦 Premium Dark Sidebar */
+        /* 🟦 Premium Dark Sidebar */
+        .dashboard-sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--ink) 0%, #000000 100%);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: white;
+            animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: sticky;
+            top: 2rem;
+            height: calc(100vh - 4rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* 🔥 Force blocks to top and bottom */
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .sidebar-brand span { color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; display: block; letter-spacing: 3px; }
+
+        .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: rgba(255,255,255,0.1); color: white; box-shadow: inset 3px 0 0 var(--accent); }
+
+        /* ⬜ Main Content Area */
+        .dashboard-content { flex: 1; display: flex; flex-direction: column; gap: 2rem; }
+
+        .premium-card {
+            background: var(--paper-card);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.04);
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+        .premium-card:nth-child(1) { animation-delay: 0.1s; }
+        .premium-card:nth-child(2) { animation-delay: 0.2s; }
+        .premium-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .section-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); margin-bottom: 1.5rem; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; }
+
+        /* Urgent AI Button */
+        .btn-urgent {
+            background: #dc3545; color: white; border: none; padding: 12px 24px; border-radius: 50px; font-weight: 600;
+            letter-spacing: 0.5px; animation: pulseAlert 2s infinite; transition: 0.3s;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-urgent:hover { background: #b02a37; transform: translateY(-2px); color: white; }
+
+        /* Quick Action Buttons */
+        .quick-actions { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 1rem; }
+        .btn-quick { padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; border: none; }
+        .btn-quick-dark { background: var(--ink); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .btn-quick-dark:hover { background: var(--ink-soft); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); color: white;}
+        .btn-quick-accent { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(200,96,42,0.2); }
+        .btn-quick-accent:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(200,96,42,0.3); color: white;}
+        .btn-quick-light { background: #fff; color: var(--ink); border: 1px solid rgba(0,0,0,0.1); }
+        .btn-quick-light:hover { background: #f8f9fa; transform: translateY(-2px); }
+
+        /* Tokens List */
+        .token-box { background: #fafafa; border: 1px solid rgba(0,0,0,0.05); border-radius: 8px; padding: 15px 20px; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .token-box:hover { border-color: rgba(200,96,42,0.3); background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .token-code { font-family: monospace; font-size: 1.2rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
+
+        /* 🎨 Custom Premium Table */
+        .table-premium { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; }
+        .table-premium th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted); border: none; padding: 12px 20px; font-weight: 600; }
+        .table-premium td { background: #fafafa; border: none; padding: 16px 20px; vertical-align: middle; color: var(--ink-soft); transition: 0.3s; }
+        .table-premium tr:hover td { background: #f5f6f8; transform: scale(1.002); }
+        .table-premium td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .table-premium td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+        .data-id { font-family: 'Courier New', Courier, monospace; font-weight: 700; font-size: 1.05rem; color: var(--ink-muted); background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 4px; }
+        .data-title { font-weight: 700; color: var(--ink); font-size: 1.05rem; font-family: 'Playfair Display', serif; }
+        .data-price { font-weight: 700; color: #198754; font-size: 1.05rem; }
+        .badge-category { background: rgba(0,0,0,0.04); color: var(--ink-muted); padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* Modal Redesign */
+        .modal-content { border-radius: 16px; border: none; box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
+        .modal-header { background: linear-gradient(135deg, #1a1a1a 0%, #3d3d3d 100%); color: white; border-bottom: none; padding: 1.5rem 2rem; border-radius: 16px 16px 0 0; }
+        .modal-title { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 1px; }
+        .modal-body { background: #f8f9fa; padding: 2rem; }
+        .ai-review-card { background: white; border-left: 4px solid #dc3545; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .ai-comment { font-style: italic; background: #fff5f5; padding: 1rem; border-radius: 6px; color: #b02a37; margin: 1rem 0; }
+        .ai-email-box { background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 1px solid #e9ecef; border-left: 4px solid #0d6efd; border-radius: 8px; padding: 1.5rem; margin-top: 1rem; }
+
+        .top-bar { position: absolute; top: 2rem; right: 3rem; z-index: 100; display: flex; gap: 12px; }
+        .btn-top { border-radius: 50px; padding: 8px 20px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; border: none; text-decoration: none;}
+        .btn-top-light { background: white; color: var(--ink); border: 1px solid rgba(0,0,0,0.1); }
+        .btn-top-light:hover { background: #f0f0f0; }
+
+        @media (max-width: 992px) {
+            .dashboard-wrapper { flex-direction: column; }
+            .dashboard-sidebar { width: 100%; height: auto; position: relative; top: 0; }
+            .top-bar { display: none; }
+        }
     </style>
 </head>
 <body>
 
-<nav class="site-nav">
-    <div class="nav-inner">
-        <a class="nav-brand" href="/admin/dashboard">
-            <span class="brand-nexus">NEXUS</span><span class="brand-bookstore">ADMIN PANEL</span>
-        </a>
-        <div class="d-flex align-items-center gap-3">
-            <a href="/admin/users" class="btn btn-sm text-dark fw-bold px-3 py-2 shadow-sm" style="background: #e6b800; border-radius: 4px;">⚙️ Manage Users</a>
-            <a href="/catalog" class="text-white-50 text-decoration-none small fw-bold transition-hover hover-white">Public Catalog</a>
-            <form th:action="@{/logout}" method="post" class="m-0"><button type="submit" class="btn btn-sm btn-danger fw-bold rounded-1 px-3 shadow-sm">Logout</button></form>
+<div class="top-bar">
+    <a th:href="@{/catalog}" class="btn-top btn-top-light">
+        <i class="bi bi-shop me-1 text-muted"></i> Public Catalog
+    </a>
+</div>
+
+<div class="dashboard-wrapper">
+
+    <aside class="dashboard-sidebar">
+
+        <div>
+            <div class="sidebar-brand">
+                NEXUS
+                <span>ADMINISTRATOR</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a th:href="@{/admin/dashboard}" class="nav-item active">
+                    <i class="bi bi-collection"></i> Inventory Hub
+                </a>
+                <a th:href="@{/admin/requests}" class="nav-item">
+                    <i class="bi bi-journal-plus"></i> Book Requests
+                </a>
+                <a th:href="@{/admin/users}" class="nav-item">
+                    <i class="bi bi-people"></i> User Management
+                </a>
+                <a th:href="@{/admin/orders/manage}" class="nav-item">
+                    <i class="bi bi-box-seam"></i> Order Command Center
+                </a>
+            </nav>
         </div>
-    </div>
-</nav>
 
-<div class="page-layout">
-    <div th:if="${successMessage}" class="alert alert-dismissible fade show shadow-sm mb-4" style="background-color: #e8f4eb; color: #1e4620; font-weight: 600; border: none; border-left: 4px solid #28a745;">
-        <i class="bi bi-check-circle-fill me-2 fs-5 align-text-bottom"></i><span th:text="${successMessage}"></span>
-        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
-    </div>
-
-    <div class="d-flex justify-content-end mb-4" th:if="${urgentReviews != null and !urgentReviews.isEmpty()}">
-        <button type="button" class="btn btn-danger fw-bold shadow-sm px-4 py-2 rounded-pill position-relative" data-bs-toggle="modal" data-bs-target="#alertsModal">
-            <i class="bi bi-exclamation-octagon-fill me-2"></i> View Urgent Customer Alerts
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark border border-light" th:text="${urgentReviews.size()}"></span>
-        </button>
-    </div>
-
-    <div class="modal fade" id="alertsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-danger text-white border-0">
-                    <h5 class="modal-title font-playfair fw-bold"><i class="bi bi-robot me-2"></i> Auto-Moderator & AI Flags</h5>
-                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body bg-light p-4">
-                    <p class="text-muted small mb-4">The following reviews were flagged by the AI for negative sentiment or automatically hidden due to profanity.</p>
-
-                    <div class="d-flex flex-column gap-3">
-
-                        <div th:each="review : ${urgentReviews}" class="p-4 bg-white border border-danger border-opacity-25 rounded shadow-sm">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h6 class="fw-bold mb-1 text-dark"><i class="bi bi-book me-2 text-muted"></i> <span th:text="${review.book.title}"></span></h6>
-                                    <div class="text-muted small fw-bold">Customer: <span th:text="${review.user.username}"></span></div>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger mb-1"><i class="bi bi-star-fill me-1"></i><span th:text="${review.rating}"></span> / 5</span><br>
-
-                                    <span th:if="${review.isHidden}" class="badge bg-dark text-white"><i class="bi bi-eye-slash-fill me-1"></i> Hidden from Public</span>
-                                    <span th:unless="${review.isHidden}" class="badge bg-success bg-opacity-75 text-white"><i class="bi bi-eye-fill me-1"></i> Publicly Visible</span>
-                                </div>
-                            </div>
-
-                            <p class="mt-3 mb-3 text-dark p-3 rounded" style="font-style: italic; background: #fff5f5; border-left: 4px solid #dc3545;">"<span th:text="${review.comment}"></span>"</p>
-
-                            <div class="d-flex gap-2 justify-content-end border-top pt-3 mt-3">
-
-                                <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-3"
-                                        th:attr="onclick=|generateApology('${review.user.username}', '${#strings.replace(review.book.title, '''', '\''')}', '${#strings.replace(review.comment, '''', '\''')}', this)|">
-                                    <i class="bi bi-envelope-paper me-1"></i> Draft Apology
-                                </button>
-
-                                <form th:if="${review.isHidden}" th:action="@{'/admin/reviews/unhide/' + ${review.reviewId}}" method="post" class="m-0">
-                                    <button type="submit" class="btn btn-sm btn-outline-success fw-bold px-3"><i class="bi bi-eye-fill me-1"></i> Unhide</button>
-                                </form>
-                                <form th:unless="${review.isHidden}" th:action="@{'/admin/reviews/hide/' + ${review.reviewId}}" method="post" class="m-0">
-                                    <button type="submit" class="btn btn-sm btn-outline-warning text-dark fw-bold px-3 border-warning"><i class="bi bi-eye-slash-fill me-1"></i> Hide</button>
-                                </form>
-
-                                <form th:action="@{'/admin/reviews/delete/' + ${review.reviewId}}" method="post" class="m-0">
-                                    <button type="submit" class="btn btn-sm btn-danger fw-bold px-3 shadow-sm" onclick="return confirm('Permanently delete this review?');"><i class="bi bi-trash3-fill me-1"></i> Delete</button>
-                                </form>
-                            </div>
-
-                            <div class="mt-3 p-3 bg-light border rounded ai-email-box" style="display: none;">
-                                <p class="small text-primary fw-bold mb-2"><i class="bi bi-stars"></i> AI Generated Apology</p>
-                                <textarea class="form-control mb-2 text-muted" rows="5" style="font-size: 0.9rem;"></textarea>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
+        <div class="border-top pt-3 mt-4" style="border-color: rgba(255,255,255,0.1) !important;">
+            <form th:action="@{/logout}" method="post" class="m-0 p-0 mb-3">
+                <button type="submit" class="nav-item w-100 text-start text-danger opacity-75 bg-transparent border-0" style="cursor: pointer;">
+                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                </button>
+            </form>
+            <div class="text-center opacity-50">
+                <small class="text-white fw-light" style="font-size: 0.7rem;">WD130 &copy; 2026</small>
             </div>
         </div>
-    </div>
 
-    <div class="premium-card mb-5">
-        <div class="d-flex justify-content-between align-items-center p-4 border-bottom bg-light">
-            <h4 class="mb-0 fw-bold font-playfair text-dark"><i class="bi bi-key-fill text-warning me-2"></i>Author Invite Codes</h4>
-            <form th:action="@{/admin/tokens/generate}" method="post" class="m-0">
-                <button type="submit" class="btn text-dark fw-bold px-4 py-2 shadow-sm rounded-1" style="background: #e6b800;">+ Generate New Code</button>
-            </form>
+    </aside>
+
+    <main class="dashboard-content">
+
+        <div th:if="${successMessage}" class="alert alert-success py-3 small fw-bold shadow-sm border-0 mb-0" style="background: #e8f4eb; color: #1e4620; border-left: 4px solid #198754 !important; animation: fadeInUp 0.5s ease;">
+            <i class="bi bi-check-circle-fill me-2 fs-6 align-middle"></i> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
         </div>
-        <div class="p-4">
-            <h6 class="text-muted fw-bold mb-3 text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">Available / Unused Codes</h6>
-            <div class="d-flex flex-column gap-2">
-                <div th:each="token : ${unusedTokens}" class="d-flex justify-content-between align-items-center p-3 rounded border" style="background: #fbfbfb;">
-                    <span class="fw-bold fs-5" style="color: var(--accent); font-family: monospace; letter-spacing: 2px;" th:text="${token.token}"></span>
+
+        <div th:if="${urgentReviews != null and !urgentReviews.isEmpty()}" class="d-flex justify-content-end" style="animation: fadeInUp 0.5s ease;">
+            <button type="button" class="btn-urgent" data-bs-toggle="modal" data-bs-target="#alertsModal">
+                <i class="bi bi-exclamation-triangle-fill"></i> View Urgent AI Alerts
+                <span class="badge bg-white text-danger rounded-pill ms-1" th:text="${urgentReviews.size()}"></span>
+            </button>
+        </div>
+
+        <div class="premium-card">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                <h4 class="section-title border-0 mb-0"><i class="bi bi-key-fill text-warning me-2"></i>Author Invite Codes</h4>
+                <form th:action="@{/admin/tokens/generate}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-dark fw-bold px-4 py-2 shadow-sm" style="border-radius: 50px;">
+                        <i class="bi bi-plus-lg me-1"></i> Generate New
+                    </button>
+                </form>
+            </div>
+
+            <div>
+                <h6 class="text-muted fw-bold mb-3 text-uppercase" style="letter-spacing: 1px; font-size: 0.75rem;">Active / Unused Codes</h6>
+
+                <div th:each="token : ${unusedTokens}" class="token-box">
+                    <span class="token-code" th:text="${token.token}"></span>
                     <div class="d-flex align-items-center gap-3">
-                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-3 py-2 rounded-1 fw-medium">Awaiting Author</span>
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary border px-3 py-2 rounded-pill fw-bold">Awaiting Setup</span>
                         <form th:action="@{'/admin/tokens/delete/' + ${token.id}}" method="post" class="m-0">
-                            <button type="submit" class="btn btn-sm btn-outline-danger shadow-none rounded-1 fw-bold" onclick="return confirm('Revoke this code?')">
-                                <i class="bi bi-trash3-fill me-1"></i> Revoke
+                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" onclick="return confirm('Revoke this code?')">
+                                <i class="bi bi-trash3-fill"></i>
                             </button>
                         </form>
                     </div>
                 </div>
-                <div th:if="${unusedTokens.isEmpty()}" class="text-muted text-center py-4 border rounded" style="background: #fbfbfb; border-style: dashed !important;">
-                    <i class="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>
-                    No active invite codes. Generate one to invite a new author.
+
+                <div th:if="${unusedTokens.isEmpty()}" class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-2 opacity-25 d-block mb-2"></i>
+                    <span class="small fw-medium">No active invite codes. Generate one to onboard a new author.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-card">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+                <h4 class="section-title border-0 mb-3 mb-md-0"><i class="bi bi-bookshelf text-success me-2"></i>Inventory Management</h4>
+
+                <div class="quick-actions">
+                    <a href="/admin/orders/manage" class="btn-quick btn-quick-dark">
+                        <i class="bi bi-cart-check-fill"></i> Orders
+                    </a>
+                    <a href="/admin/requests" class="btn-quick btn-quick-light position-relative">
+                        <i class="bi bi-bell-fill text-warning"></i> Submissions
+                        <span th:if="${pendingCount != null and pendingCount > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" th:text="${pendingCount}"></span>
+                    </a>
+                    <a href="/admin/add" class="btn-quick btn-quick-accent">
+                        <i class="bi bi-plus-lg"></i> Add Book
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-responsive" style="overflow-x: visible;">
+                <table class="table-premium">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="book : ${books}">
+                        <td><span class="data-id" th:text="${'#' + book.bookId}"></span></td>
+                        <td><span class="data-title" th:text="${book.title}"></span></td>
+                        <td><span class="fw-bold text-muted small" th:text="${book.author != null ? book.author.name : 'Unknown'}"></span></td>
+                        <td><span class="badge-category" th:text="${book.category}"></span></td>
+                        <td><span class="data-price" th:text="'LKR ' + ${book.price}"></span></td>
+                        <td>
+                            <span class="badge" th:classappend="${book.stock <= 5 ? 'bg-danger shadow-sm' : 'bg-success bg-opacity-10 text-success border border-success'}" th:text="${book.stock} + ' units'" style="padding: 6px 12px;"></span>
+                        </td>
+                        <td class="text-end pe-3">
+                            <div class="btn-group shadow-sm rounded">
+                                <a th:href="@{'/admin/edit/' + ${book.bookId}}" class="btn btn-light border text-dark btn-sm px-3 fw-bold"><i class="bi bi-pencil-square"></i></a>
+                                <a th:href="@{'/admin/delete/' + ${book.bookId}}" class="btn btn-light border text-danger btn-sm px-3 fw-bold" onclick="return confirm('Delete this book permanently?')"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${books == null or books.empty}">
+                        <td colspan="7" class="text-center py-5 text-muted bg-transparent">
+                            <i class="bi bi-journal-x fs-1 d-block mb-3 opacity-25"></i>
+                            <span class="fw-medium font-playfair fs-5">No books in inventory.</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div class="modal fade" id="alertsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-robot me-2 text-warning"></i> AI Auto-Moderator Flags</h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-4 fw-bold text-uppercase" style="letter-spacing: 1px;">Reviews flagged for negative sentiment or profanity</p>
+
+                <div class="d-flex flex-column gap-3">
+                    <div th:each="review : ${urgentReviews}" class="ai-review-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold mb-1 font-playfair fs-5"><i class="bi bi-book me-2 text-muted"></i> <span th:text="${review.book.title}"></span></h6>
+                                <div class="text-muted small fw-bold text-uppercase letter-spacing-1">Customer: <span class="text-dark" th:text="${review.user.username}"></span></div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger mb-1 px-3 py-2"><i class="bi bi-star-fill me-1"></i><span th:text="${review.rating}"></span> / 5 Rating</span><br>
+                                <span th:if="${review.isHidden}" class="badge bg-dark text-white px-3 py-2 mt-1"><i class="bi bi-eye-slash-fill me-1"></i> Hidden by Auto-Mod</span>
+                                <span th:unless="${review.isHidden}" class="badge bg-success bg-opacity-75 text-white px-3 py-2 mt-1"><i class="bi bi-eye-fill me-1"></i> Publicly Visible</span>
+                            </div>
+                        </div>
+
+                        <div class="ai-comment">"<span th:text="${review.comment}"></span>"</div>
+
+                        <div class="d-flex gap-2 justify-content-end border-top pt-3 mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-3 border-2"
+                                    th:attr="onclick=|generateApology('${review.user.username}', '${#strings.replace(review.book.title, '''', '\''')}', '${#strings.replace(review.comment, '''', '\''')}', this)|">
+                                <i class="bi bi-magic me-1"></i> Generate AI Apology
+                            </button>
+
+                            <form th:if="${review.isHidden}" th:action="@{'/admin/reviews/unhide/' + ${review.reviewId}}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm"><i class="bi bi-eye-fill me-1"></i> Unhide</button>
+                            </form>
+                            <form th:unless="${review.isHidden}" th:action="@{'/admin/reviews/hide/' + ${review.reviewId}}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold px-3 shadow-sm"><i class="bi bi-eye-slash-fill me-1"></i> Hide</button>
+                            </form>
+
+                            <form th:action="@{'/admin/reviews/delete/' + ${review.reviewId}}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-danger fw-bold px-3 shadow-sm" onclick="return confirm('Permanently delete this review?');"><i class="bi bi-trash3-fill"></i></button>
+                            </form>
+                        </div>
+
+                        <div class="ai-email-box" style="display: none;">
+                            <p class="small text-primary fw-bold mb-2 text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-robot me-1"></i> Generated Response Draft</p>
+                            <textarea class="form-control text-dark border-0 shadow-none bg-transparent" rows="5" style="font-size: 0.95rem; resize: vertical;"></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 mt-5">
-        <h2 class="fw-bold font-playfair mb-3 mb-md-0 text-dark">Inventory Management</h2>
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="/admin/orders/manage" class="btn btn-custom-dark px-4 py-2 shadow-sm">
-                <i class="bi bi-cart-check-fill me-2"></i> Customer Orders
-            </a>
-
-            <a href="/admin/requests" class="btn btn-light border border-secondary text-dark px-4 py-2 shadow-sm fw-bold position-relative">
-                <i class="bi bi-bell-fill text-warning me-2"></i> Review Submissions
-                <span th:if="${pendingCount != null and pendingCount > 0}"
-                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm"
-                      th:text="${pendingCount}">
-                </span>
-            </a>
-
-            <a href="/admin/add" class="btn btn-custom-accent px-4 py-2 shadow-sm"><i class="bi bi-plus-lg me-1"></i> Add Book</a>
-        </div>
-    </div>
-
-    <div class="premium-card mb-5 overflow-hidden">
-        <div class="table-responsive m-0">
-            <table class="table table-hover table-custom mb-0 align-middle">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="book : ${books}">
-                    <td class="data-id" th:text="${'#' + book.bookId}"></td>
-                    <td class="data-title" th:text="${book.title}"></td>
-                    <td class="fw-medium text-muted" th:text="${book.author != null ? book.author.name : 'Unknown'}"></td>
-                    <td><span class="badge bg-secondary bg-opacity-10 text-dark border border-secondary px-3 py-2 rounded-1 fw-medium" th:text="${book.category}"></span></td>
-                    <td class="data-price" th:text="'LKR ' + ${book.price}"></td>
-                    <td>
-                        <span class="fw-medium fs-6" th:text="${book.stock}" th:classappend="${book.stock <= 5 ? 'text-danger fw-bold' : ''}"></span>
-                    </td>
-                    <td class="text-center">
-                        <div class="btn-group shadow-sm rounded-1">
-                            <a th:href="@{'/admin/edit/' + ${book.bookId}}" class="btn btn-light border text-dark btn-sm px-3 fw-bold">Edit</a>
-                            <a th:href="@{'/admin/delete/' + ${book.bookId}}" class="btn btn-light border text-danger btn-sm px-3 fw-bold" onclick="return confirm('Delete this book permanently?')">Delete</a>
-                        </div>
-                    </td>
-                </tr>
-                <tr th:if="${books == null or books.empty}">
-                    <td colspan="7" class="text-center py-5 text-muted">
-                        <i class="bi bi-journal-x fs-1 d-block mb-3 opacity-50"></i>
-                        No books in inventory.
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 
-<footer class="bg-dark text-white-50 text-center py-4 mt-auto">
-    <small>© 2026 Nexus Bookstore. Designed by WD130 Group</small>
-</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     async function generateApology(customer, book, review, btn) {
         const originalHtml = btn.innerHTML;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Drafting...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> AI Thinking...';
         btn.disabled = true;
 
-        const container = btn.closest('.bg-white');
+        const container = btn.closest('.ai-review-card');
         const emailBox = container.querySelector('.ai-email-box');
         const textArea = emailBox.querySelector('textarea');
 
@@ -240,7 +407,7 @@
             textArea.value = data.email;
             emailBox.style.display = 'block';
         } catch (error) {
-            alert('Error connecting to local AI.');
+            alert('Error connecting to local Llama 3 AI.');
         } finally {
             btn.innerHTML = originalHtml;
             btn.disabled = false;

@@ -2,59 +2,345 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Edit Review - Nexus Bookstore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Review — Nexus Bookstore</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <style>
-    .navbar-brand { font-size: 1.5rem; letter-spacing: 1px; }
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    /* Interactive Star Rating CSS */
-    .rating-wrapper {
+  <style>
+    :root {
+        --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
+        --paper: #faf8f4; --paper-card: #ffffff;
+        --accent: #c8602a; --accent-dark: #9e4a1e;
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--paper) 0%, #e9e4dc 100%);
+        font-family: 'DM Sans', sans-serif;
+        color: var(--ink);
+        min-height: 100vh;
         display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1rem;
+    }
+
+    /* ✨ Premium Animations */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .dashboard-wrapper {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        gap: 2rem;
+        margin: auto;
+    }
+
+    /* 🟦 Premium Dark Sidebar */
+    .dashboard-sidebar {
+        width: 280px;
+        background: linear-gradient(135deg, var(--ink) 0%, #2a2a2a 100%);
+        border-radius: 12px;
+        padding: 2.5rem 1.5rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        color: white;
+        animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        position: relative;
+        overflow: hidden;
+        height: fit-content;
+    }
+
+    .dashboard-sidebar::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at bottom left, rgba(200,96,42,0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .sidebar-brand {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 1.5rem;
+        z-index: 2;
+        position: relative;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        z-index: 1;
+        position: relative;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        color: rgba(255,255,255,0.7);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .nav-item:hover {
+        color: white;
+        background: rgba(255,255,255,0.05);
+    }
+
+    .nav-item.active {
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 4px 15px rgba(200,96,42,0.3);
+    }
+
+    /* ⬜ Main Content Area */
+    .dashboard-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .premium-card {
+        background: var(--paper-card);
+        border-radius: 12px;
+        padding: 3rem 4rem;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.05);
+        animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation-delay: 0.2s;
+        opacity: 0;
+    }
+
+    .section-header {
+        margin-bottom: 2rem;
+        border-bottom: 2px solid var(--paper);
+        padding-bottom: 15px;
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 5px;
+    }
+
+    /* 🌟 Original Interactive Star Rating CSS (Preserved & Polished) */
+    .rating-wrapper {
+        display: inline-flex;
         flex-direction: row-reverse;
         justify-content: flex-end;
+        background: #fafafa;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(0,0,0,0.05);
     }
     .rating-wrapper input { display: none; }
     .rating-wrapper label {
         cursor: pointer;
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='%23ccc' class='bi bi-star-fill' viewBox='0 0 16 16'%3E%3Cpath d='M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: center;
         background-size: 100%;
-        transition: .3s;
+        transition: .2s;
+        margin: 0 2px;
     }
     .rating-wrapper input:checked ~ label,
     .rating-wrapper label:hover,
     .rating-wrapper label:hover ~ label {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='%23ffc107' class='bi bi-star-fill' viewBox='0 0 16 16'%3E%3Cpath d='M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z'/%3E%3C/svg%3E");
+        transform: scale(1.1);
+    }
+
+    /* Form Elements */
+    .form-group {
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    .form-group:nth-of-type(1) { animation-delay: 0.3s; }
+    .form-group:nth-of-type(2) { animation-delay: 0.4s; }
+
+    .label-text {
+        display: block;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .input-wrapper { position: relative; width: 100%; }
+
+    .custom-input {
+        width: 100%;
+        padding: 15px 15px 15px 45px;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 8px;
+        background: #fafafa;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        outline: none;
+        color: var(--ink);
+        resize: vertical;
+    }
+
+    .custom-input:focus {
+        background: #fff;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(200,96,42,0.1);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 15px;
+        color: var(--ink-muted);
+        font-size: 1.1rem;
+    }
+
+    /* Action Buttons */
+    .action-bar {
+        display: flex;
+        gap: 15px;
+        margin-top: 2rem;
+        animation: fadeInUp 0.5s ease forwards;
+        animation-delay: 0.5s;
+        opacity: 0;
+    }
+
+    .btn-custom {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-save {
+        background: var(--ink);
+        color: white;
+        border: none;
+        flex: 2;
+    }
+
+    .btn-save:hover {
+        background: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(200,96,42,0.2);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: #fafafa;
+        color: var(--ink-soft);
+        border: 1px solid rgba(0,0,0,0.1);
+        flex: 1;
+    }
+
+    .btn-cancel:hover {
+        background: #f0f0f0;
+        color: var(--ink);
+    }
+
+    /* Floating Top Bar */
+    .top-bar {
+        position: absolute;
+        top: 2rem;
+        right: 3rem;
+        z-index: 100;
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-top {
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transition: 0.3s;
+    }
+
+    .btn-top-light { background: white; color: var(--ink); border: 1px solid rgba(0,0,0,0.1); }
+    .btn-top-light:hover { background: #f0f0f0; }
+
+    @media (max-width: 992px) {
+        .dashboard-wrapper { flex-direction: column; }
+        .dashboard-sidebar { width: 100%; padding: 1.5rem; }
+        .sidebar-brand { display: none; }
+        .sidebar-nav { flex-direction: row; justify-content: space-between; overflow-x: auto; }
+        .nav-item { padding: 10px; font-size: 0.9rem; }
+        .premium-card { padding: 2rem; }
+        .top-bar { display: none; }
     }
   </style>
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm mb-5">
-  <div class="container">
-    <a class="navbar-brand fw-bold" href="/catalog">NEXUS BOOKSTORE</a>
-    <a href="/my-reviews" class="btn btn-outline-light btn-sm">← Back to My Reviews</a>
-  </div>
-</nav>
+<div class="top-bar">
+  <a th:href="@{/my-reviews}" class="btn-top btn-top-light text-decoration-none">
+    <i class="bi bi-arrow-left me-1 text-muted"></i> Back to Reviews
+  </a>
+</div>
 
-<div class="container d-flex justify-content-center">
-  <div class="card shadow-sm border-0" style="width: 100%; max-width: 600px;">
-    <div class="card-body p-5">
-      <h3 class="fw-bold mb-1">Edit Your Review</h3>
-      <p class="text-muted mb-4">Update your thoughts for <strong class="text-dark" th:text="${review.book.title}">Book Title</strong></p>
+<div class="dashboard-wrapper">
 
-      <!-- FIXED: Changed review.id to review.reviewId -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-brand">NEXUS</div>
+    <nav class="sidebar-nav">
+      <a th:href="@{/my-account}" class="nav-item">
+        <i class="bi bi-person-circle"></i> Account Details
+      </a>
+      <a th:href="@{/my-orders}" class="nav-item">
+        <i class="bi bi-box-seam"></i> My Orders
+      </a>
+      <a th:href="@{/my-reviews}" class="nav-item active">
+        <i class="bi bi-star"></i> My Reviews
+      </a>
+      <a th:href="@{/logout}" class="nav-item mt-4 text-danger opacity-75">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
+    </nav>
+  </aside>
+
+  <main class="dashboard-content">
+
+    <div class="premium-card">
+      <div class="section-header">
+        <h3 class="section-title h4">Edit Your Review</h3>
+        <p class="text-muted small mb-0">Update your thoughts for <strong class="text-dark font-playfair fs-6" th:text="${review.book.title}">Book Title</strong></p>
+      </div>
+
       <form th:action="@{/reviews/update/{id}(id=${review.reviewId})}" th:object="${review}" method="post">
 
-        <!-- Rating Selection -->
-        <div class="mb-4">
-          <label class="form-label fw-bold small d-block text-secondary">YOUR RATING</label>
-          <div class="rating-wrapper justify-content-start flex-row-reverse">
-            <!-- Thymeleaf's th:field will automatically check the correct star based on the database value -->
+        <div class="form-group">
+          <label class="label-text">Your Rating</label>
+          <div class="rating-wrapper">
             <input type="radio" id="star5" th:field="*{rating}" value="5" required/><label for="star5"></label>
             <input type="radio" id="star4" th:field="*{rating}" value="4"/><label for="star4"></label>
             <input type="radio" id="star3" th:field="*{rating}" value="3"/><label for="star3"></label>
@@ -63,21 +349,27 @@
           </div>
         </div>
 
-        <!-- Comment Textarea -->
-        <div class="mb-4">
-          <label class="form-label fw-bold small text-secondary">COMMENT</label>
-          <textarea th:field="*{comment}" class="form-control" rows="5" required placeholder="What did you think of this book?"></textarea>
+        <div class="form-group">
+          <label class="label-text">Written Comment</label>
+          <div class="input-wrapper">
+            <textarea th:field="*{comment}" class="custom-input shadow-sm" rows="5" required placeholder="What did you think of the plot, characters, or writing style?"></textarea>
+            <i class="bi bi-chat-left-text input-icon"></i>
+          </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="d-flex gap-2 mt-4">
-          <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">Save Changes</button>
-          <a href="/my-reviews" class="btn btn-light px-4 border">Cancel</a>
+        <div class="action-bar">
+          <a href="/my-reviews" class="btn-custom btn-cancel shadow-sm">
+            Cancel
+          </a>
+          <button type="submit" class="btn-custom btn-save shadow-sm">
+            <i class="bi bi-check2-circle"></i> Save Changes
+          </button>
         </div>
+
       </form>
-
     </div>
-  </div>
+
+  </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
