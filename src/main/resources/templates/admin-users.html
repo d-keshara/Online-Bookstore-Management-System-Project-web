@@ -2,100 +2,296 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Users - Nexus Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users — Nexus Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        .table-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        :root {
+            --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
+            --paper: #faf8f4; --paper-card: #ffffff;
+            --accent: #c8602a; --accent-dark: #9e4a1e;
+            --admin: #2b5c8f; --author: #d48806; --demote: #6c757d;
         }
+
+        body {
+            background: linear-gradient(135deg, #f0f2f5 0%, #e2e8f0 100%);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+        }
+
+        /* ✨ Premium Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .dashboard-wrapper {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            gap: 2rem;
+            margin: auto;
+        }
+
+        /* 🟦 Premium Dark Sidebar */
+        .dashboard-sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--ink) 0%, #000000 100%);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: white;
+            animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .sidebar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .sidebar-brand span { color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; display: block; letter-spacing: 3px; }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: rgba(255,255,255,0.1); color: white; box-shadow: inset 3px 0 0 var(--accent); }
+
+        /* ⬜ Main Content Area */
+        .dashboard-content { flex: 1; display: flex; flex-direction: column; }
+
+        .premium-card {
+            background: var(--paper-card);
+            border-radius: 12px;
+            padding: 2.5rem 3.5rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.04);
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 15px;
+        }
+
+        .section-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); margin: 0; }
+
+        /* 🎨 Custom Premium Table */
+        .table-premium { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; }
+        .table-premium th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted); border: none; padding: 12px 20px; font-weight: 600; }
+        .table-premium td { background: #fafafa; border: none; padding: 16px 20px; vertical-align: middle; color: var(--ink-soft); transition: 0.3s; }
+        .table-premium tr:hover td { background: #f5f6f8; transform: scale(1.002); }
+        .table-premium td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; font-weight: 600; color: var(--ink); }
+        .table-premium td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+        /* Role Badges */
+        .role-badge { padding: 6px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-admin { background: rgba(43,92,143,0.1); color: var(--admin); border: 1px solid rgba(43,92,143,0.2); }
+        .badge-author { background: rgba(212,136,6,0.1); color: var(--author); border: 1px solid rgba(212,136,6,0.2); }
+        .badge-user { background: rgba(0,0,0,0.05); color: var(--ink-soft); border: 1px solid rgba(0,0,0,0.1); }
+
+        /* VIP Action Buttons */
+        .action-btn { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; transition: 0.2s; text-decoration: none; border: none; background: transparent; }
+        .btn-promote-admin { color: var(--admin); background: rgba(43,92,143,0.1); }
+        .btn-promote-admin:hover { background: var(--admin); color: white; }
+        .btn-promote-author { color: var(--author); background: rgba(212,136,6,0.1); }
+        .btn-promote-author:hover { background: var(--author); color: white; }
+
+        /* 🔥 NEW DEMOTE CSS */
+        .btn-demote { color: var(--demote); background: rgba(108,117,125,0.1); }
+        .btn-demote:hover { background: var(--demote); color: white; }
+
+        .btn-remove { color: #dc3545; background: rgba(220,53,69,0.1); }
+        .btn-remove:hover { background: #dc3545; color: white; }
+
+        /* Staggered Row Animations */
+        .table-premium tbody tr { animation: fadeInUp 0.5s ease forwards; opacity: 0; }
+        .table-premium tbody tr:nth-child(1) { animation-delay: 0.3s; }
+        .table-premium tbody tr:nth-child(2) { animation-delay: 0.4s; }
+        .table-premium tbody tr:nth-child(3) { animation-delay: 0.5s; }
+        .table-premium tbody tr:nth-child(4) { animation-delay: 0.6s; }
+        .table-premium tbody tr:nth-child(5) { animation-delay: 0.7s; }
+
+        .top-bar { position: absolute; top: 2rem; right: 3rem; z-index: 100; display: flex; gap: 12px; }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-dark bg-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/admin/dashboard">Nexus Admin Panel</a>
-        <div class="d-flex align-items-center gap-3">
-            <a href="/admin/users" class="btn btn-warning btn-sm fw-bold text-dark shadow-sm">
-                ⚙️ Manage Users & Admins
-            </a>
-            <a href="/catalog" class="btn btn-outline-light btn-sm">View Public Catalog</a>
-            <form th:action="@{/logout}" method="post" class="m-0 p-0">
-                <button type="submit" class="btn btn-danger btn-sm">Logout</button>
-            </form>
+<div class="top-bar">
+    <a th:href="@{/catalog}" class="btn btn-dark rounded-pill px-4 py-2 fw-semibold shadow-sm text-decoration-none" style="font-size: 0.9rem;">
+        <i class="bi bi-shop me-1"></i> Public Catalog
+    </a>
+</div>
+
+<div class="dashboard-wrapper">
+
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-brand">
+            NEXUS
+            <span>ADMINISTRATOR</span>
         </div>
-    </div>
-</nav>
+        <nav class="sidebar-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-item">
+                <i class="bi bi-collection"></i> Inventory Hub
+            </a>
+            <a th:href="@{/admin/users}" class="nav-item active">
+                <i class="bi bi-people"></i> User Management
+            </a>
+            <form th:action="@{/logout}" method="post" class="mt-5 m-0 p-0">
+                <button type="submit" class="nav-item w-100 text-start text-danger opacity-75 bg-transparent border-0">
+                    <i class="bi bi-box-arrow-right"></i> Terminate Session
+                </button>
+            </form>
+        </nav>
+        <div class="position-absolute bottom-0 start-0 w-100 p-4 text-center opacity-50">
+            <small class="text-white fw-light" style="font-size: 0.7rem;">WD130 &copy; 2026</small>
+        </div>
+    </aside>
 
-<div class="container">
+    <main class="dashboard-content">
 
-    <div th:if="${param.promoted}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-        <strong>Success!</strong> The user has been upgraded to an Admin.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <div class="premium-card">
+            <div class="section-header">
+                <div>
+                    <h3 class="section-title h4 border-0 mb-1">Access Control</h3>
+                    <p class="text-muted small mb-0">Manage roles, promote authors, and assign administrators.</p>
+                </div>
+            </div>
 
-    <div th:if="${param.deleted}" class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
-        <strong>Removed!</strong> The user account was successfully deleted.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+            <div th:if="${param.promoted}" class="alert alert-success py-2 small fw-medium shadow-sm border-0 mb-4" style="background: #e8f4eb; color: #1e4620; animation: fadeInUp 0.5s ease;">
+                <i class="bi bi-shield-check me-2"></i> User successfully upgraded to Administrator.
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+            </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>User Management</h2>
-        <a href="/admin/dashboard" class="btn btn-secondary px-4">Back to Inventory</a>
-    </div>
+            <div th:if="${param.author_promoted}" class="alert alert-warning py-2 small fw-medium shadow-sm border-0 mb-4" style="background: #fff8e6; color: #9c6500; animation: fadeInUp 0.5s ease;">
+                <i class="bi bi-pen me-2"></i> User successfully granted Author publishing rights.
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+            </div>
 
-    <div class="table-container shadow-sm">
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th class="text-center">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="u : ${users}">
-                <td th:text="${u.id}">1</td>
-                <td class="fw-bold" th:text="${u.username}">username</td>
-                <td th:text="${u.fullName}">John Doe</td>
-                <td th:text="${u.email}">email@example.com</td>
-                <td>
-                    <!-- Highlights Admins in Blue, Normal Users in Gray -->
-                    <span th:classappend="${u.role == 'ADMIN' || u.role == 'ROLE_ADMIN'} ? 'bg-primary' : 'bg-secondary'"
-                          class="badge" th:text="${u.role}">ROLE</span>
-                </td>
-                <td class="text-center">
-                    <div class="btn-group" role="group">
+            <div th:if="${param.demoted}" class="alert alert-secondary py-2 small fw-medium shadow-sm border-0 mb-4" style="background: #f8f9fa; color: #495057; animation: fadeInUp 0.5s ease;">
+                <i class="bi bi-person-down me-2"></i> Privileges revoked. Account reverted to standard User.
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+            </div>
 
-                        <!-- Show Promote button ONLY if they are not already an Admin -->
-                        <a th:if="${u.role != 'ADMIN' && u.role != 'ROLE_ADMIN'}"
-                           th:href="@{'/admin/users/promote/' + ${u.id}}"
-                           class="btn btn-success btn-sm px-3"
-                           onclick="return confirm('Are you sure you want to make this user an Admin?');">
-                            Make Admin
-                        </a>
+            <div th:if="${param.deleted}" class="alert alert-danger py-2 small fw-medium shadow-sm border-0 mb-4" style="background: #fde8e8; color: #721c24; animation: fadeInUp 0.5s ease;">
+                <i class="bi bi-trash me-2"></i> User account permanently deleted.
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+            </div>
 
-                        <a th:href="@{'/admin/users/delete/' + ${u.id}}"
-                           class="btn btn-danger btn-sm px-3"
-                           onclick="return confirm('Are you sure you want to remove this user? This cannot be undone.');">
-                            Remove
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+            <div class="table-responsive" style="overflow-x: visible;">
+                <table class="table-premium">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Contact Email</th>
+                        <th>Clearance</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person text-secondary" style="font-size: 0.8rem;"></i>
+                                </div>
+                                <span th:text="${u.username}">username</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-dark fw-medium" th:text="${u.fullName}">John Doe</span>
+                        </td>
+                        <td>
+                            <span class="text-muted small" th:text="${u.email}">email@example.com</span>
+                        </td>
+                        <td>
+                            <span th:if="${u.role == 'ADMIN' || u.role == 'ROLE_ADMIN'}" class="role-badge badge-admin"><i class="bi bi-shield-lock-fill"></i> Admin</span>
+                            <span th:if="${u.role == 'AUTHOR' || u.role == 'ROLE_AUTHOR'}" class="role-badge badge-author"><i class="bi bi-pen-fill"></i> Author</span>
+                            <span th:if="${u.role == 'USER' || u.role == 'ROLE_USER'}" class="role-badge badge-user"><i class="bi bi-person-fill"></i> User</span>
+                        </td>
+                        <td class="text-end pe-3">
+                            <div class="d-flex justify-content-end gap-2">
 
-    <div class="mt-4 text-muted small">
-        <p>Logged in as: <span class="fw-bold">Admin</span> | Nexus Bookstore - Group WD130 Project</p>
-    </div>
+                                <a th:if="${u.role == 'USER' || u.role == 'ROLE_USER'}"
+                                   th:href="@{'/admin/users/make-author/' + ${u.id}}"
+                                   class="action-btn btn-promote-author shadow-sm" title="Grant Author Rights"
+                                   onclick="return confirm('Grant this user Author publishing rights?');">
+                                    <i class="bi bi-pen"></i>
+                                </a>
+
+                                <a th:if="${u.role != 'ADMIN' && u.role != 'ROLE_ADMIN'}"
+                                   th:href="@{'/admin/users/promote/' + ${u.id}}"
+                                   class="action-btn btn-promote-admin shadow-sm" title="Promote to Admin"
+                                   onclick="return confirm('Promote this user to System Administrator?');">
+                                    <i class="bi bi-shield-lock"></i>
+                                </a>
+
+                                <a th:if="${u.role == 'ADMIN' || u.role == 'ROLE_ADMIN' || u.role == 'AUTHOR' || u.role == 'ROLE_AUTHOR'}"
+                                   th:href="@{'/admin/users/demote/' + ${u.id}}"
+                                   class="action-btn btn-demote shadow-sm" title="Revoke Privileges (Make User)"
+                                   onclick="return confirm('Revoke this user\'s special privileges and return them to a standard User?');">
+                                    <i class="bi bi-person-down"></i>
+                                </a>
+
+                                <a th:href="@{'/admin/users/delete/' + ${u.id}}"
+                                   class="action-btn btn-remove shadow-sm" title="Terminate Account"
+                                   onclick="return confirm('Permanently delete this user? This action cannot be undone.');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

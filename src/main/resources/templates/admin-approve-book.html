@@ -2,85 +2,281 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Approve Publication - Nexus Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Publication — Nexus Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        :root { --ink: #1a1a1a; --paper: #faf8f4; --paper-card: #ffffff; --accent: #c8602a; --border: rgba(0,0,0,0.09); }
-        body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); display: flex; flex-direction: column; min-height: 100vh; }
-        .font-playfair { font-family: 'Playfair Display', serif; }
-        .premium-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+        :root {
+            --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
+            --paper: #faf8f4; --paper-card: #ffffff;
+            --accent: #c8602a; --accent-dark: #9e4a1e;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f2f5 0%, #e2e8f0 100%);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+        }
+
+        /* ✨ Premium Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .dashboard-wrapper {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            gap: 2rem;
+            margin: auto;
+        }
+
+        /* 🟦 Premium Dark Sidebar */
+        .dashboard-sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--ink) 0%, #000000 100%);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: white;
+            animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .sidebar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .sidebar-brand span { color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; display: block; letter-spacing: 3px; }
+
+        .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: rgba(255,255,255,0.1); color: white; box-shadow: inset 3px 0 0 var(--accent); }
+
+        /* ⬜ Main Content Area */
+        .dashboard-content { flex: 1; display: flex; flex-direction: column; }
+
+        .premium-card {
+            background: var(--paper-card);
+            border-radius: 12px;
+            padding: 3rem 4rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.04);
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.1s;
+            opacity: 0;
+            position: relative;
+        }
+
+        /* Top Bar Floating Button */
+        .top-bar { position: absolute; top: 2rem; right: 3rem; z-index: 100; display: flex; gap: 12px; }
+        .btn-top-dark { border-radius: 50px; padding: 8px 20px; font-weight: 600; font-size: 0.9rem; background: var(--ink); color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; text-decoration: none;}
+        .btn-top-dark:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(200,96,42,0.2); color: white; }
+
+        /* Typography & Layout */
+        .book-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); font-size: 2.2rem; margin-bottom: 0.2rem; }
+        .book-author { font-size: 1.1rem; color: var(--ink-soft); margin-bottom: 1.5rem; }
+
+        .badge-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; }
+        .badge-category { background: rgba(0,0,0,0.04); color: var(--ink-muted); border: 1px solid rgba(0,0,0,0.05); padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* Synopsis Box */
+        .synopsis-box {
+            background: #fafafa;
+            border-left: 4px solid var(--accent);
+            padding: 2rem;
+            border-radius: 0 8px 8px 0;
+            margin: 2rem 0 3rem 0;
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+        .synopsis-text { white-space: pre-wrap; font-size: 1.05rem; line-height: 1.8; color: var(--ink-soft); margin: 0; }
+
+        /* Form Inputs */
+        .form-section { animation: fadeInUp 0.5s ease forwards; animation-delay: 0.4s; opacity: 0; border-top: 2px solid #f0f2f5; padding-top: 2.5rem; }
+        .form-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); margin-bottom: 1.5rem; font-size: 1.4rem; }
+
+        .label-text { display: block; font-weight: 700; font-size: 0.8rem; margin-bottom: 8px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .custom-input { width: 100%; padding: 15px 15px 15px 50px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; background: #fff; font-size: 1.1rem; font-weight: 600; transition: all 0.3s ease; outline: none; color: var(--ink); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .custom-input:focus { border-color: #198754; box-shadow: 0 0 0 3px rgba(25,135,84,0.1); }
+        .input-wrapper { position: relative; width: 100%; }
+        .input-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--ink-muted); font-size: 1.1rem; font-weight: 700; }
+
+        /* Buttons */
+        .btn-action { padding: 14px 28px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; }
+        .btn-approve { background: #198754; color: white; box-shadow: 0 4px 15px rgba(25,135,84,0.2); }
+        .btn-approve:hover { background: #146c43; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(25,135,84,0.3); }
+
+        .btn-decline { background: transparent; color: #dc3545; border: 1px solid rgba(220,53,69,0.3); }
+        .btn-decline:hover { background: rgba(220,53,69,0.1); }
+
+        .btn-cancel { background: #f0f2f5; color: var(--ink-soft); text-decoration: none; }
+        .btn-cancel:hover { background: #e2e8f0; color: var(--ink); }
+
+        .info-alert { background: rgba(43,92,143,0.05); border-left: 4px solid var(--admin, #2b5c8f); padding: 15px 20px; border-radius: 0 8px 8px 0; color: #2b5c8f; font-size: 0.9rem; font-weight: 500; margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 12px; }
+
+        @media (max-width: 992px) {
+            .dashboard-wrapper { flex-direction: column; }
+            .dashboard-sidebar { width: 100%; padding: 1.5rem; }
+            .sidebar-brand { display: none; }
+            .sidebar-nav { flex-direction: row; justify-content: space-between; overflow-x: auto; }
+            .nav-item { padding: 10px; font-size: 0.9rem; }
+            .premium-card { padding: 2rem; }
+            .top-bar { display: none; }
+            .action-buttons { flex-direction: column; gap: 10px; }
+            .btn-action { width: 100%; justify-content: center; }
+        }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container py-5" style="max-width: 800px; flex: 1;">
-
-    <div class="mb-4 d-flex align-items-center gap-3">
-        <a href="/admin/requests" class="btn btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center text-dark" style="width: 45px; height: 45px;"><i class="bi bi-arrow-left fs-5"></i></a>
-        <h2 class="fw-bold font-playfair mb-0 text-dark">Publishing Review</h2>
-    </div>
-
-    <div class="premium-card p-4 p-md-5">
-        <div class="d-flex justify-content-between align-items-start mb-4 pb-4 border-bottom">
-            <div>
-                <span class="badge bg-secondary bg-opacity-10 text-dark border border-secondary px-3 py-2 rounded-1 text-uppercase fw-bold mb-2" th:text="${book.category}">Category</span>
-                <h3 class="font-playfair fw-bold text-dark mb-1" th:text="${book.title}">Book Title</h3>
-                <p class="text-muted mb-0 fs-5">Author: <strong class="text-dark" th:text="${book.author != null ? book.author.name : 'Unknown'}">Author Name</strong></p>
-            </div>
-            <span class="badge bg-warning text-dark border border-warning px-3 py-2 rounded-1 fw-bold shadow-sm"><i class="bi bi-hourglass-split me-1"></i> PENDING PUBLICATION</span>
-        </div>
-
-        <div class="mb-5">
-            <h6 class="fw-bold text-muted text-uppercase" style="letter-spacing: 1px;">Author's Synopsis</h6>
-            <div class="p-4 rounded border bg-light">
-                <p class="mb-0 text-dark" style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.8;" th:text="${book.description}">Synopsis goes here...</p>
-            </div>
-        </div>
-
-        <form th:action="@{'/admin/requests/approve/' + ${book.bookId}}" method="post" class="mt-5 pt-4 border-top border-2">
-
-            <h5 class="fw-bold font-playfair mb-4 text-dark"><i class="bi bi-tag-fill text-success me-2"></i>Admin: Set Retail Details</h5>
-
-            <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label fw-bold text-muted text-uppercase" style="letter-spacing: 0.5px; font-size: 0.85rem;">Retail Price (LKR) <span class="text-danger">*</span></label>
-                    <div class="input-group shadow-sm">
-                        <span class="input-group-text bg-light border-secondary fw-bold text-muted">Rs.</span>
-                        <input type="number" step="0.01" min="0" name="price" class="form-control form-control-lg border-secondary font-playfair fw-bold" required placeholder="0.00">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-bold text-muted text-uppercase" style="letter-spacing: 0.5px; font-size: 0.85rem;">Initial Stock Allocation <span class="text-danger">*</span></label>
-                    <input type="number" min="0" name="stock" class="form-control form-control-lg border-secondary shadow-sm" required placeholder="e.g. 50">
-                </div>
-            </div>
-
-            <div class="alert alert-info border-0 border-start border-info border-4 shadow-sm mb-5 bg-opacity-25 bg-info" style="color: #0c5460;">
-                <i class="bi bi-info-circle-fill me-2 fs-5 align-text-bottom"></i> <strong>Approval Action:</strong> Submitting this form will officially publish the book to the public catalog and immediately notify the author.
-            </div>
-
-            <div class="d-flex gap-3 justify-content-end">
-                <a href="/admin/requests" class="btn btn-light border px-4 py-3 fw-bold text-dark">Cancel</a>
-                <button type="submit" class="btn btn-success px-5 py-3 fw-bold shadow-sm text-uppercase" style="letter-spacing: 1px;"><i class="bi bi-check-circle-fill me-2"></i> Approve & Publish</button>
-            </div>
-        </form>
-
-        <form th:action="@{'/admin/requests/decline/' + ${book.bookId}}" method="post" class="mt-4 pt-4 border-top">
-            <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-outline-danger px-4 py-2 fw-bold" onclick="return confirm('Are you sure you want to decline this book? The author will see this in their portal.');">
-                    <i class="bi bi-x-circle me-2"></i> Decline Request
-                </button>
-            </div>
-        </form>
-
-    </div>
+<div class="top-bar">
+    <a th:href="@{/admin/requests}" class="btn-top-dark">
+        <i class="bi bi-arrow-left me-1"></i> Back to Requests
+    </a>
 </div>
 
-<footer class="bg-dark text-white-50 text-center py-4 mt-auto">
-    <small>© 2026 Nexus Bookstore Admin Portal.</small>
-</footer>
+<div class="dashboard-wrapper">
+
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-brand">
+            NEXUS
+            <span>ADMINISTRATOR</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-item">
+                <i class="bi bi-collection"></i> Inventory Hub
+            </a>
+
+            <a th:href="@{/admin/requests}" class="nav-item active">
+                <i class="bi bi-journal-plus"></i> Book Requests
+            </a>
+
+            <a th:href="@{/admin/users}" class="nav-item">
+                <i class="bi bi-people"></i> User Management
+            </a>
+            <a th:href="@{/admin/orders/manage}" class="nav-item">
+                <i class="bi bi-box-seam"></i> Order Command Center
+            </a>
+            <form th:action="@{/logout}" method="post" class="mt-5 m-0 p-0">
+                <button type="submit" class="nav-item w-100 text-start text-danger opacity-75 bg-transparent border-0">
+                    <i class="bi bi-box-arrow-right"></i> Terminate Session
+                </button>
+            </form>
+        </nav>
+        <div class="position-absolute bottom-0 start-0 w-100 p-4 text-center opacity-50">
+            <small class="text-white fw-light" style="font-size: 0.7rem;">WD130 &copy; 2026</small>
+        </div>
+    </aside>
+
+    <main class="dashboard-content">
+
+        <div class="premium-card">
+
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge-category" th:text="${book.category}">Category</span>
+                <span class="badge-pending shadow-sm"><i class="bi bi-hourglass-split"></i> Pending Publication</span>
+            </div>
+
+            <h1 class="book-title" th:text="${book.title}">Book Title</h1>
+            <p class="book-author">By <strong class="text-dark" th:text="${book.author != null ? book.author.name : 'Unknown'}">Author Name</strong></p>
+
+            <div class="synopsis-box shadow-sm">
+                <h6 class="fw-bold text-muted text-uppercase mb-3" style="letter-spacing: 1px; font-size: 0.75rem;"><i class="bi bi-journal-text me-2"></i>Author's Synopsis</h6>
+                <p class="synopsis-text" th:text="${book.description}">Synopsis goes here...</p>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-title"><i class="bi bi-tags text-success me-2"></i>Retail Configuration</h2>
+
+                <form th:action="@{'/admin/requests/approve/' + ${book.bookId}}" method="post">
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="label-text">Retail Price (LKR) <span class="text-danger">*</span></label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">Rs.</span>
+                                <input type="number" step="0.01" min="0" name="price" class="custom-input font-playfair" required placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="label-text">Initial Stock Allocation <span class="text-danger">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="bi bi-box-seam input-icon text-muted"></i>
+                                <input type="number" min="0" name="stock" class="custom-input" required placeholder="e.g. 50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-alert">
+                        <i class="bi bi-info-circle-fill fs-5 mt-1"></i>
+                        <div>
+                            <strong>Publication Notice:</strong> Submitting this form will officially publish the book to the public catalog, making it immediately available for purchase.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center action-buttons mt-5 pt-3 border-top">
+
+                        <button type="submit" form="declineForm" class="btn-action btn-decline" onclick="return confirm('Are you sure you want to decline this book? The author will be notified.');">
+                            <i class="bi bi-x-circle"></i> Decline Request
+                        </button>
+
+                        <div class="d-flex gap-3">
+                            <a href="/admin/requests" class="btn-action btn-cancel border">Cancel</a>
+                            <button type="submit" class="btn-action btn-approve">
+                                <i class="bi bi-check-circle-fill"></i> Approve & Publish
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+
+                <form id="declineForm" th:action="@{'/admin/requests/decline/' + ${book.bookId}}" method="post" style="display: none;"></form>
+
+            </div>
+        </div>
+
+    </main>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

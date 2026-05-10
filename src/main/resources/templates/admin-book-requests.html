@@ -2,78 +2,244 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Book Submissions Queue - Nexus Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Submissions Queue — Nexus Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        :root { --ink: #1a1a1a; --paper: #faf8f4; --paper-card: #ffffff; --accent: #c8602a; --border: rgba(0,0,0,0.09); }
-        body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
-        .font-playfair { font-family: 'Playfair Display', serif; }
+        :root {
+            --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
+            --paper: #faf8f4; --paper-card: #ffffff;
+            --accent: #c8602a; --accent-dark: #9e4a1e;
+        }
 
-        .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .table-container { background-color: var(--paper-card); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid var(--border); overflow: hidden; }
+        body {
+            background: linear-gradient(135deg, #f0f2f5 0%, #e2e8f0 100%);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+        }
 
-        /* Custom Header for Action Queues */
-        .table-custom th { background-color: #f8f9fa !important; color: var(--ink) !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; padding: 1.2rem 1rem; border-bottom: 2px solid var(--border); }
-        .table-custom td { vertical-align: middle; border-bottom: 1px solid var(--border); padding: 1.2rem 1rem; }
+        /* ✨ Premium Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .dashboard-wrapper {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            gap: 2rem;
+            margin: auto;
+        }
+
+        /* 🟦 Premium Dark Sidebar */
+        .dashboard-sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--ink) 0%, #000000 100%);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            color: white;
+            animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .sidebar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .sidebar-brand span { color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; display: block; letter-spacing: 3px; }
+
+        .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: rgba(255,255,255,0.1); color: white; box-shadow: inset 3px 0 0 var(--accent); }
+
+        /* ⬜ Main Content Area */
+        .dashboard-content { flex: 1; display: flex; flex-direction: column; }
+
+        .premium-card {
+            background: var(--paper-card);
+            border-radius: 12px;
+            padding: 2.5rem 3.5rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.04);
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 15px;
+        }
+
+        .section-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); margin: 0; }
+
+        /* 🎨 Custom Premium Table */
+        .table-premium { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; }
+        .table-premium th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted); border: none; padding: 12px 20px; font-weight: 600; }
+        .table-premium td { background: #fafafa; border: none; padding: 16px 20px; vertical-align: middle; color: var(--ink-soft); transition: 0.3s; }
+        .table-premium tr:hover td { background: #f5f6f8; transform: scale(1.002); }
+        .table-premium td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .table-premium td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+        /* Typography & Badges */
+        .badge-warning-soft { background: #fff8e6; color: #9c6500; border: 1px solid rgba(212,136,6,0.2); padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; }
+        .badge-category { background: rgba(0,0,0,0.04); color: var(--ink-muted); padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        .btn-review { background: var(--ink); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; transition: 0.2s; text-decoration: none; display: inline-block; }
+        .btn-review:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(200,96,42,0.2); color: white; }
+
+        /* Staggered Row Animations */
+        .table-premium tbody tr { animation: fadeInUp 0.5s ease forwards; opacity: 0; }
+        .table-premium tbody tr:nth-child(1) { animation-delay: 0.3s; }
+        .table-premium tbody tr:nth-child(2) { animation-delay: 0.4s; }
+        .table-premium tbody tr:nth-child(3) { animation-delay: 0.5s; }
+        .table-premium tbody tr:nth-child(4) { animation-delay: 0.6s; }
+
+        .top-bar { position: absolute; top: 2rem; right: 3rem; z-index: 100; display: flex; gap: 12px; }
     </style>
 </head>
 <body>
 
-<nav class="site-nav py-3 mb-5">
-    <div class="container d-flex justify-content-between align-items-center">
-        <span class="text-white fw-bold font-playfair fs-5">Nexus Admin Panel</span>
-        <a href="/admin/dashboard" class="btn btn-outline-light btn-sm fw-bold px-3"><i class="bi bi-arrow-left me-1"></i> Back to Dashboard</a>
-    </div>
-</nav>
+<div class="top-bar">
+    <a th:href="@{/catalog}" class="btn btn-dark rounded-pill px-4 py-2 fw-semibold shadow-sm text-decoration-none" style="font-size: 0.9rem;">
+        <i class="bi bi-shop me-1"></i> Public Catalog
+    </a>
+</div>
 
-<div class="container" style="max-width: 1100px; flex: 1;">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
-        <div>
-            <h2 class="font-playfair fw-bold mb-1 text-dark">Author Submissions Queue</h2>
-            <p class="text-muted mb-0">Review and approve new books requested by authors.</p>
-        </div>
-        <div class="bg-warning bg-opacity-10 text-dark border border-warning px-4 py-2 rounded shadow-sm fw-bold">
-            <i class="bi bi-inbox-fill text-warning me-2 fs-5 align-text-bottom"></i> Action Required
-        </div>
-    </div>
+<div class="dashboard-wrapper">
 
-    <div class="table-container mb-5">
-        <div class="table-responsive m-0">
-            <table class="table table-hover table-custom align-middle m-0">
-                <thead>
-                <tr>
-                    <th>Manuscript Title</th>
-                    <th>Author</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                    <th class="text-center">Admin Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="book : ${pendingBooks}">
-                    <td class="fw-bold text-dark font-playfair fs-5" th:text="${book.title}">Title</td>
-                    <td class="text-muted fw-bold" th:text="${book.author != null ? book.author.name : 'Unknown'}">Author</td>
-                    <td><span class="badge bg-light text-dark border border-secondary px-3 py-2 rounded-1" th:text="${book.category}">Category</span></td>
-                    <td><span class="badge bg-warning bg-opacity-25 text-dark border border-warning px-3 py-2 rounded-1 fw-bold"><i class="bi bi-hourglass-split me-1"></i> Awaiting Review</span></td>
-                    <td class="text-center">
-                        <a th:href="@{'/admin/requests/review/' + ${book.bookId}}" class="btn btn-dark btn-sm px-4 py-2 fw-bold shadow-sm">
-                            Review & Publish <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(pendingBooks)}">
-                    <td colspan="5" class="text-center py-5 text-muted" style="background: rgba(0,0,0,0.02);">
-                        <i class="bi bi-check2-circle display-4 text-success d-block mb-3 opacity-75"></i>
-                        <h4 class="font-playfair fw-bold text-dark">Queue is empty</h4>
-                        <p class="mb-0">You're all caught up! There are no pending submissions.</p>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-brand">
+            NEXUS
+            <span>ADMINISTRATOR</span>
         </div>
-    </div>
+        <nav class="sidebar-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-item">
+                <i class="bi bi-collection"></i> Inventory Hub
+            </a>
+
+            <a th:href="@{/admin/requests}" class="nav-item active">
+                <i class="bi bi-journal-plus"></i> Book Requests
+            </a>
+
+            <a th:href="@{/admin/users}" class="nav-item">
+                <i class="bi bi-people"></i> User Management
+            </a>
+            <a th:href="@{/admin/orders/manage}" class="nav-item">
+                <i class="bi bi-box-seam"></i> Order Command Center
+            </a>
+            <form th:action="@{/logout}" method="post" class="mt-5 m-0 p-0">
+                <button type="submit" class="nav-item w-100 text-start text-danger opacity-75 bg-transparent border-0">
+                    <i class="bi bi-box-arrow-right"></i> Terminate Session
+                </button>
+            </form>
+        </nav>
+        <div class="position-absolute bottom-0 start-0 w-100 p-4 text-center opacity-50">
+            <small class="text-white fw-light" style="font-size: 0.7rem;">WD130 &copy; 2026</small>
+        </div>
+    </aside>
+
+    <main class="dashboard-content">
+
+        <div class="premium-card">
+            <div class="section-header">
+                <div>
+                    <h3 class="section-title h4 border-0 mb-1">Author Submissions Queue</h3>
+                    <p class="text-muted small mb-0">Review and approve new books requested by authors.</p>
+                </div>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success py-2 small fw-medium shadow-sm border-0 mb-4" style="background: #e8f4eb; color: #1e4620; animation: fadeInUp 0.5s ease;">
+                <i class="bi bi-check2-circle me-2"></i> <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="table-responsive" style="overflow-x: visible;">
+                <table class="table-premium">
+                    <thead>
+                    <tr>
+                        <th>Manuscript Title</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="book : ${pendingBooks}">
+                        <td>
+                            <span class="font-playfair fw-bold text-dark fs-5" th:text="${book.title}">Title</span>
+                        </td>
+                        <td>
+                            <span class="text-dark fw-medium" th:text="${book.author != null ? book.author.name : 'Unknown'}">Author</span>
+                        </td>
+                        <td>
+                            <span class="badge-category" th:text="${book.category}">Category</span>
+                        </td>
+                        <td>
+                            <span class="badge-warning-soft"><i class="bi bi-hourglass-split"></i> Awaiting Review</span>
+                        </td>
+                        <td class="text-center">
+                            <a th:href="@{'/admin/requests/review/' + ${book.bookId}}" class="btn-review shadow-sm">
+                                Review & Publish <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(pendingBooks)}">
+                        <td colspan="5" class="text-center py-5 bg-transparent">
+                            <i class="bi bi-check2-circle opacity-25 mb-3" style="font-size: 3.5rem; color: #198754;"></i>
+                            <h5 class="font-playfair fw-bold text-dark">Queue is empty</h5>
+                            <p class="text-muted small mb-0">You're all caught up! There are no pending submissions.</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

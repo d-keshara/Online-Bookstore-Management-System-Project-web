@@ -73,7 +73,10 @@ public class AdminWebController {
     // ORDER COMMAND CENTER
     @GetMapping("/orders/manage")
     public String manageOrders(Model model) {
-        model.addAttribute("allOrders", orderRepository.findAll());
+        List<Order> reversedOrders = new java.util.ArrayList<>(orderRepository.findAll());
+        java.util.Collections.reverse(reversedOrders);
+
+        model.addAttribute("allOrders", reversedOrders);
         return "admin-order-management";
     }
 
@@ -197,6 +200,37 @@ public class AdminWebController {
         if (book == null) return "redirect:/admin/requests?error=BookNotFound";
         model.addAttribute("book", book);
         return "admin-approve-book";
+    }
+
+    @GetMapping("/users/make-author/{id}")
+    public String promoteToAuthor(@PathVariable Integer id) {
+        userRepository.findById(id).ifPresent(user -> {
+            user.setRole("ROLE_AUTHOR");
+
+            if (user.getAuthor() == null) {
+                Author newProfile = new Author();
+
+                newProfile.setName(user.getFullName() != null && !user.getFullName().isEmpty()
+                        ? user.getFullName() : user.getUsername());
+
+                newProfile.setUser(user);
+                user.setAuthor(newProfile);
+            }
+
+            userRepository.save(user);
+        });
+
+        return "redirect:/admin/users?author_promoted";
+    }
+
+    @GetMapping("/users/demote/{id}")
+    public String demoteToUser(@PathVariable Integer id) {
+        userRepository.findById(id).ifPresent(user -> {
+            user.setRole("ROLE_USER");
+            userRepository.save(user);
+        });
+
+        return "redirect:/admin/users?demoted";
     }
 
     @PostMapping("/requests/approve/{id}")
