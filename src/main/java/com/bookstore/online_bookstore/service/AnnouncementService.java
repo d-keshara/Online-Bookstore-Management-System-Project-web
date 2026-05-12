@@ -19,4 +19,23 @@ public class AnnouncementService {
     public void saveAnnouncement(Announcement announcement) {
         announcementRepository.save(announcement);
     }
+
+    // Read by ID
+    public Announcement getAnnouncementById(Long id) {
+        return announcementRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Announcement not found"));
+    }
+
+    // Update
+    public void updateAnnouncement(Long id, Announcement updated) {
+        Announcement existing = getAnnouncementById(id);
+        existing.setTitle(updated.getTitle());
+        existing.setContent(updated.getContent());
+        announcementRepository.save(existing);
+    }
+
+    // Delete
+    public void deleteAnnouncement(Long id) {
+        announcementRepository.deleteById(id);
+    }
 }
