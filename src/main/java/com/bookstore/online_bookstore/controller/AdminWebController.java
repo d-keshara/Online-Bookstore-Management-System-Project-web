@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -260,9 +261,24 @@ public class AdminWebController {
 
     // ADMIN REVIEW MANAGEMENT ENDPOINTS
     @PostMapping("/reviews/delete/{id}")
+    @Transactional // This locks the database transaction
     public String deleteReview(@PathVariable Integer id, RedirectAttributes ra) {
-        reviewRepository.deleteById(id);
-        ra.addFlashAttribute("successMessage", "Review was permanently deleted from the database.");
+        try {
+            reviewRepository.findById(id).ifPresent(review -> {
+                String bookTitle = review.getBook() != null ? review.getBook().getTitle() : "a book";
+                
+                review.setBook(null);
+                review.setUser(null);
+
+                // 2. Delete and FORCE the database to execute it right now
+                reviewRepository.delete(review);
+                reviewRepository.flush();
+
+                ra.addFlashAttribute("successMessage", "✅ Review for '" + bookTitle + "' was permanently deleted.");
+            });
+        } catch (Exception e) {
+            ra.addFlashAttribute("successMessage", "⚠️ DATABASE ERROR: Could not delete due to a constraint.");
+        }
         return "redirect:/admin/dashboard";
     }
 
