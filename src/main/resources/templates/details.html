@@ -212,6 +212,11 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="mt-3 text-center border-top pt-3" style="border-color: rgba(0,0,0,0.05) !important;">
+                            <button type="button" id="wishlist-btn" class="btn btn-sm btn-outline-dark fw-bold rounded-pill px-4" th:onclick="'addToWishlist(' + ${book.bookId} + ', 1)'">
+                                <i class="bi bi-heart me-1"></i> Save to Wishlist
+                            </button>
+                        </div>
                     </form>
                 </div>
 
@@ -521,6 +526,43 @@
             });
         }
     });
+
+    // 🔥 3. Dulara's Wishlist API Call
+    async function addToWishlist(bookId, userId) {
+        // Prevent errors if user isn't logged in
+        if (!userId) {
+            alert("Please log in to save books to your wishlist!");
+            return;
+        }
+
+        const btn = document.getElementById('wishlist-btn');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+
+        try {
+            const payload = {
+                user: { id: userId },
+                book: { bookId: bookId }
+            };
+
+            const response = await fetch('/api/wishlist/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                btn.innerHTML = '<i class="bi bi-heart-fill text-danger me-1"></i> Saved!';
+                btn.classList.add('border-danger', 'text-danger'); // Makes it turn red to show success
+            } else {
+                alert("Failed to save book.");
+                btn.innerHTML = '<i class="bi bi-heart me-1"></i> Save to Wishlist';
+            }
+        } catch (error) {
+            console.error("Error connecting to server:", error);
+            btn.innerHTML = '<i class="bi bi-heart me-1"></i> Save to Wishlist';
+        }
+    }
+
 </script>
 
 </body>

@@ -24,14 +24,14 @@ import java.util.List;
 
         // GET: View "My Wishlist"
         @GetMapping("/{userId}")
-        public ResponseEntity<List<Wishlist>> getWishlist(@PathVariable Long userId) {
+        public ResponseEntity<List<Wishlist>> getWishlist(@PathVariable Integer userId) {
             List<Wishlist> wishlist = wishlistService.getWishlistByUser(userId);
             return ResponseEntity.ok(wishlist);
         }
 
         // DELETE: Remove from wishlist
         @DeleteMapping("/remove/{userId}/{bookId}")
-        public ResponseEntity<String> removeFromWishlist(@PathVariable Long userId, @PathVariable Long bookId) {
+        public ResponseEntity<String> removeFromWishlist(@PathVariable Integer userId, @PathVariable Integer bookId) {
             wishlistService.removeFromWishlist(userId, bookId);
             return ResponseEntity.ok("Book removed from wishlist.");
         }
