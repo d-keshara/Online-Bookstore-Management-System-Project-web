@@ -51,13 +51,12 @@
             margin: auto;
         }
 
-       /* 🟦 Premium Dark Sidebar */
-        /* 🟦 Premium Dark Sidebar */
+        /* 🟦 BULLETPROOF SIDEBAR ARCHITECTURE */
         .dashboard-sidebar {
             width: 280px;
             background: linear-gradient(135deg, var(--ink) 0%, #000000 100%);
             border-radius: 12px;
-            padding: 2.5rem 1.5rem;
+            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
             color: white;
             animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -66,8 +65,23 @@
             height: calc(100vh - 4rem);
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* 🔥 Force blocks to top and bottom */
+            overflow: hidden;
+        }
+
+        .sidebar-scroll-area {
+            flex: 1;
             overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .sidebar-scroll-area::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+        .sidebar-fixed-bottom {
+            flex-shrink: 0;
+            padding-top: 1.5rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
         .sidebar-brand {
@@ -112,19 +126,26 @@
             animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             opacity: 0;
         }
-        .premium-card:nth-child(1) { animation-delay: 0.1s; }
-        .premium-card:nth-child(2) { animation-delay: 0.2s; }
-        .premium-card:nth-child(3) { animation-delay: 0.3s; }
+        .premium-card:nth-child(2) { animation-delay: 0.1s; }
+        .premium-card:nth-child(3) { animation-delay: 0.2s; }
 
         .section-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); margin-bottom: 1.5rem; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; }
 
-        /* Urgent AI Button */
+        /* 🔥 Top Action Buttons (Catalog & AI Alerts) */
         .btn-urgent {
-            background: #dc3545; color: white; border: none; padding: 12px 24px; border-radius: 50px; font-weight: 600;
+            background: #dc3545; color: white; border: none; padding: 10px 24px; border-radius: 50px; font-weight: 600;
             letter-spacing: 0.5px; animation: pulseAlert 2s infinite; transition: 0.3s;
-            display: inline-flex; align-items: center; gap: 8px;
+            display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem;
         }
         .btn-urgent:hover { background: #b02a37; transform: translateY(-2px); color: white; }
+
+        .btn-top {
+            border-radius: 50px; padding: 10px 24px; font-weight: 600; font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.3s; border: none; text-decoration: none;
+            display: inline-flex; align-items: center;
+        }
+        .btn-top-light { background: white; color: var(--ink); border: 1px solid rgba(0,0,0,0.1); }
+        .btn-top-light:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
 
         /* Quick Action Buttons */
         .quick-actions { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 1rem; }
@@ -163,31 +184,18 @@
         .ai-comment { font-style: italic; background: #fff5f5; padding: 1rem; border-radius: 6px; color: #b02a37; margin: 1rem 0; }
         .ai-email-box { background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 1px solid #e9ecef; border-left: 4px solid #0d6efd; border-radius: 8px; padding: 1.5rem; margin-top: 1rem; }
 
-        .top-bar { position: absolute; top: 2rem; right: 3rem; z-index: 100; display: flex; gap: 12px; }
-        .btn-top { border-radius: 50px; padding: 8px 20px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; border: none; text-decoration: none;}
-        .btn-top-light { background: white; color: var(--ink); border: 1px solid rgba(0,0,0,0.1); }
-        .btn-top-light:hover { background: #f0f0f0; }
-
         @media (max-width: 992px) {
             .dashboard-wrapper { flex-direction: column; }
             .dashboard-sidebar { width: 100%; height: auto; position: relative; top: 0; }
-            .top-bar { display: none; }
         }
     </style>
 </head>
 <body>
 
-<div class="top-bar">
-    <a th:href="@{/catalog}" class="btn-top btn-top-light">
-        <i class="bi bi-shop me-1 text-muted"></i> Public Catalog
-    </a>
-</div>
-
 <div class="dashboard-wrapper">
 
     <aside class="dashboard-sidebar">
-
-        <div>
+        <div class="sidebar-scroll-area">
             <div class="sidebar-brand">
                 NEXUS
                 <span>ADMINISTRATOR</span>
@@ -208,7 +216,7 @@
             </nav>
         </div>
 
-        <div class="border-top pt-3 mt-4" style="border-color: rgba(255,255,255,0.1) !important;">
+        <div class="sidebar-fixed-bottom">
             <form th:action="@{/logout}" method="post" class="m-0 p-0 mb-3">
                 <button type="submit" class="nav-item w-100 text-start text-danger opacity-75 bg-transparent border-0" style="cursor: pointer;">
                     <i class="bi bi-box-arrow-right"></i> Sign Out
@@ -218,9 +226,7 @@
                 <small class="text-white fw-light" style="font-size: 0.7rem;">WD130 &copy; 2026</small>
             </div>
         </div>
-
     </aside>
-
     <main class="dashboard-content">
 
         <div th:if="${successMessage}" class="alert alert-success py-3 small fw-bold shadow-sm border-0 mb-0" style="background: #e8f4eb; color: #1e4620; border-left: 4px solid #198754 !important; animation: fadeInUp 0.5s ease;">
@@ -228,8 +234,12 @@
             <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
         </div>
 
-        <div th:if="${urgentReviews != null and !urgentReviews.isEmpty()}" class="d-flex justify-content-end" style="animation: fadeInUp 0.5s ease;">
-            <button type="button" class="btn-urgent" data-bs-toggle="modal" data-bs-target="#alertsModal">
+        <div class="d-flex justify-content-end align-items-center gap-3 mb-2" style="animation: fadeInUp 0.5s ease;">
+            <a th:href="@{/catalog}" class="btn-top btn-top-light m-0">
+                <i class="bi bi-shop me-1 text-muted"></i> Public Catalog
+            </a>
+
+            <button th:if="${urgentReviews != null and !urgentReviews.isEmpty()}" type="button" class="btn-urgent m-0" data-bs-toggle="modal" data-bs-target="#alertsModal">
                 <i class="bi bi-exclamation-triangle-fill"></i> View Urgent AI Alerts
                 <span class="badge bg-white text-danger rounded-pill ms-1" th:text="${urgentReviews.size()}"></span>
             </button>
@@ -328,7 +338,6 @@
 
     </main>
 </div>
-
 <div class="modal fade" id="alertsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -343,8 +352,13 @@
                     <div th:each="review : ${urgentReviews}" class="ai-review-card">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                <h6 class="fw-bold mb-1 font-playfair fs-5"><i class="bi bi-book me-2 text-muted"></i> <span th:text="${review.book.title}"></span></h6>
-                                <div class="text-muted small fw-bold text-uppercase letter-spacing-1">Customer: <span class="text-dark" th:text="${review.user.username}"></span></div>
+                                <h6 class="fw-bold mb-1 font-playfair fs-5">
+                                    <i class="bi bi-book me-2 text-muted"></i>
+                                    <span th:text="${review.book != null ? review.book.title : 'Deleted / Unknown Book'}"></span>
+                                </h6>
+                                <div class="text-muted small fw-bold text-uppercase letter-spacing-1">
+                                    Customer: <span class="text-dark" th:text="${review.user != null ? review.user.username : 'Unknown User'}"></span>
+                                </div>
                             </div>
                             <div class="text-end">
                                 <span class="badge bg-danger bg-opacity-10 text-danger border border-danger mb-1 px-3 py-2"><i class="bi bi-star-fill me-1"></i><span th:text="${review.rating}"></span> / 5 Rating</span><br>
@@ -356,8 +370,10 @@
                         <div class="ai-comment">"<span th:text="${review.comment}"></span>"</div>
 
                         <div class="d-flex gap-2 justify-content-end border-top pt-3 mt-3">
+
                             <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-3 border-2"
-                                    th:attr="onclick=|generateApology('${review.user.username}', '${#strings.replace(review.book.title, '''', '\''')}', '${#strings.replace(review.comment, '''', '\''')}', this)|">
+                                    th:with="safeBook=${review.book != null ? #strings.replace(review.book.title, '''', '\''') : 'Unknown'}, safeUser=${review.user != null ? review.user.username : 'Unknown'}"
+                                    th:attr="onclick=|generateApology('${safeUser}', '${safeBook}', '${#strings.replace(review.comment, '''', '\''')}', this)|">
                                 <i class="bi bi-magic me-1"></i> Generate AI Apology
                             </button>
 

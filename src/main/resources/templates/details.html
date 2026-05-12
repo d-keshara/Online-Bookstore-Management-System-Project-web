@@ -10,42 +10,95 @@
 
     <style>
         :root {
-            --ink: #2b2b2b; --ink-soft: #4a4a4a; --ink-muted: #888;
+            --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
             --paper: #faf8f4; --paper-warm: #f3efe8; --paper-card: #ffffff;
             --accent: #c8602a; --accent-light: #f5ece4; --accent-dark: #9e4a1e;
             --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.15);
         }
 
-        body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); display: flex; flex-direction: column; min-height: 100vh; }
-        
-        .site-nav { background: #1a1a1a; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
-        .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; }
-        .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; }
-        .brand-bookstore { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 400; letter-spacing: 1.5px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-top: 3px; }
+        body {
+            background: linear-gradient(135deg, var(--paper) 0%, #e9e4dc 100%);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; position: relative;
+        }
 
-        .btn-nav-ghost { color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.2); padding: 0.35rem 0.85rem; border-radius: 4px; text-decoration: none; font-size: 12.5px; font-weight: 500; transition: 0.2s; }
+        body::before {
+            content: '“'; position: fixed; top: -5%; left: 2%; font-size: 80vh; line-height: 1;
+            font-family: 'Playfair Display', serif; color: rgba(0,0,0,0.02); z-index: -1; pointer-events: none;
+        }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes revealRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes floatBook {
+            0% { transform: translateY(0px) rotateY(-8deg); box-shadow: -15px 25px 40px rgba(0,0,0,0.15); }
+            50% { transform: translateY(-8px) rotateY(-8deg); box-shadow: -20px 35px 50px rgba(0,0,0,0.25); }
+            100% { transform: translateY(0px) rotateY(-8deg); box-shadow: -15px 25px 40px rgba(0,0,0,0.15); }
+        }
+
+        /* Nav */
+        .site-nav { background: #1a1a1a; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; transition: 0.3s; }
+        .nav-brand:hover { opacity: 0.8; }
+        .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; }
+        .brand-bookstore { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.8rem; margin-top: 2px; }
+        .btn-nav-ghost { color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.2); padding: 0.35rem 1rem; border-radius: 50px; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: 0.3s; }
         .btn-nav-ghost:hover { color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
 
-        /* 🔥 Slightly increased max-width to make the book picture slightly wider */
-        .page-layout { max-width: 1150px; margin: 3rem auto; padding: 0 2rem; flex: 1; }
+        /* Layout & Book */
+        .page-layout { max-width: 1150px; margin: 3rem auto; padding: 0 2rem; flex: 1; position: relative; z-index: 1; }
+        .book-cover-wrapper { perspective: 1200px; padding: 2rem 1rem 3rem 1rem; animation: revealRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .book-cover-3d {
+            background: var(--paper-warm); height: 480px; width: 100%; max-width: 330px; margin: 0 auto;
+            border-radius: 4px 10px 10px 4px; overflow: hidden; position: relative; transform-style: preserve-3d;
+            border-left: 6px solid rgba(0,0,0,0.08); animation: floatBook 5s ease-in-out infinite;
+        }
+        .book-cover-3d::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 8%, rgba(0,0,0,0.03) 100%); pointer-events: none; }
+        .book-cover-3d img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 🔥 Increased height proportionally for the wider book cover */
-        .book-cover-large { background: var(--paper-warm); height: 520px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; position: relative; }
-        .book-cover-large img { width: 100%; height: 100%; object-fit: cover; }
+        .trust-badges { animation: fadeInUp 0.6s ease forwards; animation-delay: 0.3s; opacity: 0; }
+        .trust-badge-item { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; color: var(--ink-soft); }
+        .trust-badge-icon { width: 45px; height: 45px; border-radius: 50%; background: var(--paper-card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 
         .font-playfair { font-family: 'Playfair Display', serif; }
+        .animate-item-1 { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.1s; }
+        .animate-item-2 { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.2s; }
+        .animate-item-3 { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.3s; }
 
-        .add-to-cart-box { background: var(--paper-card); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; margin-top: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-
-        .btn-massive-cart { background: var(--paper-warm); color: var(--ink); border: 1px solid var(--border-strong); font-weight: 500; padding: 0.75rem; border-radius: 4px; transition: 0.2s; font-size: 0.95rem; }
-        .btn-massive-cart:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
-
-        .btn-buy-now { background: var(--accent); color: #fff; border: none; font-weight: 600; padding: 0.75rem; border-radius: 4px; transition: 0.2s; box-shadow: 0 4px 10px rgba(200,96,42,0.2); font-size: 0.95rem; }
-        .btn-buy-now:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 6px 12px rgba(200,96,42,0.3); }
-
+        /* Cart Box */
+        .add-to-cart-box { background: var(--paper-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
+        .add-to-cart-box::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+        .btn-massive-cart { background: var(--paper-warm); color: var(--ink); border: 1px solid var(--border-strong); font-weight: 600; padding: 0.8rem; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-massive-cart:hover { background: var(--ink); color: #fff; border-color: var(--ink); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.08); }
+        .btn-buy-now { background: var(--accent); color: #fff; border: none; font-weight: 600; padding: 0.8rem; border-radius: 6px; transition: 0.3s; box-shadow: 0 6px 15px rgba(200,96,42,0.2); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-buy-now:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(200,96,42,0.3); color: white;}
+        .qty-selector { border-radius: 6px; overflow: hidden; border: 1px solid var(--border-strong); background: white; height: 42px; }
+        .qty-btn { width: 35px; height: 100%; background: transparent; border: none; color: var(--ink); transition: 0.2s; }
+        .qty-btn:hover { background: var(--paper-warm); }
+        .qty-input { width: 50px; height: 100%; border: none; text-align: center; font-weight: 700; font-size: 1rem; border-left: 1px solid var(--border-strong); border-right: 1px solid var(--border-strong); }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
+
+        /* Reviews */
+        .review-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; transition: 0.3s; margin-bottom: 1rem; }
+        .review-card:hover { border-color: rgba(200,96,42,0.2); box-shadow: 0 8px 20px rgba(0,0,0,0.04); }
+        .premium-divider { background: var(--paper-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 2rem 0; margin: 4rem 0; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+
+        /* Interactive Star Rating CSS */
+        .rating-star { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; color: #d1d5db; }
+        .rating-star:hover { transform: scale(1.15); }
+        .rating-star.active, .rating-star.hover-active { color: #ffc107 !important; filter: drop-shadow(0 2px 8px rgba(255, 193, 7, 0.4)); }
+
+        .all-reviews-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 10px; }
+        .all-reviews-modal-body::-webkit-scrollbar { width: 6px; }
+        .all-reviews-modal-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 10px; }
+        .all-reviews-modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+
+        @media (max-width: 992px) {
+            .book-cover-3d { height: 400px; max-width: 280px; transform: none; animation: none; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-left: none; }
+            .book-cover-wrapper { padding: 1rem; perspective: none; }
+        }
     </style>
 </head>
 <body>
@@ -60,248 +113,325 @@
     </div>
 </nav>
 
-<div th:if="${param.review_success != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #e8f4eb; color: #1e4620; font-weight: 500; padding: 0.8rem; border-bottom: 1px solid #c3e6cb !important;" role="alert">
-    <i class="bi bi-star-fill text-warning me-2 align-text-bottom"></i> Review posted successfully! Thank you for sharing your thoughts.
-    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+<div th:if="${param.review_success != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #e8f4eb; color: #1e4620; font-weight: 600; padding: 0.8rem; border-bottom: 2px solid #198754 !important; z-index: 1001;">
+    <i class="bi bi-star-fill text-warning me-2 align-text-bottom fs-5"></i> Review posted successfully!
+    <button type="button" class="btn-close shadow-none mt-1" data-bs-dismiss="alert"></button>
 </div>
-
-<div th:if="${param.review_error != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #fde8e8; color: #721c24; font-weight: 500; padding: 0.8rem; border-bottom: 1px solid #f5c6cb !important;" role="alert">
-    <i class="bi bi-exclamation-triangle-fill me-2 align-text-bottom"></i> You have already submitted a review for this book!
-    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+<div th:if="${param.review_error != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #fde8e8; color: #721c24; font-weight: 600; padding: 0.8rem; border-bottom: 2px solid #dc3545 !important; z-index: 1001;">
+    <i class="bi bi-exclamation-triangle-fill me-2 align-text-bottom fs-5"></i> You have already submitted a review for this book!
+    <button type="button" class="btn-close shadow-none mt-1" data-bs-dismiss="alert"></button>
 </div>
-
-<div th:if="${param.added != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: var(--accent-light); color: var(--accent-dark); font-weight: 500; padding: 0.8rem; border-bottom: 1px solid #eecab3 !important;" role="alert">
-    <i class="bi bi-bag-check-fill me-2 align-text-bottom"></i> Book successfully added to your cart!
-    <a th:href="@{/cart}" class="ms-3 fw-semibold text-decoration-underline" style="color: var(--accent-dark);">View Cart & Checkout</a>
-    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+<div th:if="${param.added != null}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #f8ede6; color: var(--accent-dark); font-weight: 600; padding: 0.8rem; border-bottom: 2px solid var(--accent) !important; z-index: 1001;">
+    <i class="bi bi-bag-check-fill me-2 align-text-bottom fs-5"></i> Book successfully added to your cart!
+    <a th:href="@{/cart}" class="ms-3 fw-bold text-decoration-underline" style="color: var(--accent-dark);">View Cart & Checkout</a>
+    <button type="button" class="btn-close shadow-none mt-1" data-bs-dismiss="alert"></button>
 </div>
 
 <div class="page-layout">
+
     <div class="row gx-lg-5">
-        <div class="col-md-5 mb-4 position-relative">
-            <div class="book-cover-large shadow-sm">
-                <div class="position-absolute top-0 end-0 m-3 z-1" th:if="${book.stock <= 5 and book.stock > 0}">
-                    <span class="badge bg-danger bg-opacity-75 shadow-sm py-1 px-2 fw-medium border border-danger">Only [[${book.stock}]] left!</span>
+
+        <div class="col-lg-5 mb-5 mb-lg-0">
+            <div class="book-cover-wrapper">
+                <div class="book-cover-3d">
+                    <div class="position-absolute top-0 end-0 m-3 z-1" th:if="${book.stock <= 5 and book.stock > 0}">
+                        <span class="badge bg-danger shadow-sm py-2 px-3 fw-bold border border-danger text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Only [[${book.stock}]] left!</span>
+                    </div>
+                    <img th:if="${book.coverImagePath != null}" th:src="@{${book.coverImagePath}}" alt="Cover">
+                    <i th:if="${book.coverImagePath == null}" class="bi bi-book text-muted opacity-25" style="font-size: 6rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
                 </div>
-                <img th:if="${book.coverImagePath != null}" th:src="@{${book.coverImagePath}}" alt="Cover">
-                <i th:if="${book.coverImagePath == null}" class="bi bi-book text-muted opacity-25" style="font-size: 6rem;"></i>
+            </div>
+
+            <div class="d-flex justify-content-center gap-4 trust-badges mt-2">
+                <div class="trust-badge-item">
+                    <div class="trust-badge-icon"><i class="bi bi-shield-check"></i></div>
+                    <span class="fw-bold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">100% Authentic</span>
+                </div>
+                <div class="trust-badge-item">
+                    <div class="trust-badge-icon"><i class="bi bi-truck"></i></div>
+                    <span class="fw-bold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Fast Shipping</span>
+                </div>
+                <div class="trust-badge-item">
+                    <div class="trust-badge-icon"><i class="bi bi-credit-card"></i></div>
+                    <span class="fw-bold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Secure Pay</span>
+                </div>
             </div>
         </div>
+        <div class="col-lg-7 pt-4">
+            <div class="animate-item-1">
+                <div class="badge text-uppercase mb-3 px-3 py-1 fw-bold rounded-pill" style="background: var(--paper-warm); color: var(--accent); letter-spacing: 1px; font-size: 0.7rem;" th:text="${book.category}">Category</div>
 
-        <div class="col-md-7 pt-1">
-            <div class="badge text-uppercase mb-2 px-2 py-1 fw-semibold" style="background: var(--paper-warm); color: var(--accent); letter-spacing: 0.5px; border: 1px solid var(--border); font-size: 0.7rem;" th:text="${book.category}">Category</div>
+                <h1 class="font-playfair fw-bold mb-2" style="color: var(--ink); line-height: 1.2; font-size: 2.5rem;" th:text="${book.title}">Book Title</h1>
 
-            <h1 class="font-playfair fw-semibold fs-2 mb-1" style="color: var(--ink); line-height: 1.2;" th:text="${book.title}">Book Title</h1>
+                <div class="d-flex align-items-center mb-4 pb-3 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                    <div class="text-muted fs-6 fw-light">By <strong class="text-dark font-playfair fw-bold" th:text="${book.author != null ? book.author.name : 'Unknown Author'}">Author</strong></div>
+                    <div class="mx-3 text-muted opacity-25 fs-5">|</div>
+                    <div class="text-warning" style="font-size: 0.95rem;">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+                        <span class="text-muted ms-2 fw-medium" style="font-size: 0.8rem;">(Customer Ratings)</span>
+                    </div>
+                </div>
 
-            <div class="d-flex align-items-center mb-3 pb-3 border-bottom border-light">
-                <div class="text-muted fs-6 fw-light">By <strong class="text-dark font-playfair fw-medium" th:text="${book.author != null ? book.author.name : 'Unknown Author'}">Author</strong></div>
-                <div class="mx-3 text-muted opacity-50">|</div>
-                <div class="text-warning small">
-                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
-                    <span class="text-muted ms-1 fw-light" style="font-size: 0.8rem;">(Customer Ratings)</span>
+                <div class="d-flex align-items-center gap-4 mb-4">
+                    <div class="fw-bold font-playfair" style="color: var(--ink); font-size: 2rem; letter-spacing: -0.5px;" th:text="'LKR ' + ${book.price}"></div>
+                    <div class="text-success fw-bold bg-success bg-opacity-10 px-2 py-1 rounded-1 border border-success" style="font-size: 0.8rem;" th:if="${book.stock > 0}"><i class="bi bi-check-circle-fill me-1"></i> In Stock</div>
+                    <div class="text-danger fw-bold bg-danger bg-opacity-10 px-2 py-1 rounded-1 border border-danger" style="font-size: 0.8rem;" th:if="${book.stock <= 0}"><i class="bi bi-x-circle-fill me-1"></i> Out of Stock</div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3 font-playfair fs-5" style="color: var(--ink);">Synopsis</h5>
+                    <p th:if="${not #strings.isEmpty(book.description)}" style="font-size: 1.05rem; line-height: 1.7; color: var(--ink-soft); font-weight: 400;" th:text="${book.description}"></p>
+                    <p th:if="${#strings.isEmpty(book.description)}" class="text-muted fst-italic" style="font-size: 0.95rem;">No Details available for this title.</p>
                 </div>
             </div>
 
-            <div class="d-flex align-items-center gap-3 mb-4">
-                <div class="fs-3 fw-semibold font-playfair" style="color: var(--accent); letter-spacing: -0.5px;" th:text="'LKR ' + ${book.price}"></div>
-                <div class="text-success fw-medium bg-success bg-opacity-10 px-2 py-1 rounded-1 border border-success small" th:if="${book.stock > 0}"><i class="bi bi-check-circle me-1 opacity-75"></i> In Stock</div>
-                <div class="text-danger fw-medium bg-danger bg-opacity-10 px-2 py-1 rounded-1 border border-danger small" th:if="${book.stock <= 0}"><i class="bi bi-x-circle me-1 opacity-75"></i> Out of Stock</div>
-            </div>
-
-            <div class="mb-4 bg-white p-3 rounded-1 border shadow-sm">
-                <h5 class="fw-semibold mb-2 font-playfair fs-5" style="color: var(--ink);">Details</h5>
-                <p th:if="${not #strings.isEmpty(book.description)}" style="font-size: 0.95rem; line-height: 1.7; color: var(--ink-soft); margin-bottom: 0; font-weight: 400;" th:text="${book.description}"></p>
-                <p th:if="${#strings.isEmpty(book.description)}" class="text-muted fst-italic mb-0" style="font-size: 0.9rem;">No Details available for this title.</p>
-            </div>
-
-            <div class="add-to-cart-box">
+            <div class="add-to-cart-box animate-item-2">
                 <div sec:authorize="isAuthenticated()">
                     <form method="post" th:action="@{/cart/add}" class="m-0 w-100">
                         <input type="hidden" name="bookId" th:value="${book.bookId}">
 
-                        <div class="d-flex align-items-center mb-3 pb-3 border-bottom border-light">
-                            <label class="fw-medium me-3 text-muted" style="font-size: 0.9rem;">Select Quantity:</label>
-                            <div class="input-group shadow-sm" style="width: 120px; height: 38px;">
-                                <button class="btn btn-light border-secondary text-dark px-2 bg-white" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepDown()"><i class="bi bi-dash"></i></button>
-                                <input type="number" name="quantity" class="form-control text-center border-secondary fw-semibold shadow-none bg-white px-1" value="1" min="1" th:max="${book.stock}" readonly>
-                                <button class="btn btn-light border-secondary text-dark px-2 bg-white" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepUp()"><i class="bi bi-plus"></i></button>
+                        <div class="d-flex align-items-center justify-content-between mb-4 pb-4 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                            <label class="fw-bold text-dark text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">Quantity</label>
+
+                            <div class="d-flex align-items-center qty-selector shadow-sm">
+                                <button class="qty-btn border-end" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepDown()"><i class="bi bi-dash-lg"></i></button>
+                                <input type="number" name="quantity" class="qty-input" value="1" min="1" th:max="${book.stock}" readonly>
+                                <button class="qty-btn border-start" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepUp()"><i class="bi bi-plus-lg"></i></button>
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-massive-cart w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-light text-muted border-light' : ''}">
-                                <i class="bi bi-cart-plus me-1 opacity-75"></i> Add to Cart
-                            </button>
-                            <button type="submit" class="btn btn-buy-now w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-secondary border-secondary' : ''}">
-                                <i class="bi bi-lightning-charge-fill text-warning me-1 opacity-75"></i> Buy Now
-                            </button>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <button type="submit" class="btn btn-massive-cart w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-light text-muted border-light' : ''}">
+                                    <i class="bi bi-cart-plus me-2 fs-5 align-middle"></i> Add to Cart
+                                </button>
+                            </div>
+                            <div class="col-sm-6">
+                                <button type="submit" class="btn btn-buy-now w-100" th:disabled="${book.stock <= 0}" th:classappend="${book.stock <= 0 ? 'bg-secondary border-secondary' : ''}">
+                                    <i class="bi bi-lightning-charge-fill text-warning me-2 fs-5 align-middle"></i> Buy Now
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
 
                 <div sec:authorize="isAnonymous()">
-                    <div class="text-center p-1">
-                        <i class="bi bi-shield-lock fs-1 text-muted mb-2 d-block opacity-25"></i>
-                        <h5 class="font-playfair fw-semibold">Sign In Required</h5>
-                        <p class="text-muted mb-3 fw-light small">Please log in to purchase this book.</p>
-                        <a th:href="@{/login}" class="btn btn-dark w-100 py-2 fw-medium rounded-1 shadow-sm">
+                    <div class="text-center p-2">
+                        <i class="bi bi-shield-lock text-muted mb-3 d-block opacity-25" style="font-size: 2.5rem;"></i>
+                        <h5 class="font-playfair fw-bold text-dark">Authentication Required</h5>
+                        <p class="text-muted mb-4 fs-6">Please log in to your Nexus account to securely purchase this book.</p>
+                        <a th:href="@{/login}" class="btn btn-dark w-100 py-3 fw-bold rounded-1 shadow-sm text-uppercase" style="letter-spacing: 1px; font-size: 0.9rem;">
                             <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to Continue
                         </a>
                     </div>
                 </div>
             </div>
-
-            <div class="mt-4 pt-4 border-top border-light">
-                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-light">
-                    <h4 class="font-playfair fw-semibold mb-0 text-dark fs-5">Customer Reviews</h4>
-                    <button class="btn btn-outline-dark fw-medium px-3 py-1 rounded-1 transition-hover bg-white" style="font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#reviewModal" sec:authorize="isAuthenticated()">
-                        <i class="bi bi-pencil-square me-1 opacity-75"></i> Write Review
-                    </button>
-                    <a th:href="@{/login}" class="btn btn-outline-secondary fw-medium px-3 py-1 rounded-1 bg-white" style="font-size: 0.85rem;" sec:authorize="isAnonymous()">
-                        Login to Review
-                    </a>
-                </div>
-
-                <div class="card border-0 mb-4 shadow-sm" style="background: linear-gradient(to right, #f8f9fa, #e9ecef); border-left: 4px solid var(--accent) !important;">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="fw-bold mb-0 text-dark font-playfair"><i class="bi bi-stars text-warning me-2"></i>AI Review Consensus</h6>
-                            <button id="btn-summarize" class="btn btn-sm btn-dark fw-bold rounded-pill px-3 shadow-sm" th:onclick="'generateSummary(' + ${book.bookId} + ')'">
-                                Generate Summary
-                            </button>
-                        </div>
-                        <p id="ai-summary-output" class="text-muted small mb-0 fst-italic" style="display: none;"></p>
-                    </div>
-                </div>
-
-                <div th:if="${reviews == null or reviews.empty}" class="p-4 rounded-1 text-center" style="background: var(--paper-warm); border: 1px dashed var(--border-strong);">
-                    <p class="text-muted mb-0 fw-light" style="font-size: 0.9rem;">No reviews yet. Be the first to share your thoughts!</p>
-                </div>
-
-                <div th:if="${reviews != null and !reviews.empty}" class="d-flex flex-column gap-3">
-                    <div th:each="review : ${reviews}" class="p-3 rounded-1 shadow-sm bg-white border position-relative overflow-hidden">
-                        <div class="position-absolute top-0 start-0 w-100" style="height: 2px; background: var(--border-strong);"></div>
-
-                        <div class="d-flex justify-content-between align-items-start mb-2 mt-1">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border" style="width: 35px; height: 35px;">
-                                    <i class="bi bi-person text-secondary" style="font-size: 0.9rem;"></i>
-                                </div>
-                                <div>
-                                    <strong class="d-block font-playfair fw-semibold" style="font-size: 0.9rem;" th:text="${review.user != null ? review.user.username : 'Verified Reader'}">User</strong>
-                                    <span class="text-success fw-medium" style="font-size: 0.7rem;"><i class="bi bi-check2-circle me-1"></i>Verified</span>
-                                </div>
-                            </div>
-                            <div class="text-warning" style="font-size: 0.8rem;">
-                                <i th:class="${review.rating >= 1 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
-                                <i th:class="${review.rating >= 2 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
-                                <i th:class="${review.rating >= 3 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
-                                <i th:class="${review.rating >= 4 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
-                                <i th:class="${review.rating >= 5 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
-                            </div>
-                        </div>
-                        <p class="mb-0 pt-2 border-top border-light text-muted" style="font-size: 0.9rem; line-height: 1.5; font-weight: 300;" th:text="${review.comment}">Review comment text.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </div> </div> <div class="premium-divider animate-item-3">
+    <div class="text-center text-muted fw-bold text-uppercase" style="letter-spacing: 3px; font-size: 0.75rem;">
+        <i class="bi bi-star-fill text-warning me-1"></i> Reader Feedback & Ratings <i class="bi bi-star-fill text-warning ms-1"></i>
     </div>
 </div>
 
+    <div class="row gx-lg-5 animate-item-3 pb-5">
+
+        <div class="col-lg-5 mb-5 mb-lg-0">
+            <h3 class="font-playfair fw-bold mb-4 text-dark">Reader Reviews</h3>
+
+            <div class="d-flex gap-3 mb-4">
+                <button class="btn btn-dark fw-bold px-4 py-2 shadow-sm rounded-pill w-100" style="font-size: 0.9rem;" data-bs-toggle="modal" data-bs-target="#reviewModal" sec:authorize="isAuthenticated()">
+                    <i class="bi bi-pencil-square me-1"></i> Write a Review
+                </button>
+                <a th:href="@{/login}" class="btn btn-outline-secondary fw-bold px-4 py-2 rounded-pill w-100" style="font-size: 0.9rem;" sec:authorize="isAnonymous()">
+                    Login to Review
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(to bottom right, var(--paper-card), var(--paper)); border-top: 5px solid var(--accent) !important; border-radius: 12px; position: sticky; top: 100px;">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column mb-3">
+                        <h5 class="fw-bold mb-1 text-dark font-playfair"><i class="bi bi-robot text-warning me-2 fs-4 align-middle"></i>AI Review Consensus</h5>
+                        <p class="text-muted small mb-0">Our AI analyzes all reviews to save you time.</p>
+                    </div>
+                    <button id="btn-summarize" class="btn btn-sm btn-outline-dark fw-bold rounded-pill px-4 w-100 py-2" th:onclick="'generateSummary(' + ${book.bookId} + ')'">
+                        Generate Quick Summary
+                    </button>
+                    <p id="ai-summary-output" class="text-muted mb-0 fst-italic mt-4" style="display: none; font-size: 0.95rem; line-height: 1.6; padding: 1rem; background: rgba(0,0,0,0.02); border-radius: 8px;"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div th:if="${reviews == null or reviews.empty}" class="p-5 rounded-1 text-center h-100 d-flex flex-column justify-content-center" style="background: var(--paper-warm); border: 2px dashed var(--border-strong); min-height: 300px;">
+                <i class="bi bi-chat-right-quote text-muted opacity-25 mb-3 d-block" style="font-size: 3rem;"></i>
+                <h5 class="fw-bold font-playfair text-dark">No reviews yet</h5>
+                <p class="text-muted mb-0">Be the first to share your thoughts on this manuscript!</p>
+            </div>
+
+            <div th:if="${reviews != null and !reviews.empty}">
+
+                <div th:each="review, iterStat : ${reviews}" th:if="${iterStat.index < 3}" class="review-card shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border" style="width: 45px; height: 45px;">
+                                <i class="bi bi-person text-secondary fs-5"></i>
+                            </div>
+                            <div>
+                                <strong class="d-block font-playfair fw-bold fs-6 text-dark" th:text="${review.user != null ? review.user.username : 'Verified Reader'}">User</strong>
+                                <span class="text-success fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;"><i class="bi bi-check2-circle me-1"></i>Verified Purchase</span>
+                            </div>
+                        </div>
+                        <div class="text-warning fs-6">
+                            <i th:class="${review.rating >= 1 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            <i th:class="${review.rating >= 2 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            <i th:class="${review.rating >= 3 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            <i th:class="${review.rating >= 4 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            <i th:class="${review.rating >= 5 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                        </div>
+                    </div>
+                    <p class="mb-0 pt-3 border-top text-dark" style="font-size: 0.95rem; line-height: 1.7; border-color: rgba(0,0,0,0.05) !important;" th:text="${review.comment}">Review comment text.</p>
+                </div>
+
+                <div th:if="${reviews.size() > 3}" class="text-center mt-4 pt-2">
+                    <button class="btn btn-outline-dark fw-bold px-5 py-2 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#allReviewsModal">
+                        Read All <span th:text="${reviews.size()}"></span> Reviews <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div> </div> ```
+
 <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="background: var(--paper-card); border-radius: 8px; overflow: hidden;">
-            <div class="modal-header border-bottom-0 pt-4 px-4 pb-0 bg-light">
-                <h4 class="modal-title font-playfair fw-semibold text-dark">Share Your Thoughts</h4>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="background: var(--paper-card); border-radius: 12px; overflow: hidden;">
+            <div class="modal-header border-bottom-0 pt-4 px-5 pb-0 bg-light">
+                <h4 class="modal-title font-playfair fw-bold text-dark">Share Your Thoughts</h4>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
             </div>
-            <div class="bg-light px-4 pb-3 border-bottom border-light">
-                <p class="text-muted mb-0 fw-light" style="font-size: 0.9rem;">Your review helps other readers discover great books.</p>
+            <div class="bg-light px-5 pb-4 border-bottom" style="border-color: rgba(0,0,0,0.05) !important;">
+                <p class="text-muted mb-0 fs-6">Your review helps other readers discover great literature.</p>
             </div>
             <form th:action="@{/reviews/add}" method="post">
-                <div class="modal-body px-4 py-3">
+                <div class="modal-body px-5 py-4">
                     <input type="hidden" name="bookId" th:value="${book.bookId}">
 
-                    <div class="mb-3">
-                        <label class="form-label fw-medium text-dark" style="font-size: 0.9rem;">Overall Rating <span class="text-danger opacity-75">*</span></label>
-                        <select name="rating" class="form-select bg-light border-secondary shadow-none cursor-pointer" required>
-                            <option value="" disabled selected>Select a rating...</option>
-                            <option value="5">⭐⭐⭐⭐⭐ (5/5) - Masterpiece!</option>
-                            <option value="4">⭐⭐⭐⭐ (4/5) - Great read</option>
-                            <option value="3">⭐⭐⭐ (3/5) - It was okay</option>
-                            <option value="2">⭐⭐ (2/5) - Not for me</option>
-                            <option value="1">⭐ (1/5) - Did not like it</option>
-                        </select>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark text-uppercase mb-3" style="font-size: 0.8rem; letter-spacing: 1px;">Overall Rating <span class="text-danger">*</span></label>
+
+                        <div class="d-flex align-items-center gap-3 bg-light border border-secondary p-3" style="border-radius: 8px;">
+                            <div class="star-rating-container d-flex gap-1" id="interactiveStars">
+                                <i class="bi bi-star rating-star fs-3" data-value="1"></i>
+                                <i class="bi bi-star rating-star fs-3" data-value="2"></i>
+                                <i class="bi bi-star rating-star fs-3" data-value="3"></i>
+                                <i class="bi bi-star rating-star fs-3" data-value="4"></i>
+                                <i class="bi bi-star rating-star fs-3" data-value="5"></i>
+                            </div>
+                            <span id="ratingDescription" class="text-muted fw-medium border-start ps-3 ms-2" style="font-size: 0.95rem;">Select your rating...</span>
+                        </div>
+                        <input type="hidden" name="rating" id="ratingHiddenInput" required>
                     </div>
 
                     <div class="mb-2">
-                        <label class="form-label fw-medium text-dark" style="font-size: 0.9rem;">Written Review <span class="text-danger opacity-75">*</span></label>
-                        <textarea name="comment" class="form-control bg-light border-secondary shadow-none" rows="4" placeholder="What did you think of the plot, characters, or writing style?" required></textarea>
-                        <div class="form-text mt-1 text-muted fw-light" style="font-size: 0.8rem;">Please keep reviews respectful and avoid major spoilers.</div>
+                        <label class="form-label fw-bold text-dark text-uppercase mb-3" style="font-size: 0.8rem; letter-spacing: 1px;">Written Review <span class="text-danger">*</span></label>
+                        <textarea name="comment" class="form-control bg-light border-secondary shadow-none fw-medium" rows="5" style="font-size: 0.95rem;" placeholder="What did you think of the plot, the characters, or the writing style?" required></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 pt-0 px-4 pb-4 bg-white d-flex gap-2">
-                    <button type="button" class="btn btn-light border-secondary fw-medium px-4 flex-fill py-2" data-bs-dismiss="modal" style="font-size: 0.95rem;">Cancel</button>
-                    <button type="submit" class="btn fw-medium px-4 flex-fill py-2 shadow-sm" style="background: var(--accent); color: #fff; font-size: 0.95rem;">Post Review</button>
+                <div class="modal-footer border-top-0 pt-0 px-5 pb-4 bg-white d-flex gap-3">
+                    <button type="button" class="btn btn-light border-secondary fw-bold px-4 py-2 text-uppercase" data-bs-dismiss="modal" style="letter-spacing: 1px; font-size: 0.85rem;">Cancel</button>
+                    <button type="submit" class="btn btn-dark fw-bold px-5 py-2 shadow-sm text-uppercase" style="background: var(--accent); border-color: var(--accent); letter-spacing: 1px; font-size: 0.85rem;">Post Review</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<footer class="mt-auto position-relative" style="background: #1a1a1a; color: rgba(255,255,255,0.6); font-size: 14.5px; padding-top: 5rem; padding-bottom: 2rem; margin-top: 5rem;">
-    <div class="position-absolute top-0 start-0 w-100" style="height: 3px; background: linear-gradient(90deg, var(--accent) 0%, #e67e22 50%, var(--accent) 100%); opacity: 0.8;"></div>
+<div class="modal fade" id="allReviewsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="background: var(--paper); border-radius: 12px; overflow: hidden;">
+            <div class="modal-header pt-4 px-5 pb-4 bg-light border-bottom">
+                <div>
+                    <h3 class="modal-title font-playfair fw-bold text-dark mb-1">All Reader Reviews</h3>
+                    <div class="text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;" th:text="${book.title}">Book Title</div>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body px-5 py-4 all-reviews-modal-body">
+                <div th:each="review : ${reviews}" class="review-card shadow-sm bg-white">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border" style="width: 45px; height: 45px;">
+                                <i class="bi bi-person text-secondary fs-5"></i>
+                            </div>
+                            <div>
+                                <strong class="d-block font-playfair fw-bold fs-6 text-dark" th:text="${review.user != null ? review.user.username : 'Verified Reader'}">User</strong>
+                                <span class="text-success fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;"><i class="bi bi-check2-circle me-1"></i>Verified</span>
+                            </div>
+                        </div>
+                        <div class="text-warning fs-6">
+                            <i th:class="${review.rating >= 1 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            <i th:class="${review.rating >= 2 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            <i th:class="${review.rating >= 3 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            <i th:class="${review.rating >= 4 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            <i th:class="${review.rating >= 5 ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                        </div>
+                    </div>
+                    <p class="mb-0 pt-3 border-top text-dark" style="font-size: 0.95rem; line-height: 1.7; border-color: rgba(0,0,0,0.05) !important;" th:text="${review.comment}">Review comment text.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="mt-auto position-relative animate-item-3" style="background: #1a1a1a; color: rgba(255,255,255,0.6); padding-top: 5rem; padding-bottom: 2rem; margin-top: 5rem;">
+    <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, var(--accent) 0%, #e67e22 50%, var(--accent) 100%);"></div>
     <div class="container" style="max-width: 1200px;">
         <div class="row gy-5 mb-5">
             <div class="col-lg-4 pe-lg-5">
-                <div style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; margin-bottom: 1.2rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #fff; margin-bottom: 1.5rem;">
                     <span style="font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; letter-spacing: 2px;">NEXUS</span>
-                    <span style="font-family: 'DM Sans', sans-serif; font-size: 0.8rem; letter-spacing: 2px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.8rem; margin-top: 3px;">BOOKSTORE</span>
+                    <span style="font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; color: var(--accent); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.8rem; margin-top: 3px;">BOOKSTORE</span>
                 </div>
-                <p style="line-height: 1.7; margin-bottom: 2rem; font-weight: 300;">Your premium destination for the world's best literature, educational materials, and timeless classics. Discover, read, and grow with us today.</p>
-                <div class="d-flex gap-3 fs-5">
-                    <a href="#" class="text-white-50 text-decoration-none" style="transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="text-white-50 text-decoration-none" style="transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="text-white-50 text-decoration-none" style="transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#" class="text-white-50 text-decoration-none" style="transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-linkedin"></i></a>
+                <p style="line-height: 1.8; margin-bottom: 2.5rem; font-weight: 400; font-size: 0.95rem;">Your premium destination for the world's best literature, educational materials, and timeless classics. Discover, read, and grow with us today.</p>
+                <div class="d-flex gap-4 fs-5">
+                    <a href="#" class="text-white-50 text-decoration-none transition-hover" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white-50 text-decoration-none transition-hover" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-white-50 text-decoration-none transition-hover" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="text-white-50 text-decoration-none transition-hover" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'"><i class="bi bi-linkedin"></i></a>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <h5 class="text-white fw-medium mb-4 font-playfair fs-5">Explore</h5>
-                <ul class="list-unstyled d-flex flex-column gap-3 mb-0 fw-light">
-                    <li><a th:href="@{/catalog}" class="text-decoration-none" style="color: rgba(255,255,255,0.6); transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">Browse Catalog</a></li>
-                    <li><a th:href="@{/catalog(sort='newest')}" class="text-decoration-none" style="color: rgba(255,255,255,0.6); transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">New Arrivals</a></li>
-                    <li><a th:href="@{/cart}" class="text-decoration-none" style="color: rgba(255,255,255,0.6); transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">Shopping Cart</a></li>
-                    <li sec:authorize="isAuthenticated()"><a th:href="@{/my-orders}" class="text-decoration-none" style="color: rgba(255,255,255,0.6); transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">Track My Orders</a></li>
+            <div class="col-lg-3 col-md-6 offset-lg-1">
+                <h5 class="text-white fw-bold mb-4 font-playfair">Explore</h5>
+                <ul class="list-unstyled d-flex flex-column gap-3 mb-0 fs-6">
+                    <li><a th:href="@{/catalog}" class="text-decoration-none text-white-50 transition-hover" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Browse Catalog</a></li>
+                    <li><a th:href="@{/cart}" class="text-decoration-none text-white-50 transition-hover" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Shopping Cart</a></li>
+                    <li sec:authorize="isAuthenticated()"><a th:href="@{/my-orders}" class="text-decoration-none text-white-50 transition-hover" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Track My Orders</a></li>
                 </ul>
             </div>
-            <div class="col-lg-5 col-md-6">
-                <h5 class="text-white fw-medium mb-4 font-playfair fs-5">Contact & Support</h5>
-                <ul class="list-unstyled d-flex flex-column gap-3 mb-0 fw-light">
-                    <li class="d-flex align-items-start gap-3 p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
-                        <i class="bi bi-geo-alt mt-1 fs-5" style="color: var(--accent);"></i>
+            <div class="col-lg-4 col-md-6">
+                <h5 class="text-white fw-bold mb-4 font-playfair">Contact Support</h5>
+                <ul class="list-unstyled d-flex flex-column gap-3 mb-0">
+                    <li class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                        <i class="bi bi-geo-alt fs-4" style="color: var(--accent);"></i>
                         <div>
-                            <strong class="text-white d-block mb-1 fw-medium">Main Headquarters</strong>
-                            <span class="opacity-75">SLIIT Campus, New Kandy Road,<br>Malabe, Sri Lanka</span>
+                            <strong class="text-white d-block mb-1 fs-6">Main Headquarters</strong>
+                            <span class="opacity-75 small">SLIIT Campus, Malabe, Sri Lanka</span>
                         </div>
                     </li>
                     <div class="d-flex gap-3">
-                        <li class="d-flex align-items-center gap-2 p-3 rounded flex-fill" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <li class="d-flex align-items-center gap-2 p-3 rounded-3 flex-fill" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
                             <i class="bi bi-telephone fs-5" style="color: var(--accent);"></i>
-                            <span class="text-white fw-medium">076 064 9784</span>
-                        </li>
-                        <li class="d-flex align-items-center gap-2 p-3 rounded flex-fill" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
-                            <i class="bi bi-envelope fs-5" style="color: var(--accent);"></i>
-                            <span class="text-white opacity-75">support@nexus.lk</span>
+                            <span class="text-white fw-bold small">076 064 9784</span>
                         </li>
                     </div>
                 </ul>
             </div>
         </div>
-        <div class="border-top pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-center text-md-start fw-light" style="border-color: rgba(255,255,255,0.08) !important;">
+        <div class="border-top pt-4 mt-5 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-center text-md-start" style="border-color: rgba(255,255,255,0.1) !important;">
             <div><span class="text-white opacity-75">&copy; 2026 Nexus Bookstore.</span> All Rights Reserved.</div>
-            <div style="background: rgba(200, 96, 42, 0.08); padding: 0.4rem 1rem; border-radius: 4px; border: 1px solid rgba(200, 96, 42, 0.15);">
-                <span style="color: var(--accent); font-weight: 500; font-size: 0.85rem;"><i class="bi bi-code-slash me-2 opacity-75"></i>Designed & Developed by WD130 Group</span>
+            <div style="background: rgba(200, 96, 42, 0.1); padding: 0.5rem 1.5rem; border-radius: 50px; border: 1px solid rgba(200, 96, 42, 0.2);">
+                <span style="color: var(--accent); font-weight: 600; font-size: 0.85rem;"><i class="bi bi-code-slash me-2"></i>Developed by WD130 Group</span>
             </div>
         </div>
     </div>
@@ -310,14 +440,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // 🔥 1. AI Review Summary Logic
     async function generateSummary(bookId) {
         const btn = document.getElementById('btn-summarize');
         const output = document.getElementById('ai-summary-output');
 
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analyzing...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Analyzing...';
         btn.disabled = true;
         output.style.display = 'block';
-        output.innerText = "Reading all customer reviews...";
+        output.innerText = "Nexus AI is reading all customer reviews...";
 
         try {
             const response = await fetch('/api/ai/review-summary', {
@@ -327,13 +458,69 @@
             });
             const data = await response.json();
 
-            output.innerHTML = `<strong class="text-dark">Overall:</strong> ${data.summary}`;
+            output.innerHTML = `<strong class="text-dark"><i class="bi bi-stars text-warning me-1"></i> Consensus:</strong> ${data.summary}`;
         } catch (error) {
-            output.innerText = 'Error connecting to Nexus AI.';
+            output.innerText = 'Error connecting to Nexus AI Core.';
         } finally {
-            btn.innerHTML = 'Summary Generated';
+            btn.innerHTML = '<i class="bi bi-check2 me-1"></i> Generated';
         }
     }
+
+    // 🔥 2. Interactive Star Rating Logic
+    document.addEventListener("DOMContentLoaded", function() {
+        const stars = document.querySelectorAll('.rating-star');
+        const hiddenInput = document.getElementById('ratingHiddenInput');
+        const ratingDesc = document.getElementById('ratingDescription');
+
+        const descriptions = {
+            1: "⭐ Very disappointing",
+            2: "⭐⭐ Not my style",
+            3: "⭐⭐⭐ It was okay",
+            4: "⭐⭐⭐⭐ Great read, highly recommend",
+            5: "⭐⭐⭐⭐⭐ A Literary Masterpiece!"
+        };
+
+        let currentRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function() {
+                const val = this.getAttribute('data-value');
+                fillStars(val, 'hover-active');
+                ratingDesc.innerText = descriptions[val];
+                ratingDesc.classList.add('text-dark');
+            });
+
+            star.addEventListener('mouseout', function() {
+                fillStars(currentRating, 'active');
+                if (currentRating > 0) {
+                    ratingDesc.innerText = descriptions[currentRating];
+                } else {
+                    ratingDesc.innerText = "Select your rating...";
+                    ratingDesc.classList.remove('text-dark');
+                }
+            });
+
+            star.addEventListener('click', function() {
+                currentRating = this.getAttribute('data-value');
+                hiddenInput.value = currentRating;
+                fillStars(currentRating, 'active');
+
+                this.style.transform = 'scale(1.3)';
+                setTimeout(() => this.style.transform = '', 150);
+            });
+        });
+
+        function fillStars(val, className) {
+            stars.forEach(s => {
+                s.classList.remove('bi-star-fill', 'bi-star', 'active', 'hover-active');
+                if (s.getAttribute('data-value') <= val) {
+                    s.classList.add('bi-star-fill', className);
+                } else {
+                    s.classList.add('bi-star');
+                }
+            });
+        }
+    });
 </script>
 
 </body>
