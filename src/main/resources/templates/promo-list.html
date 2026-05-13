@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Promo Codes — Nexus Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f5f7fa; font-family: 'DM Sans', sans-serif; padding: 3rem; }
+        .card-box { background: white; padding: 2.5rem; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.04); border-top: 4px solid #c8602a; }
+        .page-title { font-family: 'Playfair Display', serif; font-weight: 700; color: #1a1a1a; }
+        .promo-badge { font-family: monospace; font-size: 1.1rem; letter-spacing: 2px; padding: 6px 12px; background: #fff3cd; color: #856404; border: 1px dashed #ffeeba; }
+    </style>
+</head>
+<body>
+
+<div class="container" style="max-width: 1000px;">
+    <div class="card-box">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <h2 class="page-title"><i class="bi bi-tags-fill text-warning me-2"></i>Active Promotions</h2>
+            <a th:href="@{/admin/promos/add}" class="btn btn-dark fw-bold px-4 rounded-pill">
+                <i class="bi bi-plus-lg me-1"></i> Create Promo
+            </a>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success fw-bold border-0 shadow-sm">
+            <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+        </div>
+
+        <table class="table table-hover align-middle mt-3">
+            <thead class="table-light text-uppercase" style="font-size: 0.85rem; letter-spacing: 1px;">
+            <tr>
+                <th>Code</th>
+                <th>Discount (%)</th>
+                <th>Status</th>
+                <th width="150" class="text-center">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="promo : ${promos}">
+                <td><span class="badge promo-badge text-uppercase" th:text="${promo.code}">SUMMER20</span></td>
+                <td class="fw-bold text-success fs-5" th:text="${promo.discountPercentage} + '%'">20%</td>
+                <td>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success" th:if="${promo.active}">Active</span>
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger" th:if="${!promo.active}">Expired</span>
+                </td>
+                <td class="text-center">
+                    <form th:action="@{/admin/promos/delete/{id}(id=${promo.id})}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-outline-danger btn-sm fw-bold rounded-pill px-3">Revoke</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(promos)}">
+                <td colspan="4" class="text-center text-muted py-4 fst-italic">No active promo codes. Generate one to boost sales!</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
