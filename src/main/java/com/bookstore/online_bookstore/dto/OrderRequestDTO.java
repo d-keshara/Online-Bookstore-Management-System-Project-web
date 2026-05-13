@@ -6,6 +6,9 @@ public class OrderRequestDTO {
     private Integer userId;
     private List<CartItemDTO> items;
 
+    private Double discountPercentage;
+    private String promoCode;
+
     // Inner class for the items in the cart
     public static class CartItemDTO {
         private Integer bookId;
@@ -23,4 +26,10 @@ public class OrderRequestDTO {
     public void setUserId(Integer userId) { this.userId = userId; }
     public List<CartItemDTO> getItems() { return items; }
     public void setItems(List<CartItemDTO> items) { this.items = items; }
+
+    public Double getDiscountPercentage() { return discountPercentage; }
+    public void setDiscountPercentage(Double discountPercentage) { this.discountPercentage = discountPercentage; }
+
+    public String getPromoCode() { return promoCode; }
+    public void setPromoCode(String promoCode) { this.promoCode = promoCode; }
 }
