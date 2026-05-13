@@ -165,18 +165,6 @@ public class AdminWebController {
         return "redirect:/admin/dashboard";
     }
 
-    @GetMapping("/authors/add")
-    public String showAddAuthorForm(Model model) {
-        model.addAttribute("author", new Author());
-        return "add-author";
-    }
-
-    @PostMapping("/authors/save")
-    public String saveAuthor(@ModelAttribute("author") Author author) {
-        authorRepository.save(author);
-        return "redirect:/admin/authors/add?success";
-    }
-
     // AUTHOR INVITE TOKENS
     @PostMapping("/tokens/generate")
     public String generateNewInviteToken(RedirectAttributes ra) {
@@ -266,7 +254,7 @@ public class AdminWebController {
         try {
             reviewRepository.findById(id).ifPresent(review -> {
                 String bookTitle = review.getBook() != null ? review.getBook().getTitle() : "a book";
-                
+
                 review.setBook(null);
                 review.setUser(null);
 

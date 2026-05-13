@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Nexus Bookstore — Welcome</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'DM Sans', sans-serif; background-color: #f8f9fa; }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .hero-section { background: linear-gradient(rgba(26, 26, 26, 0.9), rgba(26, 26, 26, 0.9)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop') center/cover; padding: 100px 0; color: white; border-bottom: 5px solid #c8602a; }
+    .vip-card { transition: transform 0.3s ease; border-top: 4px solid #c8602a !important; }
+    .vip-card:hover { transform: translateY(-5px); }
+  </style>
+</head>
+<body>
+
+<header class="hero-section text-center shadow-lg">
+  <div class="container">
+    <h1 class="font-playfair display-3 fw-bold mb-3">Welcome to Nexus</h1>
+    <p class="lead mb-5 opacity-75">Discover your next favorite story in our curated premium collection.</p>
+    <a href="/catalog" class="btn btn-lg btn-light fw-bold px-5 rounded-pill text-uppercase" style="color: #c8602a; letter-spacing: 1px;">
+      <i class="bi bi-book-half me-2"></i> Browse Catalog
+    </a>
+  </div>
+</header>
+
+<div class="container my-5 py-5">
+  <div class="text-center mb-5">
+    <h2 class="font-playfair fw-bold display-5 text-dark">
+      <i class="bi bi-star-fill text-warning me-2"></i>Featured VIP Authors
+    </h2>
+    <p class="text-muted fs-5">Award-winning creators highlighted by the Nexus team.</p>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+    <div th:each="vip : ${vipAuthors}" class="col-md-4">
+      <div class="card h-100 shadow-sm border-0 vip-card p-4 text-center bg-white rounded-4">
+
+        <div class="mx-auto mb-3">
+          <img th:if="${vip.profileImageUrl != null and !vip.profileImageUrl.empty}"
+               th:src="${vip.profileImageUrl}"
+               class="rounded-circle shadow"
+               style="width: 130px; height: 130px; object-fit: cover;">
+
+          <div th:unless="${vip.profileImageUrl != null and !vip.profileImageUrl.empty}"
+               class="rounded-circle shadow bg-dark d-inline-flex align-items-center justify-content-center text-white"
+               style="width: 130px; height: 130px; font-size: 3rem;">
+            <i class="bi bi-person"></i>
+          </div>
+        </div>
+
+        <h3 class="font-playfair fw-bold text-dark" th:text="${vip.name}">Author Name</h3>
+
+        <div class="mb-3">
+                        <span class="badge bg-warning text-dark px-3 py-2 fw-bold text-uppercase rounded-pill"
+                              style="letter-spacing: 1px;" th:text="${vip.awardTitle}">Award Title</span>
+        </div>
+
+        <p class="text-muted small" th:text="${#strings.abbreviate(vip.biography != null ? vip.biography : 'No biography available.', 120)}">Bio snippet...</p>
+      </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(vipAuthors)}" class="col-12 text-center py-5">
+      <div class="alert alert-light border shadow-sm d-inline-block px-5 text-muted fst-italic">
+        <i class="bi bi-info-circle me-2"></i> No VIP authors featured at this time.
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
