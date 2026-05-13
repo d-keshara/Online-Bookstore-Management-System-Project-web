@@ -45,7 +45,7 @@ public class AuthorWebController {
         this.reviewRepository = reviewRepository;
     }
 
-    @GetMapping("/admin/authors")
+    @GetMapping("/admin/authors/list")
     public String listAuthors(Model model, @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<Author> authorPage = authorService.getAllAuthors(pageable);
@@ -56,6 +56,31 @@ public class AuthorWebController {
 
         return "authors-list";
     }
+
+    @GetMapping("/admin/authors/add")
+    public String showAuthorForm(Model model) {
+        model.addAttribute("author", new Author());
+        return "author-form";
+    }
+
+    @GetMapping("/admin/authors/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        model.addAttribute("author", authorService.getAuthorById(id));
+        return "author-form";
+    }
+
+    @PostMapping("/admin/authors/save")
+    public String saveAuthor(@ModelAttribute Author author, RedirectAttributes ra) {
+        if (author.getId() == null) {
+            authorService.createAuthor(author); // It's a new author
+        } else {
+            authorService.updateAuthor(author.getId(), author); // It's an edit
+        }
+
+        ra.addAttribute("success", true); // Triggers your green alert banner!
+        return "redirect:/admin/authors/list";
+    }
+
 
     @GetMapping("/author/dashboard")
     public String showAuthorDashboard(Model model, Principal principal) {
@@ -111,7 +136,7 @@ public class AuthorWebController {
 
             double averageRating = totalReviews > 0 ? totalRating / totalReviews : 0.0;
 
-            model.addAttribute("books", myBooks); // We still pass all books so they show in the table!
+            model.addAttribute("books", myBooks);
             model.addAttribute("username", currentUser.getUsername());
             model.addAttribute("totalBooksSold", totalBooksSold);
             model.addAttribute("averageRating", String.format("%.1f", averageRating));
