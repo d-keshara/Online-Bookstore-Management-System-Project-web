@@ -9,6 +9,10 @@ import com.bookstore.online_bookstore.repository.UserRepository;
 import com.bookstore.online_bookstore.repository.CartItemRepository;
 import com.bookstore.online_bookstore.service.CartService;
 import com.bookstore.online_bookstore.service.EmailService;
+import com.bookstore.online_bookstore.payment.Payment;
+import com.bookstore.online_bookstore.payment.CardPayment;
+import com.bookstore.online_bookstore.payment.CashPayment;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,23 +49,32 @@ public class OrderWebController {
     @Autowired
     private CartItemRepository cartItemRepository;
 
-    private String generateReceiptText(Order order) {
+    // UPGRADED RECEIPT GENERATOR TO HANDLE COD DETAILS
+    private String generateReceiptText(Order order, String address, String phone) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDate = LocalDateTime.now().format(formatter);
 
-        return  "==========================================\n" +
+        String receipt = "==========================================\n" +
                 "         NEXUS BOOKSTORE RECEIPT          \n" +
                 "==========================================\n" +
                 "Order ID       : NX-" + order.getOrderId() + "\n" +
                 "Date           : " + formattedDate + "\n" +
                 "Payment Method : " + order.getPaymentMethod() + "\n" +
                 "Status         : " + order.getStatus() + "\n" +
-                "------------------------------------------\n" +
-                "TOTAL PAID     : LKR " + order.getTotalPrice() + "\n" +
+                "------------------------------------------\n";
+
+        if ("COD".equals(order.getPaymentMethod()) && address != null && !address.isEmpty()) {
+            receipt +=   "Delivery To    : " + address + "\n" +
+                    "Contact No     : " + phone + "\n" +
+                    "------------------------------------------\n";
+        }
+
+        receipt +=       "TOTAL PAID     : LKR " + order.getTotalPrice() + "\n" +
                 "==========================================\n" +
                 "         Thank you for shopping!          \n" +
                 "         Developed by Group WD130         \n" +
                 "==========================================\n";
+        return receipt;
     }
 
     @GetMapping("/checkout-payment")
@@ -73,23 +86,36 @@ public class OrderWebController {
 
     @PostMapping("/confirm")
     public String confirmOrder(@RequestParam("paymentMethod") String paymentMethod,
+                               @RequestParam(value = "deliveryAddress", required = false) String deliveryAddress,
+                               @RequestParam(value = "contactNumber", required = false) String contactNumber,
                                @AuthenticationPrincipal UserDetails userDetails,
+                               HttpSession session,
                                RedirectAttributes ra) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
 
         Order order = new Order();
         order.setUser(user);
         order.setPaymentMethod(paymentMethod);
-        order.setTotalPrice(BigDecimal.valueOf(cartService.calculateTotal(user)));
+        Double totalAmount = cartService.calculateTotal(user);
+        order.setTotalPrice(BigDecimal.valueOf(totalAmount));
 
-        // 🔥 THE FIX: Transfer the user's cart items into the actual order before saving
+        // THE STRATEGY PATTERN IN ACTION
+        Payment paymentStrategy;
+        if ("CARD".equals(paymentMethod)) {
+            paymentStrategy = new CardPayment();
+        } else {
+            paymentStrategy = new CashPayment();
+        }
+        // Triggers the simulated gateway logs in your IntelliJ console!
+        paymentStrategy.processPayment(totalAmount);
+
         List<CartItem> cartItems = cartItemRepository.findByUser(user);
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (CartItem cItem : cartItems) {
             OrderItem oItem = new OrderItem();
             oItem.setOrder(order);
-            oItem.setBookId(cItem.getBook().getBookId()); // Now the DB knows exactly which book sold!
+            oItem.setBookId(cItem.getBook().getBookId());
             oItem.setQuantity(cItem.getQuantity());
 
             BigDecimal itemPrice = cItem.getBook().getPrice().multiply(BigDecimal.valueOf(cItem.getQuantity()));
@@ -98,7 +124,6 @@ public class OrderWebController {
             orderItems.add(oItem);
         }
 
-        // Attach the items to the order. CascadeType.ALL in your Order entity will save them to MySQL automatically.
         order.setItems(orderItems);
 
         if ("COD".equals(paymentMethod)) {
@@ -111,7 +136,8 @@ public class OrderWebController {
 
         orderRepository.save(order);
 
-        String receiptContent = generateReceiptText(order);
+        // Generate the receipt with the dynamic form data
+        String receiptContent = generateReceiptText(order, deliveryAddress, contactNumber);
 
         String directoryPath = "files/";
         String fileName = "receipt_order_" + order.getOrderId() + ".txt";
@@ -135,7 +161,10 @@ public class OrderWebController {
             System.out.println(e.getMessage());
         }
 
+        // Clear cart and any promo sessions
         cartService.clearCart(user);
+        session.removeAttribute("appliedDiscount");
+        session.removeAttribute("appliedPromoCode");
 
         return "redirect:/catalog";
     }
@@ -158,7 +187,8 @@ public class OrderWebController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        String receiptContent = generateReceiptText(order);
+        // Fallback for downloading historical receipts
+        String receiptContent = generateReceiptText(order, "Saved Address", "Saved Phone");
         byte[] fileBytes = receiptContent.getBytes();
 
         HttpHeaders headers = new HttpHeaders();
