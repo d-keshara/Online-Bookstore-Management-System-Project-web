@@ -21,6 +21,44 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); font-size: 15px; display: flex; flex-direction: column; min-height: 100vh; }
 
+        /* ── ANNOUNCEMENT PULSE ── */
+.announcement-pulse {
+    background: var(--accent); /* Premium Orange */
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 0;
+    text-align: center;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1100;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.announcement-pulse a {
+    color: white;
+    text-decoration: underline;
+    margin-left: 10px;
+    opacity: 0.9;
+    transition: 0.2s;
+}
+
+.announcement-pulse a:hover {
+    opacity: 1;
+}
+
+.pulse-icon {
+    animation: pulse-animation 2s infinite;
+    margin-right: 8px;
+}
+
+@keyframes pulse-animation {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+
         /* ── NAVBAR ── */
         .site-nav { background: var(--ink); position: sticky; top: 0; z-index: 1000; }
         .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 64px; }
@@ -92,6 +130,14 @@
     </style>
 </head>
 <body>
+
+<div th:if="${announcements != null and !announcements.empty}" class="announcement-pulse shadow-sm">
+    <div class="container">
+        <i class="bi bi-megaphone-fill pulse-icon"></i>
+        <span th:text="${announcements[0].title}">Special Announcement!</span>
+        <a th:href="@{/announcements}">Read All Announcements <i class="bi bi-arrow-right"></i></a>
+    </div>
+</div>
 
 <nav class="site-nav">
     <div class="nav-inner">

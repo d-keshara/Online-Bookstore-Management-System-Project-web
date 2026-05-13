@@ -9,6 +9,7 @@ import com.bookstore.online_bookstore.repository.ReviewRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
 import com.bookstore.online_bookstore.service.OrderService;
 import com.bookstore.online_bookstore.service.OllamaService;
+import com.bookstore.online_bookstore.service.AnnouncementService; // 🌟 ADDED IMPORT
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,17 +34,20 @@ public class BookWebController {
     private final OrderService orderService;
     private final ReviewRepository reviewRepository;
     private final OllamaService ollamaService;
+    private final AnnouncementService announcementService;
 
     public BookWebController(BookRepository bookRepository,
                              UserRepository userRepository,
                              OrderService orderService,
                              ReviewRepository reviewRepository,
-                             OllamaService ollamaService) {
+                             OllamaService ollamaService,
+                             AnnouncementService announcementService) {
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.orderService = orderService;
         this.reviewRepository = reviewRepository;
         this.ollamaService = ollamaService;
+        this.announcementService = announcementService;
     }
 
     @GetMapping("/catalog")
@@ -75,6 +79,9 @@ public class BookWebController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategory", category);
         model.addAttribute("currentSort", sort);
+
+        // THE ANNOUNCEMENTS TO THE MODEL
+        model.addAttribute("announcements", announcementService.getAllAnnouncements());
 
         return "book-catalog";
     }
