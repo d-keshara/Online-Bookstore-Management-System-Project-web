@@ -160,6 +160,7 @@
             </div>
 
             <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-1">
+                <a th:href="@{/wishlist}" class="btn-nav btn-nav-ghost"><i class="bi bi-suit-heart fs-5"></i> Wishlist</a>
                 <a th:href="@{/cart}" class="btn-nav btn-nav-ghost"><i class="bi bi-cart3 fs-5"></i> Cart</a>
                 <a th:href="@{/my-orders}" class="btn-nav btn-nav-ghost"><i class="bi bi-box-seam fs-5"></i> Orders</a>
 
@@ -191,6 +192,18 @@
     <a th:href="@{/cart}" class="ms-3 fw-bold text-decoration-underline" style="color: var(--accent-dark);">Proceed to Checkout</a>
     <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
+
+<div th:if="${wishlistSuccess}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #fff0f3; color: #dc3545; font-weight: 600; padding: 1rem; border-bottom: 2px solid #ffccd5 !important;" role="alert">
+    <i class="bi bi-suit-heart-fill me-2 fs-5 align-text-bottom"></i> <span th:text="${wishlistSuccess}"></span>
+    <a th:href="@{/wishlist}" class="ms-3 fw-bold text-decoration-underline" style="color: #dc3545;">View Wishlist</a>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<div th:if="${wishlistInfo}" class="alert alert-dismissible fade show m-0 text-center border-0 rounded-0 shadow-sm" style="background-color: #e2e3e5; color: #383d41; font-weight: 600; padding: 1rem; border-bottom: 2px solid #d6d8db !important;" role="alert">
+    <i class="bi bi-info-circle-fill me-2 fs-5 align-text-bottom"></i> <span th:text="${wishlistInfo}"></span>
+    <a th:href="@{/wishlist}" class="ms-3 fw-bold text-decoration-underline" style="color: #383d41;">View Wishlist</a>
+    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
 
 <div class="cat-bar-wrapper">
     <div class="cat-bar">
