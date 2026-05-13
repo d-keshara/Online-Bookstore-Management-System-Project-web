@@ -6,8 +6,14 @@ public class OrderRequestDTO {
     private Integer userId;
     private List<CartItemDTO> items;
 
+    // Promo Code Data
     private Double discountPercentage;
     private String promoCode;
+
+    // Payment & Delivery Data
+    private String paymentMethod;
+    private String deliveryAddress;
+    private String contactNumber;
 
     // Inner class for the items in the cart
     public static class CartItemDTO {
@@ -21,9 +27,10 @@ public class OrderRequestDTO {
         public void setQuantity(Integer quantity) { this.quantity = quantity; }
     }
 
-    // Getters and Setters
+    // --- GETTERS AND SETTERS ---
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }
+
     public List<CartItemDTO> getItems() { return items; }
     public void setItems(List<CartItemDTO> items) { this.items = items; }
 
@@ -32,4 +39,13 @@ public class OrderRequestDTO {
 
     public String getPromoCode() { return promoCode; }
     public void setPromoCode(String promoCode) { this.promoCode = promoCode; }
+
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public String getDeliveryAddress() { return deliveryAddress; }
+    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
+
+    public String getContactNumber() { return contactNumber; }
+    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
 }
