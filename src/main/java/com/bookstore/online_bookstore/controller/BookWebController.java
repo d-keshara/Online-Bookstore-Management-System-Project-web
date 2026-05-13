@@ -4,12 +4,14 @@ import com.bookstore.online_bookstore.dto.OrderRequestDTO;
 import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.Review;
 import com.bookstore.online_bookstore.entity.User;
+import com.bookstore.online_bookstore.entity.Wishlist;
 import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.ReviewRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
 import com.bookstore.online_bookstore.service.OrderService;
 import com.bookstore.online_bookstore.service.OllamaService;
-import com.bookstore.online_bookstore.service.AnnouncementService; // 🌟 ADDED IMPORT
+import com.bookstore.online_bookstore.service.AnnouncementService;
+import com.bookstore.online_bookstore.service.WishlistService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,19 +37,22 @@ public class BookWebController {
     private final ReviewRepository reviewRepository;
     private final OllamaService ollamaService;
     private final AnnouncementService announcementService;
+    private final WishlistService wishlistService;
 
     public BookWebController(BookRepository bookRepository,
                              UserRepository userRepository,
                              OrderService orderService,
                              ReviewRepository reviewRepository,
                              OllamaService ollamaService,
-                             AnnouncementService announcementService) {
+                             AnnouncementService announcementService,
+                             WishlistService wishlistService) {
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.orderService = orderService;
         this.reviewRepository = reviewRepository;
         this.ollamaService = ollamaService;
         this.announcementService = announcementService;
+        this.wishlistService = wishlistService;
     }
 
     @GetMapping("/catalog")
@@ -72,15 +77,12 @@ public class BookWebController {
             bookPage = bookRepository.findByApprovalStatus("APPROVED", pageable);
         }
 
-
         model.addAttribute("books", bookPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", bookPage.getTotalPages());
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategory", category);
         model.addAttribute("currentSort", sort);
-
-        // THE ANNOUNCEMENTS TO THE MODEL
         model.addAttribute("announcements", announcementService.getAllAnnouncements());
 
         return "book-catalog";
@@ -115,17 +117,27 @@ public class BookWebController {
     }
 
     @GetMapping("/details")
-    public String viewBookDetails(@RequestParam("id") Integer id, Model model) {
+    public String viewBookDetails(@RequestParam("id") Integer id, Model model, Principal principal) { // ADDED PRINCIPAL
         Book book = bookRepository.findById(id).orElse(null);
         if (book == null) return "redirect:/catalog?error=BookNotFound";
 
-        // FILTER: Only send reviews to the public page that are NOT hidden
         List<Review> publicReviews = reviewRepository.findByBook_BookId(book.getBookId()).stream()
                 .filter(review -> !review.isHidden())
                 .collect(Collectors.toList());
 
+        // CHECK IF BOOK IS ALREADY IN WISHLIST
+        boolean inWishlist = false;
+        if (principal != null) {
+            User user = userRepository.findByUsername(principal.getName()).orElse(null);
+            if (user != null) {
+                List<Wishlist> userWishlist = wishlistService.getWishlistByUser(Integer.valueOf(user.getId().toString()));
+                inWishlist = userWishlist.stream().anyMatch(w -> w.getBook().getBookId().equals(id));
+            }
+        }
+
         model.addAttribute("book", book);
         model.addAttribute("reviews", publicReviews);
+        model.addAttribute("inWishlist", inWishlist); // PASSED FLAG TO THYMELEAF
 
         return "details";
     }
@@ -153,7 +165,6 @@ public class BookWebController {
             review.setComment(comment);
             review.setCreatedAt(LocalDateTime.now());
 
-            // AUTO-MODERATOR: Check for extreme profanity
             String[] badWords = {"garbage", "trash", "scam", "worst", "terrible"};
             boolean hasBadWords = false;
             for (String word : badWords) {
@@ -163,10 +174,9 @@ public class BookWebController {
                 }
             }
 
-            // Hide it if it has bad words, otherwise ask AI for sentiment
             if (hasBadWords) {
                 review.setHidden(true);
-                review.setSentiment("NEGATIVE"); // Force flag it for the admin
+                review.setSentiment("NEGATIVE");
             } else {
                 review.setHidden(false);
                 String aiSentiment = ollamaService.analyzeSentiment(comment);

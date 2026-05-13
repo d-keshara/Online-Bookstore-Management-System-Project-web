@@ -1,86 +1,77 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>My Wishlist</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist — Nexus Bookstore</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --ink: #1a1a1a; --paper: #faf8f4; --paper-card: #ffffff; --accent: #c8602a; --border: rgba(0,0,0,0.09); }
+        body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); padding-bottom: 5rem;}
+
+        .nav-brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #1a1a1a; }
+        .brand-nexus { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
+
+        .book-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: 0.3s; display: flex; flex-direction: column; }
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .book-cover { height: 260px; background: #eee; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .book-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); text-decoration: none; }
+        .btn-buy { background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; padding: 8px 15px; border-radius: 4px; border: none; transition: 0.2s; width: 100%; text-align: center; text-decoration: none;}
+        .btn-buy:hover { background: var(--accent); color: white;}
+    </style>
 </head>
 <body>
 
-<div class="container mt-5">
-    <h2>❤️ My Wishlist</h2>
-    <hr>
-
-    <div id="wishlist-container" class="row">
-        <p>Loading your saved books...</p>
-    </div>
+<div class="container py-4 border-bottom mb-5 d-flex justify-content-between align-items-center">
+    <a class="nav-brand" th:href="@{/catalog}">
+        <span class="brand-nexus">NEXUS</span>
+        <span style="color: var(--accent); font-size: 0.8rem; letter-spacing: 1.5px; border-left: 1px solid #ccc; padding-left: 0.6rem;">BOOKSTORE</span>
+    </a>
+    <a th:href="@{/catalog}" class="btn btn-light border fw-bold text-uppercase" style="font-size: 12px; letter-spacing: 1px;"><i class="bi bi-arrow-left"></i> Back to Catalog</a>
 </div>
 
-<script>
-    // HARDCODED FOR TESTING: Replace with actual logged-in user ID
-    const currentUserId = 1;
+<div class="container" style="max-width: 1200px;">
+    <h2 class="font-playfair fw-bold mb-4 border-bottom pb-3"><i class="bi bi-suit-heart-fill text-danger me-2"></i>My Wishlist</h2>
 
-    // Function to load the wishlist when the page opens
-    async function loadWishlist() {
-        const container = document.getElementById('wishlist-container');
-        try {
-            const response = await fetch(`/api/wishlist/${currentUserId}`);
-            const wishlists = await response.json();
+    <div th:if="${successMessage}" class="alert alert-success fw-bold shadow-sm border-0"><i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span></div>
 
-            container.innerHTML = ""; // Clear the loading text
+    <div class="row g-4" th:if="${!wishlistItems.empty}">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="item : ${wishlistItems}">
+            <div class="book-card h-100">
+                <div class="book-cover">
+                    <img th:if="${item.book.coverImagePath != null}" th:src="@{${item.book.coverImagePath}}" alt="Cover">
+                    <i th:if="${item.book.coverImagePath == null}" class="bi bi-book text-muted" style="font-size: 3rem;"></i>
+                </div>
+                <div class="p-3 d-flex flex-column flex-grow-1">
+                    <a th:href="@{/details(id=${item.book.bookId})}" class="book-title mb-1" th:text="${item.book.title}">Title</a>
+                    <span class="text-muted small fw-bold mb-3" th:text="${item.book.author != null ? item.book.author.name : 'Unknown'}"></span>
+                    <span class="fw-bold fs-5 mt-auto mb-3" style="color: var(--accent);" th:text="'LKR ' + ${item.book.price}">LKR 0.00</span>
 
-            if (wishlists.length === 0) {
-                container.innerHTML = "<p>Your wishlist is empty. Go save some books!</p>";
-                return;
-            }
-
-            // Loop through the data and create HTML cards for each book
-            wishlists.forEach(item => {
-                const book = item.book;
-                const cardHtml = `
-                    <div class="col-md-3 mb-4" id="wishlist-item-${book.bookId}">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">${book.title}</h5>
-                                <p class="card-text text-muted">${book.category}</p>
-                                <h6 class="text-success">$${book.price}</h6>
-                                <button onclick="removeFromWishlist(${book.bookId})" class="btn btn-danger btn-sm mt-2">
-                                    ❌ Remove
-                                </button>
-                            </div>
-                        </div>
+                    <div class="d-flex gap-2">
+                        <form th:action="@{/cart/add}" method="post" class="w-100">
+                            <input type="hidden" name="bookId" th:value="${item.book.bookId}">
+                            <button type="submit" class="btn-buy w-100"><i class="bi bi-cart-plus"></i> Cart</button>
+                        </form>
+                        <form th:action="@{/wishlist/remove}" method="post">
+                            <input type="hidden" name="bookId" th:value="${item.book.bookId}">
+                            <button type="submit" class="btn btn-light border text-danger" title="Remove"><i class="bi bi-trash3-fill"></i></button>
+                        </form>
                     </div>
-                `;
-                container.innerHTML += cardHtml;
-            });
-        } catch (error) {
-            container.innerHTML = "<p class='text-danger'>Error loading wishlist. Is the server running?</p>";
-        }
-    }
+                </div>
+            </div>
+        </div>
+    </div>
 
-    // Function to delete a book from the wishlist
-    async function removeFromWishlist(bookId) {
-        if (!confirm("Are you sure you want to remove this book?")) return;
-
-        try {
-            const response = await fetch(`/api/wishlist/remove/${currentUserId}/${bookId}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                // Instantly remove the card from the screen without refreshing the page!
-                document.getElementById(`wishlist-item-${bookId}`).remove();
-            } else {
-                alert("Failed to remove book.");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        }
-    }
-
-    // Run the load function immediately when the page starts
-    loadWishlist();
-</script>
+    <div th:if="${wishlistItems.empty}" class="text-center py-5">
+        <i class="bi bi-heart text-muted display-1 opacity-25 d-block mb-3"></i>
+        <h4 class="font-playfair fw-bold text-muted">Your wishlist is empty.</h4>
+        <p class="text-muted">Explore the catalog and save your favorite books for later!</p>
+        <a th:href="@{/catalog}" class="btn btn-dark mt-3 rounded-1 px-4 py-2">Discover Books</a>
+    </div>
+</div>
 
 </body>
 </html>
