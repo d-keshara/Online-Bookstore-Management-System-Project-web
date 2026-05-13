@@ -1,29 +1,20 @@
 package com.bookstore.online_bookstore.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
-@SuppressWarnings("JpaDataSourceORMInspection")
 @Entity
 @Table(name = "featured_authors")
+
 public class FeaturedAuthor extends Author {
 
+    @Column(name = "award_title")
     private String awardTitle;
-    private boolean featuredOnHomePage;
 
-    public String getAwardTitle() {
-        return awardTitle;
-    }
+    @Column(name = "featured_on_home_page", nullable = false)
+    private boolean featuredOnHomePage = false;
 
-    public void setAwardTitle(String awardTitle) {
-        this.awardTitle = awardTitle;
-    }
-
-    public boolean isFeaturedOnHomePage() {
-        return featuredOnHomePage;
-    }
-
-    public void setFeaturedOnHomePage(boolean featuredOnHomePage) {
-        this.featuredOnHomePage = featuredOnHomePage;
-    }
+    public String getAwardTitle() { return awardTitle; }
+    public void setAwardTitle(String awardTitle) { this.awardTitle = awardTitle; }
+    public boolean isFeaturedOnHomePage() { return featuredOnHomePage; }
+    public void setFeaturedOnHomePage(boolean featuredOnHomePage) { this.featuredOnHomePage = featuredOnHomePage; }
 }
