@@ -14,6 +14,7 @@ import com.bookstore.online_bookstore.service.AuthorService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder; // 🔥 IMPORT ADDED
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,17 +33,20 @@ public class AuthorWebController {
     private final BookRepository bookRepository;
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthorWebController(AuthorService authorService,
                                UserRepository userRepository,
                                BookRepository bookRepository,
                                OrderRepository orderRepository,
-                               ReviewRepository reviewRepository) {
+                               ReviewRepository reviewRepository,
+                               PasswordEncoder passwordEncoder) {
         this.authorService = authorService;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
         this.reviewRepository = reviewRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/admin/authors/list")
@@ -72,12 +76,36 @@ public class AuthorWebController {
     @PostMapping("/admin/authors/save")
     public String saveAuthor(@ModelAttribute Author author, RedirectAttributes ra) {
         if (author.getId() == null) {
-            authorService.createAuthor(author); // It's a new author
+            // 1. Save the new Author profile (Bio, Image) to the database
+            Author savedAuthor = authorService.createAuthor(author);
+
+            // Auto-generate a linked User account so they can log in
+            // and they appear in the User Management Dashboard!
+            User newUser = new User();
+
+            // Generate a clean username (e.g., "J.K. Rowling" -> "jkrowling")
+            String generatedUsername = author.getName().replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+
+            newUser.setUsername(generatedUsername);
+            newUser.setFullName(author.getName());
+            newUser.setEmail(generatedUsername + "@author.nexus.lk"); // Default email
+
+            // SECURE PASSWORD ENCODING IMPLEMENTED HERE
+            newUser.setPassword(passwordEncoder.encode("NexusAuthor123!"));
+
+            newUser.setRole("AUTHOR"); // Triggers the Yellow Badge in User Management
+
+            // Link the database tables together!
+            newUser.setAuthor(savedAuthor);
+
+            userRepository.save(newUser);
+
         } else {
-            authorService.updateAuthor(author.getId(), author); // It's an edit
+            // If the ID isn't null, the admin is just editing an existing author
+            authorService.updateAuthor(author.getId(), author);
         }
 
-        ra.addAttribute("success", true); // Triggers your green alert banner!
+        ra.addAttribute("success", true);
         return "redirect:/admin/authors/list";
     }
 

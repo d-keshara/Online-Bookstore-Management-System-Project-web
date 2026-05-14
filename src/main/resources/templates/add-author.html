@@ -57,7 +57,7 @@
       <a th:href="@{/admin/promos/list}" class="nav-item"><i class="bi bi-ticket-perforated"></i> Promo Codes</a>
     </nav>
     <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; margin-top: 1rem;">
-      <a th:href="@{/admin/dashboard}" class="nav-item text-white-50"><i class="bi bi-arrow-left"></i> Back to Dash</a>
+      <a th:href="@{/admin/dashboard}" class="nav-item text-white-50"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
     </div>
   </aside>
 
@@ -76,8 +76,9 @@
       <form th:action="@{/admin/authors/save}" th:object="${author}" method="post">
 
         <div class="mb-4">
-          <label class="form-label">Author Full Name <span class="text-danger">*</span></label>
-          <input type="text" th:field="*{name}" class="custom-input" required placeholder="e.g. J.K. Rowling">
+          <label class="form-label">Author Username <span class="text-danger">*</span></label>
+          <input type="text" th:field="*{name}" class="custom-input" required placeholder="e.g. jkrowling (no spaces)">
+          <div class="form-text mt-2 small text-muted"><i class="bi bi-info-circle me-1"></i>The author will use this to log in. They can set their full display name later.</div>
         </div>
 
         <div class="mb-4">
