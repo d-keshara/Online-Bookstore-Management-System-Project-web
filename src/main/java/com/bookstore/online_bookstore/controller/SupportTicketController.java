@@ -25,9 +25,7 @@ import java.util.List;
         @Autowired
         private UserRepository userRepository;
 
-        // ==========================================
-        // CUSTOMER ROUTES
-        // ==========================================
+
 
         @GetMapping("/contact")
         public String showContactForm(Model model) {
@@ -52,9 +50,7 @@ import java.util.List;
             return "redirect:/contact";
         }
 
-        // ==========================================
-        // ADMIN ROUTES
-        // ==========================================
+
 
         @GetMapping("/admin/tickets")
         public String viewAllTickets(Model model) {
