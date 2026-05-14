@@ -403,18 +403,18 @@
     </div>
 </div>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    // 1. Secretly grab the books from Thymeleaf and put them into a JS Array
-    let storeInventory = [];
-    /*[# th:if="${books != null}"]*/
-        /*[# th:each="book : ${books}"]*/
-            storeInventory.push(/*[[${book.title} + ' (Category: ' + ${book.category} + ')']]*/);
-        /*[/]*/
-    /*[/]*/
-    let inventoryString = storeInventory.length > 0 ? storeInventory.join(', ') : 'No books currently in stock.';
-    /*]]>*/
+<div id="ai-inventory-data" style="display: none;">
+    <th:block th:if="${books != null}">
+        <div th:each="book : ${books}"
+             class="ai-book-data"
+             th:data-title="${book.title}"
+             th:data-category="${book.category}"
+             th:data-desc="${book.description != null ? book.description : 'No description available.'}">
+        </div>
+    </th:block>
+</div>
 
+<script>
     // Toggle Chat Window Visibility
     function toggleAIChat() {
         const widget = document.getElementById('ai-chat-widget');
@@ -422,14 +422,17 @@
 
         if (widget.style.display === 'none' || widget.style.display === '') {
             widget.style.display = 'flex';
-            btn.innerHTML = '<i class="bi bi-x-lg"></i>'; // Change icon to X
+            btn.innerHTML = '<i class="bi bi-x-lg"></i>';
             btn.style.background = 'var(--ink)';
         } else {
             widget.style.display = 'none';
-            btn.innerHTML = '<i class="bi bi-robot"></i>'; // Change icon back to Robot
+            btn.innerHTML = '<i class="bi bi-robot"></i>';
             btn.style.background = 'var(--accent)';
         }
     }
+
+    // Create a memory bank for the AI
+    let conversationHistory = "";
 
     async function askPhi3() {
         const inputField = document.getElementById('ai-user-input');
@@ -445,15 +448,36 @@
         chatBox.innerHTML += `<p id="ai-loading" class="mb-2 text-muted fst-italic small">Checking inventory...</p>`;
         chatBox.scrollTop = chatBox.scrollHeight;
 
-// Construct the super-prompt with our injected database knowledge
-    const systemPrompt = `You are an expert AI Librarian for Nexus Bookstore.
-    IMPORTANT FACT: You ONLY sell the books in this exact list: [${inventoryString}].
-    If a customer asks for a recommendation or a specific topic, enthusiastically suggest a relevant book FROM THIS LIST ONLY.
-    If they ask for a book you don't have, politely suggest the closest match from the list.
-    RULE 1: NEVER apologize or say "I'm sorry".
-    RULE 2: NEVER invent fake books, aisles, or physical locations.
-    RULE 3: Keep your answer under 50 words.
-    Customer asks: ${question}`;
+        // 🔥 Read the inventory safely from the hidden HTML!
+        let storeInventory = [];
+        document.querySelectorAll('.ai-book-data').forEach(item => {
+            let title = item.getAttribute('data-title') || 'Unknown';
+            let category = item.getAttribute('data-category') || 'Unknown';
+            let desc = item.getAttribute('data-desc') || 'No description';
+
+            desc = desc.replace(/[\r\n]+/g, " "); // Clean up line breaks
+            storeInventory.push(`${title} | Category: ${category} | Synopsis: ${desc}`);
+        });
+
+        let inventoryString = storeInventory.length > 0 ? storeInventory.join('\n') : 'No books currently in stock.';
+
+        // The Upgraded Prompt Architecture
+        const systemPrompt = `You are the Nexus Bookstore AI Librarian.
+
+INVENTORY LIST:
+${inventoryString}
+
+CONVERSATION HISTORY:
+${conversationHistory}
+
+STRICT RULES:
+1. ONLY recommend or describe books from the INVENTORY LIST above.
+2. If the user asks for a description/summary of a book, use the "Synopsis" provided in the INVENTORY LIST. Do NOT invent plots.
+3. Use the CONVERSATION HISTORY to understand context.
+4. Keep answers under 50 words. Do not trail off.
+
+User's New Question: ${question}
+Librarian Answer:`;
 
         try {
             const response = await fetch('http://localhost:11434/api/generate', {
@@ -462,15 +486,22 @@
                 body: JSON.stringify({
                     model: 'phi3:mini',
                     prompt: systemPrompt,
-                    stream: false
+                    stream: false,
+                    options: {
+                        temperature: 0.1 // Low temperature stops it from hallucinating!
+                    }
                 })
             });
 
             const data = await response.json();
+            const aiAnswer = data.response.trim();
+
+            // Save this interaction to the memory bank
+            conversationHistory += `User: ${question}\nLibrarian: ${aiAnswer}\n\n`;
 
             // Print Phi-3's answer
             document.getElementById('ai-loading').remove();
-            chatBox.innerHTML += `<p class="mb-3 border-bottom pb-2"><strong style="color: var(--accent);">Librarian:</strong> ${data.response}</p>`;
+            chatBox.innerHTML += `<p class="mb-3 border-bottom pb-2"><strong style="color: var(--accent);">Librarian:</strong> ${aiAnswer}</p>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
         } catch (error) {
@@ -479,7 +510,6 @@
         }
     }
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

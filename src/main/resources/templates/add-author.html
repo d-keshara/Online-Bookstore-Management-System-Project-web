@@ -1,48 +1,106 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Add Author - Nexus Admin</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Author — Nexus Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root { --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888; --paper-card: #ffffff; --accent: #c8602a; --border: rgba(0,0,0,0.09); }
+    body { background: linear-gradient(135deg, #f0f2f5 0%, #e2e8f0 100%); font-family: 'DM Sans', sans-serif; color: var(--ink); min-height: 100vh; display: flex; justify-content: center; padding: 3rem 1rem; }
+
+    /* ✨ Premium Animations */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+
+    .dashboard-wrapper { width: 100%; max-width: 1350px; display: flex; gap: 2rem; margin: auto; }
+
+    /* 🟦 SIDEBAR */
+    .dashboard-sidebar { width: 280px; background: linear-gradient(135deg, var(--ink) 0%, #000000 100%); border-radius: 12px; padding: 2.5rem 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.15); color: white; animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; position: sticky; top: 2rem; height: calc(100vh - 4rem); display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-brand { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 2.5rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem; color: #fff; }
+    .sidebar-brand span { color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; display: block; letter-spacing: 3px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; transition: all 0.3s ease; margin-bottom: 0.5rem; }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active { background: rgba(255,255,255,0.1); color: white; box-shadow: inset 3px 0 0 var(--accent); }
+
+    /* ⬜ Main Content Area */
+    .dashboard-content { flex: 1; display: flex; flex-direction: column; gap: 2rem; align-items: flex-start; }
+    .premium-card { background: var(--paper-card); border-radius: 12px; padding: 3rem; width: 100%; max-width: 800px; box-shadow: 0 25px 50px rgba(0,0,0,0.04); animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    .section-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); margin-bottom: 1.5rem; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; }
+
+    /* 🎨 Custom Form Styling */
+    .form-label { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted); margin-bottom: 0.5rem; }
+    .custom-input { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-weight: 500; background: #fafafa; transition: all 0.3s ease; color: var(--ink); width: 100%; }
+    .custom-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(200,96,42,0.1); outline: none; }
+
+    .btn-primary-custom { background: var(--accent); color: white; border: none; padding: 12px 24px; font-weight: 600; border-radius: 8px; transition: 0.2s; }
+    .btn-primary-custom:hover { background: #9e4a1e; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(200,96,42,0.3); }
+    .btn-ghost-custom { background: transparent; color: var(--ink-muted); border: 1px solid var(--border); padding: 12px 24px; font-weight: 600; border-radius: 8px; transition: 0.2s; text-decoration: none; display: inline-block; }
+    .btn-ghost-custom:hover { background: #f5f6f8; color: var(--ink); border-color: var(--ink-muted); }
+  </style>
 </head>
-<body class="bg-light p-5">
+<body>
 
-<div class="container bg-white p-4 shadow-sm rounded" style="max-width: 600px;">
+<div class="dashboard-wrapper">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-brand">NEXUS<span>ADMINISTRATOR</span></div>
+    <nav style="flex: 1; overflow-y: auto; padding-right: 5px;">
+      <a th:href="@{/admin/dashboard}" class="nav-item"><i class="bi bi-collection"></i> Inventory Hub</a>
+      <a th:href="@{/admin/requests}" class="nav-item"><i class="bi bi-journal-plus"></i> Book Requests</a>
+      <a th:href="@{/admin/users}" class="nav-item"><i class="bi bi-people"></i> User Management</a>
+      <a th:href="@{/admin/orders/manage}" class="nav-item"><i class="bi bi-box-seam"></i> Orders</a>
+      <a th:href="@{/admin/authors/list}" class="nav-item active"><i class="bi bi-pen"></i> Authors</a>
+      <a th:href="@{/admin/announcements/list}" class="nav-item"><i class="bi bi-megaphone"></i> Announcements</a>
+      <a th:href="@{/admin/promos/list}" class="nav-item"><i class="bi bi-ticket-perforated"></i> Promo Codes</a>
+    </nav>
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; margin-top: 1rem;">
+      <a th:href="@{/admin/dashboard}" class="nav-item text-white-50"><i class="bi bi-arrow-left"></i> Back to Dash</a>
+    </div>
+  </aside>
 
-  <!-- NEW: Success Message Alert -->
-  <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>Success!</strong> The author has been successfully saved to the database.
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
+  <main class="dashboard-content">
 
-  <h2 class="mb-4 text-primary fw-bold">Register New Author</h2>
-
-  <form th:action="@{/admin/authors/save}" th:object="${author}" method="post">
-
-    <div class="mb-3">
-      <label class="form-label fw-bold">Author Full Name</label>
-      <input type="text" th:field="*{name}" class="form-control" required placeholder="e.g. J.K. Rowling">
+    <div th:if="${param.success}" class="alert alert-success py-3 small fw-bold shadow-sm border-0 w-100" style="max-width: 800px; background: #e8f4eb; color: #1e4620; border-left: 4px solid #198754 !important; animation: fadeInUp 0.5s ease;">
+      <div class="d-flex justify-content-between align-items-center">
+        <div><i class="bi bi-check-circle-fill me-2 fs-6 align-middle"></i> The author has been successfully saved to the database.</div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
     </div>
 
-    <div class="mb-3">
-      <label class="form-label fw-bold">Biography</label>
-      <textarea th:field="*{biography}" class="form-control" rows="4" placeholder="Brief history of the author..."></textarea>
-    </div>
+    <div class="premium-card">
+      <h3 class="section-title"><i class="bi bi-person-plus-fill text-primary me-2"></i>Register New Author</h3>
 
-    <div class="mb-4">
-      <label class="form-label fw-bold">Profile Image URL</label>
-      <input type="url" th:field="*{profileImageUrl}" class="form-control" placeholder="https://example.com/image.jpg">
-      <div class="form-text">Paste a link to the author's photo (optional).</div>
-    </div>
+      <form th:action="@{/admin/authors/save}" th:object="${author}" method="post">
 
-    <div class="d-flex gap-2 pt-3 border-top">
-      <button type="submit" class="btn btn-primary px-4 fw-bold">Save Author</button>
-      <!-- Updated cancel link to go back to dashboard -->
-      <a href="/admin/dashboard" class="btn btn-outline-secondary">Cancel</a>
+        <div class="mb-4">
+          <label class="form-label">Author Full Name <span class="text-danger">*</span></label>
+          <input type="text" th:field="*{name}" class="custom-input" required placeholder="e.g. J.K. Rowling">
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Biography</label>
+          <textarea th:field="*{biography}" class="custom-input" rows="5" placeholder="Enter a brief history of the author's career, notable works, and achievements..."></textarea>
+        </div>
+
+        <div class="mb-5">
+          <label class="form-label">Profile Image URL</label>
+          <input type="url" th:field="*{profileImageUrl}" class="custom-input" placeholder="https://example.com/author-image.jpg">
+          <div class="form-text mt-2 small text-muted"><i class="bi bi-info-circle me-1"></i>Paste a secure direct link (HTTPS) to the author's portrait photograph.</div>
+        </div>
+
+        <div class="d-flex gap-3 pt-4 border-top" style="border-color: #f0f2f5 !important;">
+          <button type="submit" class="btn-primary-custom"><i class="bi bi-save2 me-2"></i>Save Author</button>
+          <a th:href="@{/admin/authors/list}" class="btn-ghost-custom">Cancel</a>
+        </div>
+
+      </form>
     </div>
-  </form>
+  </main>
 </div>
 
-<!-- Need Bootstrap JS for the closeable alert to work -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
