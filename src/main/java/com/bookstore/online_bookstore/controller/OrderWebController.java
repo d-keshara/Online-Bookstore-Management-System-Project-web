@@ -187,13 +187,28 @@ public class OrderWebController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // Fallback for downloading historical receipts
-        String receiptContent = generateReceiptText(order, "Saved Address", "Saved Phone");
-        byte[] fileBytes = receiptContent.getBytes();
+        byte[] fileBytes;
+        String directoryPath = "files/";
+        String fileName = "receipt_order_" + orderId + ".txt";
+        Path path = Paths.get(directoryPath + fileName);
+
+        try {
+            // Actually read the perfect file we saved during checkout!
+            if (Files.exists(path)) {
+                fileBytes = Files.readAllBytes(path);
+            } else {
+                // Fallback ONLY if the file was deleted from the server
+                String receiptContent = generateReceiptText(order, "N/A", "N/A");
+                fileBytes = receiptContent.getBytes();
+            }
+        } catch (Exception e) {
+            System.out.println("Error reading receipt: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_PLAIN);
-        headers.setContentDispositionFormData("attachment", "receipt_order_" + orderId + ".txt");
+        headers.setContentDispositionFormData("attachment", fileName);
 
         return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
     }
