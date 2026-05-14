@@ -60,7 +60,7 @@ public class AuthorWebController {
     @GetMapping("/admin/authors/add")
     public String showAuthorForm(Model model) {
         model.addAttribute("author", new Author());
-        return "author-form";
+        return "add-author";
     }
 
     @GetMapping("/admin/authors/edit/{id}")
