@@ -12,4 +12,6 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
 
     // NEW: Find profile by user account
     Author findByUser(User user);
+    List<Author> findByAwardTitleIsNotNull();
+    List<Author> findByFeaturedOnHomePageTrue();
 }
