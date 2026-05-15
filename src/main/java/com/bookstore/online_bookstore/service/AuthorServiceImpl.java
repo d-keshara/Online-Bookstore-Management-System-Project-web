@@ -45,7 +45,10 @@ public class AuthorServiceImpl implements AuthorService {
         author.setBiography(updatedAuthor.getBiography());
         author.setProfileImageUrl(updatedAuthor.getProfileImageUrl());
         author.setAwardTitle(updatedAuthor.getAwardTitle());
-        author.setFeaturedOnHomePage(updatedAuthor.isFeaturedOnHomePage());
+
+        // 🔥 FIX: Changed 'is' to 'get' to match the new Boolean object!
+        author.setFeaturedOnHomePage(updatedAuthor.getFeaturedOnHomePage());
+
         return authorRepository.save(author);
     }
 
