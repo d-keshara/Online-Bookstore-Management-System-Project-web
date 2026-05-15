@@ -301,6 +301,14 @@
                         <i class="bi bi-bell-fill text-warning"></i> Submissions
                         <span th:if="${pendingCount != null and pendingCount > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" th:text="${pendingCount}"></span>
                     </a>
+
+                    <a href="/admin/tickets" class="btn-quick btn-quick-light position-relative border-primary bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-headset"></i> Support
+                        <span th:if="${openTicketsCount != null and openTicketsCount > 0}"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm"
+                              th:text="${openTicketsCount}"></span>
+                    </a>
+
                     <a href="/admin/add" class="btn-quick btn-quick-accent">
                         <i class="bi bi-plus-lg"></i> Add Book
                     </a>

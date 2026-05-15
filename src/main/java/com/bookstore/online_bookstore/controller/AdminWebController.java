@@ -28,6 +28,7 @@ public class AdminWebController {
     private final UserRepository userRepository;
     private final InviteTokenRepository inviteTokenRepository;
     private final ReviewRepository reviewRepository;
+    private final SupportTicketRepository ticketRepository;
 
     @Autowired
     public AdminWebController(BookRepository bookRepository,
@@ -35,13 +36,15 @@ public class AdminWebController {
                               AuthorRepository authorRepository,
                               UserRepository userRepository,
                               InviteTokenRepository inviteTokenRepository,
-                              ReviewRepository reviewRepository) {
+                              ReviewRepository reviewRepository,
+                              SupportTicketRepository ticketRepository) {
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
         this.authorRepository = authorRepository;
         this.userRepository = userRepository;
         this.inviteTokenRepository = inviteTokenRepository;
         this.reviewRepository = reviewRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     // MAIN DASHBOARD
@@ -67,6 +70,10 @@ public class AdminWebController {
                 .filter(review -> "NEGATIVE".equalsIgnoreCase(review.getSentiment()) || review.isHidden())
                 .collect(Collectors.toList());
         model.addAttribute("urgentReviews", urgentReviews);
+
+        // SUPPORT TICKETS
+        long openTicketsCount = ticketRepository.countByStatus("OPEN");
+        model.addAttribute("openTicketsCount", openTicketsCount);
 
         return "admin-dashboard";
     }
@@ -115,7 +122,7 @@ public class AdminWebController {
         return "redirect:/admin/users?deleted";
     }
 
-    //BOOK REQUESTS
+    // BOOK REQUESTS
     @GetMapping("/requests")
     public String viewBookRequests(Model model) {
         List<Book> pendingBooks = bookRepository.findAll().stream()

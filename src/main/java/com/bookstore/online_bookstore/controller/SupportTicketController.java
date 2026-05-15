@@ -61,7 +61,7 @@ import java.util.List;
         }
 
         @PostMapping("/admin/tickets/resolve/{id}")
-        public String resolveTicket(@PathVariable("id") Integer id, RedirectAttributes ra) {
+        public String resolveTicket(@PathVariable("id") Long id, RedirectAttributes ra) {
             SupportTicket ticket = ticketRepository.findById(id).orElse(null);
             if (ticket != null) {
                 ticket.setStatus("RESOLVED");
