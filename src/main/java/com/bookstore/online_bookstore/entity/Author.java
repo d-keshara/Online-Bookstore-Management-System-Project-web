@@ -19,6 +19,12 @@ public class Author {
     @Column(columnDefinition = "TEXT")
     private String biography;
 
+    @Column
+    private String awardTitle;
+
+    @Column(name = "featured_on_home_page")
+    private boolean featuredOnHomePage;
+
     private String profileImageUrl;
 
     // NEW: The "Glue" linking the profile to a user account
@@ -42,7 +48,11 @@ public class Author {
     public List<Book> getBooks() { return books; }
     public void setBooks(List<Book> books) { this.books = books; }
 
-    // NEW: User Getter and Setter
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+    public String getAwardTitle() { return awardTitle; }
+    public void setAwardTitle(String awardTitle) { this.awardTitle = awardTitle; }
+
+    public boolean isFeaturedOnHomePage() { return featuredOnHomePage; }
+    public void setFeaturedOnHomePage(boolean featuredOnHomePage) { this.featuredOnHomePage = featuredOnHomePage; }
 }

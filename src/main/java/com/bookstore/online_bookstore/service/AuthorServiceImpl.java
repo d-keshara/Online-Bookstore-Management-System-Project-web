@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AuthorServiceImpl implements AuthorService {
 
@@ -42,6 +44,8 @@ public class AuthorServiceImpl implements AuthorService {
         author.setName(updatedAuthor.getName());
         author.setBiography(updatedAuthor.getBiography());
         author.setProfileImageUrl(updatedAuthor.getProfileImageUrl());
+        author.setAwardTitle(updatedAuthor.getAwardTitle());
+        author.setFeaturedOnHomePage(updatedAuthor.isFeaturedOnHomePage());
         return authorRepository.save(author);
     }
 
@@ -56,4 +60,16 @@ public class AuthorServiceImpl implements AuthorService {
         getAuthorById(authorId);
         return bookRepository.findByAuthorId(authorId, pageable);
     }
+
+    @Override
+    public List<Author> getVipAuthors() {
+        return authorRepository.findByAwardTitleIsNotNull();
+    }
+
+    @Override
+    public List<Author> getFeaturedAuthors() {
+        // Returns all authors — you can later add filtering/sorting here
+        return authorRepository.findAll();
+    }
+
 }
