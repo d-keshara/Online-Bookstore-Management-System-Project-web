@@ -55,7 +55,6 @@
                 <td>
                     <img th:if="${author.profileImageUrl != null and !author.profileImageUrl.empty}"
                          th:src="${author.profileImageUrl}"
-                         alt="Author Image"
                          class="rounded-circle shadow-sm"
                          style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #eee;">
 
@@ -66,12 +65,34 @@
                     </div>
                 </td>
 
-                <td class="fw-bold text-dark fs-6" th:text="${author.name}">Name</td>
+                <td class="fw-bold text-dark fs-6">
+                    <span th:text="${author.name}">Name</span>
+                    <span th:if="${author.featuredOnHomePage != null and author.featuredOnHomePage}"
+                          class="badge bg-warning text-dark ms-2" style="font-size: 0.65rem; vertical-align: middle;">
+                        <i class="bi bi-star-fill"></i> VIP
+                    </span>
+                </td>
 
                 <td class="bio-text" th:text="${#strings.abbreviate(author.biography != null ? author.biography : 'No bio provided.', 70)}">Bio</td>
 
                 <td class="text-center">
-                    <a th:href="@{/admin/authors/edit/{id}(id=${author.id})}" class="btn btn-sm btn-outline-dark fw-bold rounded-pill px-4">Edit</a>
+                    <div class="d-flex justify-content-center gap-2">
+                        <form th:if="${author.featuredOnHomePage != null and author.featuredOnHomePage}"
+                              th:action="@{/admin/authors/revoke/{id}(id=${author.id})}" method="post" class="m-0">
+                            <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3" title="Remove from Home Page">
+                                <i class="bi bi-star-half"></i> Remove VIP
+                            </button>
+                        </form>
+
+                        <a th:href="@{/admin/authors/edit/{id}(id=${author.id})}" class="btn btn-sm btn-outline-dark fw-bold rounded-pill px-4">Edit</a>
+
+                        <form th:action="@{/admin/authors/delete/{id}(id=${author.id})}" method="post" class="m-0">
+                            <button type="submit" class="btn btn-sm btn-danger fw-bold rounded-pill px-3"
+                                    onclick="return confirm('Permanently delete this author?');">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(authors)}">

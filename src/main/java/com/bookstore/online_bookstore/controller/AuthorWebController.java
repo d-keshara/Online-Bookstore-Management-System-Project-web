@@ -14,7 +14,7 @@ import com.bookstore.online_bookstore.service.AuthorService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder; // 🔥 IMPORT ADDED
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -109,6 +109,28 @@ public class AuthorWebController {
         return "redirect:/admin/authors/list";
     }
 
+    // Handles the "Delete" Button from the Authors List
+    @PostMapping("/admin/authors/delete/{id}")
+    public String deleteAuthor(@PathVariable Long id, RedirectAttributes ra) {
+        authorService.deleteAuthor(id);
+        ra.addAttribute("success", true);
+        return "redirect:/admin/authors/list";
+    }
+
+    // Handles the "Remove VIP" Button from the Authors List
+    @PostMapping("/admin/authors/revoke/{id}")
+    public String revokeFeaturedStatus(@PathVariable Long id, RedirectAttributes ra) {
+        Author author = authorService.getAuthorById(id);
+
+        // Turn off the Home Page flag
+        author.setFeaturedOnHomePage(false);
+
+        // Save the update
+        authorService.updateAuthor(id, author);
+
+        ra.addAttribute("success", true);
+        return "redirect:/admin/authors/list";
+    }
 
     @GetMapping("/author/dashboard")
     public String showAuthorDashboard(Model model, Principal principal) {
