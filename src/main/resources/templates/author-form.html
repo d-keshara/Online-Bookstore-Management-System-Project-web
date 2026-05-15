@@ -20,7 +20,6 @@
 
 <div class="card-box">
 
-  <!-- Page heading changes based on add vs edit -->
   <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
     <a href="/admin/authors/list" class="btn btn-light btn-sm rounded-pill px-3">
       <i class="bi bi-arrow-left me-1"></i> Back
@@ -30,7 +29,6 @@
     </h2>
   </div>
 
-  <!-- Success alert -->
   <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show fw-bold border-0 shadow-sm">
     <i class="bi bi-check-circle-fill me-2"></i> Author saved successfully!
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -38,10 +36,8 @@
 
   <form th:action="@{/admin/authors/save}" th:object="${author}" method="post">
 
-    <!-- Hidden ID field — needed for edit to work -->
     <input type="hidden" th:field="*{id}">
 
-    <!-- Basic Info -->
     <div class="mb-3">
       <label class="form-label">Author Full Name</label>
       <input type="text" th:field="*{name}" class="form-control" required placeholder="e.g. J.K. Rowling">
@@ -58,20 +54,19 @@
       <div class="form-text">Paste a link to the author's photo (optional).</div>
     </div>
 
-    <!-- Featured Author Section -->
     <div class="section-divider">
       <div class="featured-box">
         <p class="featured-title mb-3"><i class="bi bi-star-fill me-2"></i>Home Page Feature Settings</p>
 
         <div class="mb-3">
           <label class="form-label">Award Title</label>
-          <input type="text" th:field="*{awardTitle}" class="form-control" placeholder="e.g. Booker Prize Winner">
+          <input type="text" name="awardTitle" id="awardTitle" class="form-control" placeholder="e.g. Booker Prize Winner">
           <div class="form-text">Leave blank if this author has no award to display.</div>
         </div>
 
         <div class="form-check form-switch mt-3">
           <input class="form-check-input" type="checkbox" role="switch"
-                 th:field="*{featuredOnHomePage}" id="featuredSwitch"
+                 name="featuredOnHomePage" id="featuredSwitch" value="true"
                  style="width: 3em; height: 1.5em;">
           <label class="form-check-label ms-2 fw-bold" for="featuredSwitch">
             Show this author on the Home Page
@@ -80,7 +75,6 @@
       </div>
     </div>
 
-    <!-- Buttons -->
     <div class="d-flex gap-2 pt-4 mt-3 border-top">
       <button type="submit" class="btn btn-dark fw-bold px-4 rounded-pill" style="background:#c8602a; border:none;">
         <i class="bi bi-save me-1"></i>

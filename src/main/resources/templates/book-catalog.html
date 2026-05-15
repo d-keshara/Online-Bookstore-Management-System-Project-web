@@ -21,6 +21,58 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); font-size: 15px; display: flex; flex-direction: column; min-height: 100vh; }
 
+
+/* ✨ PREMIUM ANIMATION ENGINE ✨ */
+@keyframes fadeUpSmooth {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Base Classes */
+.animate-fade-up {
+    animation: fadeUpSmooth 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+}
+
+.animate-slide-right {
+    animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+}
+
+/* Staggered Delays for smooth cascading */
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+/* The "Magnetic" Hover Effect */
+.hover-magnetic {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease !important;
+}
+.hover-magnetic:hover {
+    transform: translateY(-8px) scale(1.02) !important;
+    box-shadow: 0 25px 45px rgba(200, 96, 42, 0.15) !important; /* Uses your premium orange */
+}
+
+/* Cascade effect specifically for your book/VIP grid */
+.book-card, .vip-card {
+    animation: fadeUpSmooth 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+}
+.book-card:nth-child(1), .col-md-4:nth-child(1) .vip-card { animation-delay: 0.1s; }
+.book-card:nth-child(2), .col-md-4:nth-child(2) .vip-card { animation-delay: 0.2s; }
+.book-card:nth-child(3), .col-md-4:nth-child(3) .vip-card { animation-delay: 0.3s; }
+.book-card:nth-child(4) { animation-delay: 0.4s; }
+.book-card:nth-child(5) { animation-delay: 0.5s; }
+.book-card:nth-child(n+6) { animation-delay: 0.6s; }
+
+
+
+
         /* ── ANNOUNCEMENT PULSE ── */
 .announcement-pulse {
     background: var(--accent); /* Premium Orange */
@@ -141,7 +193,7 @@
 
 <nav class="site-nav">
     <div class="nav-inner">
-        <a class="nav-brand" th:href="@{/catalog}">
+        <a class="nav-brand" th:href="@{/}">
             <span class="brand-nexus">NEXUS</span>
             <span class="brand-bookstore">BOOKSTORE</span>
         </a>
@@ -154,6 +206,10 @@
         </form>
 
         <div class="nav-actions">
+            <a th:href="@{/}" class="btn-nav btn-nav-ghost me-3" style="border-color: rgba(255,255,255,0.1);">
+                <i class="bi bi-star-fill text-warning"></i> VIP Authors
+            </a>
+
             <div sec:authorize="isAnonymous()">
                 <a th:href="@{/login}" class="btn-nav btn-nav-ghost"><i class="bi bi-person"></i> Sign In</a>
                 <a th:href="@{/register}" class="btn-nav btn-nav-accent ms-1">Sign Up</a>
@@ -164,6 +220,7 @@
                 <a th:href="@{/cart}" class="btn-nav btn-nav-ghost"><i class="bi bi-cart3 fs-5"></i> Cart</a>
                 <a th:href="@{/my-orders}" class="btn-nav btn-nav-ghost"><i class="bi bi-box-seam fs-5"></i> Orders</a>
                 <a th:href="@{/contact}" class="btn-nav btn-nav-ghost"><i class="bi bi-headset fs-5"></i> Support</a>
+
                 <div sec:authorize="hasRole('ADMIN')" style="border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.5rem; margin-left: 0.2rem;">
                     <a th:href="@{/admin/dashboard}" class="btn-nav btn-nav-warn"><i class="bi bi-speedometer2"></i> Admin</a>
                 </div>
