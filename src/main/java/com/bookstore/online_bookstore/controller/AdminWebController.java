@@ -100,7 +100,7 @@ public class AdminWebController {
             order.setStatus(status);
             orderRepository.save(order);
 
-            // 🔥 THE RECEIPT TRICK: Delete the old receipt file so the system is forced to generate a new one with the updated status!
+            //  Delete the old receipt file so the system is forced to generate a new one with the updated status!
             try {
                 String filePath = "files/receipt_order_" + orderId + ".txt";
                 java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(filePath));
@@ -108,7 +108,7 @@ public class AdminWebController {
                 System.out.println("Notice: Could not delete old receipt: " + e.getMessage());
             }
 
-            // 🔥 EMAIL NOTIFICATION: Send the live update to the user!
+            //  Send the live update to the user!
             try {
                 if (order.getUser() != null && order.getUser().getEmail() != null) {
                     emailService.sendOrderStatusUpdate(order.getUser().getEmail(), order.getUser().getUsername(), order.getOrderId(), status);
@@ -204,8 +204,21 @@ public class AdminWebController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteBook(@PathVariable Integer id) {
-        bookRepository.deleteById(id);
+    public String deleteBook(@PathVariable Integer id, RedirectAttributes ra) {
+        try {
+            // Attempt a permanent database deletion
+            bookRepository.deleteById(id);
+            ra.addFlashAttribute("successMessage", "Book was permanently deleted from the database.");
+
+        } catch (Exception e) {
+            // If the book is in a cart or has reviews, MySQL blocks the deletion.
+            // Archive it so it safely vanishes!
+            bookRepository.findById(id).ifPresent(book -> {
+                book.setApprovalStatus("ARCHIVED");
+                bookRepository.save(book);
+            });
+            ra.addFlashAttribute("successMessage", "Book safely archived and hidden from catalog (tied to active carts/reviews).");
+        }
         return "redirect:/admin/dashboard";
     }
 

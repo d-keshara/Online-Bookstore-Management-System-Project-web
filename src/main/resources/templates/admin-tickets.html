@@ -88,12 +88,23 @@
                         <span th:if="${ticket.status == 'RESOLVED'}" class="badge rounded-pill badge-resolved">RESOLVED</span>
                     </td>
                     <td class="text-end pe-3">
-                        <form th:if="${ticket.status == 'OPEN'}" th:action="@{'/admin/tickets/resolve/' + ${ticket.id}}" method="post" class="m-0">
-                            <button type="submit" class="btn btn-sm btn-success fw-bold rounded-pill px-3 shadow-sm" onclick="return confirm('Mark this ticket as resolved?');">
-                                <i class="bi bi-check2-circle me-1"></i> Resolve
-                            </button>
-                        </form>
-                        <span th:if="${ticket.status == 'RESOLVED'}" class="text-muted small fw-bold"><i class="bi bi-check-all fs-5 text-success"></i></span>
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <form th:if="${ticket.status == 'OPEN'}" th:action="@{'/admin/tickets/resolve/' + ${ticket.id}}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-success fw-bold rounded-pill px-3 shadow-sm" onclick="return confirm('Mark this ticket as resolved?');">
+                                    <i class="bi bi-check2-circle me-1"></i> Resolve
+                                </button>
+                            </form>
+
+                            <span th:if="${ticket.status == 'RESOLVED'}" class="text-muted small fw-bold px-2">
+                                <i class="bi bi-check-all fs-5 text-success"></i>
+                            </span>
+
+                            <form th:action="@{'/admin/tickets/delete/' + ${ticket.id}}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm fw-bold rounded-pill px-3 shadow-sm" style="background: #fde8e8; color: #b83232; border: 1px solid #f5c6cb;" onclick="return confirm('Are you sure you want to permanently delete this ticket?');">
+                                    <i class="bi bi-trash3 me-1"></i> Delete
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 <tr th:if="${tickets == null or tickets.empty}">
