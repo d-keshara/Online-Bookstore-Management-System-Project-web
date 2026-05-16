@@ -23,7 +23,7 @@ public class AiController {
     private BookRepository bookRepository;
 
     @Autowired
-    private ReviewRepository reviewRepository; // fetch reviews for the summary
+    private ReviewRepository reviewRepository;
 
     @PostMapping("/enhance-synopsis")
     public ResponseEntity<?> enhanceSynopsis(@RequestBody Map<String, String> payload) {
@@ -32,13 +32,10 @@ public class AiController {
             return ResponseEntity.badRequest().body(Map.of("error", "Draft cannot be empty"));
         }
 
-        // Call Ollama Service!
         String enhancedText = ollamaService.enhanceSynopsis(draft);
-
         return ResponseEntity.ok(Map.of("enhanced", enhancedText));
     }
 
-    // The Strict Chatbot Endpoint (Reads Database)
     @PostMapping("/chat")
     public ResponseEntity<?> chatWithAI(@RequestBody Map<String, String> request) {
         String userQuery = request.get("query");
@@ -57,7 +54,6 @@ public class AiController {
         return ResponseEntity.ok(Map.of("answer", aiResponse));
     }
 
-    // AI Apology Email Generator
     @PostMapping("/apology")
     public ResponseEntity<?> generateApology(@RequestBody Map<String, String> request) {
         String customerName = request.get("customerName");
@@ -69,24 +65,28 @@ public class AiController {
         return ResponseEntity.ok(Map.of("email", email));
     }
 
-    // Review Summary Endpoint
+    // THE DATA SHIELD
     @PostMapping("/review-summary")
     public ResponseEntity<?> summarizeReviews(@RequestBody Map<String, Integer> request) {
         Integer bookId = request.get("bookId");
 
-        // Fetch all public reviews for this specific book
         List<Review> reviews = reviewRepository.findByBook_BookId(bookId).stream()
                 .filter(r -> !r.isHidden())
                 .toList();
 
-        if (reviews.isEmpty()) {
-            return ResponseEntity.ok(Map.of("summary", "There are not enough reviews to generate a consensus yet."));
+        //Check if there are enough actual reviews
+        if (reviews.size() < 3) {
+            return ResponseEntity.ok(Map.of("summary", "Not enough detailed reviews to form an AI consensus yet. Be the first to leave an in-depth review!"));
         }
 
-        // Bundle them into a single string for the AI
         StringBuilder allReviewsText = new StringBuilder();
         for (Review r : reviews) {
             allReviewsText.append(r.getComment()).append(" | ");
+        }
+
+        //Check if the reviews are just 1-word answers (Data Starvation)
+        if (allReviewsText.length() < 5) {
+            return ResponseEntity.ok(Map.of("summary", "Current reviews are too brief for an AI consensus."));
         }
 
         String summary = ollamaService.summarizeBookReviews(allReviewsText.toString());
