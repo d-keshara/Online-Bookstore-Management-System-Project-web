@@ -216,6 +216,10 @@
                 <i class="bi bi-star-fill text-warning"></i> VIPs
             </a>
 
+            <a th:href="@{/contact}" class="btn-nav btn-nav-ghost px-2 me-3" title="Contact Support">
+                <i class="bi bi-headset fs-5"></i>
+            </a>
+
             <div sec:authorize="isAnonymous()">
                 <a th:href="@{/login}" class="btn-nav btn-nav-ghost"><i class="bi bi-person"></i> Sign In</a>
                 <a th:href="@{/register}" class="btn-nav btn-nav-accent ms-1">Sign Up</a>
