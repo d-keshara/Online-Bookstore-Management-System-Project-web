@@ -26,7 +26,7 @@ The platform features a **Dual-Model Local AI Architecture**, utilizing **Ollama
 | **Akindu** | **Promo Management:** Dynamic Promo Code discount engine, validation logic, and cart recalculation. |
 | **Thenujaya** | **Featured Admin & Broadcast Management:** implemented featured authors and handles all global announcements and user notifications across the platform. |
 | **Dulara** | **Book Wishlist Management:** Handles the creation, storage, and management of user-specific wishlists. |
-| **Keshara** | **Order,Book,Review,User Management & AI (Tech Lead):** Directs the technical architecture, and developing core management modules while implementing advanced features including a reactive checkout, Strategy Pattern payment gateway, and Dual-Model AI integration. |
+| **Keshara** | **Core Systems Architecture & AI Integration (Tech Lead):** Directs the technical architecture, and developing core management modules while implementing advanced features including a reactive checkout, Strategy Pattern payment gateway, and Dual-Model AI integration. |
 
 ---
 
