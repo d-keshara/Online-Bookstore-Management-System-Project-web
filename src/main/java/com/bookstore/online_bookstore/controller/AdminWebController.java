@@ -2,6 +2,7 @@ package com.bookstore.online_bookstore.controller;
 
 import com.bookstore.online_bookstore.entity.*;
 import com.bookstore.online_bookstore.repository.*;
+import com.bookstore.online_bookstore.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +30,7 @@ public class AdminWebController {
     private final InviteTokenRepository inviteTokenRepository;
     private final ReviewRepository reviewRepository;
     private final SupportTicketRepository ticketRepository;
+    private final EmailService emailService;
 
     @Autowired
     public AdminWebController(BookRepository bookRepository,
@@ -37,7 +39,8 @@ public class AdminWebController {
                               UserRepository userRepository,
                               InviteTokenRepository inviteTokenRepository,
                               ReviewRepository reviewRepository,
-                              SupportTicketRepository ticketRepository) {
+                              SupportTicketRepository ticketRepository,
+                              EmailService emailService) {
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
         this.authorRepository = authorRepository;
@@ -45,6 +48,7 @@ public class AdminWebController {
         this.inviteTokenRepository = inviteTokenRepository;
         this.reviewRepository = reviewRepository;
         this.ticketRepository = ticketRepository;
+        this.emailService = emailService;
     }
 
     // MAIN DASHBOARD
@@ -95,8 +99,26 @@ public class AdminWebController {
         orderRepository.findById(orderId).ifPresent(order -> {
             order.setStatus(status);
             orderRepository.save(order);
+
+            // 🔥 THE RECEIPT TRICK: Delete the old receipt file so the system is forced to generate a new one with the updated status!
+            try {
+                String filePath = "files/receipt_order_" + orderId + ".txt";
+                java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(filePath));
+            } catch (Exception e) {
+                System.out.println("Notice: Could not delete old receipt: " + e.getMessage());
+            }
+
+            // 🔥 EMAIL NOTIFICATION: Send the live update to the user!
+            try {
+                if (order.getUser() != null && order.getUser().getEmail() != null) {
+                    emailService.sendOrderStatusUpdate(order.getUser().getEmail(), order.getUser().getUsername(), order.getOrderId(), status);
+                }
+            } catch (Exception e) {
+                System.out.println("Notice: Failed to send status update email: " + e.getMessage());
+            }
         });
-        ra.addFlashAttribute("successMessage", "Order #" + orderId + " updated to " + status);
+
+        ra.addFlashAttribute("successMessage", "Order #NX-" + orderId + " updated to " + status);
         return "redirect:/admin/orders/manage";
     }
 

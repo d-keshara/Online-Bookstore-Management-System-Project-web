@@ -45,4 +45,25 @@ public class EmailService {
             System.err.println("Failed to send email with attachment: " + e.getMessage());
         }
     }
+
+    // 🔥 NEW: Sends a live update whenever the Admin changes the order status!
+    public void sendOrderStatusUpdate(String toEmail, String username, Integer orderId, String newStatus) {
+        try {
+            org.springframework.mail.SimpleMailMessage message = new org.springframework.mail.SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setSubject("Order Update: #NX-" + orderId + " is now " + newStatus);
+            message.setText("Hello " + username + ",\n\n" +
+                    "Good news! There is an update regarding your recent purchase.\n\n" +
+                    "Order Reference : #NX-" + orderId + "\n" +
+                    "Current Status  : " + newStatus + "\n\n" +
+                    "You can view your updated receipt by logging into your Nexus Bookstore account and visiting 'My Orders'.\n\n" +
+                    "Thank you for shopping with us!\n" +
+                    "- The Nexus Team");
+
+            mailSender.send(message);
+            System.out.println("Status update email sent to: " + toEmail);
+        } catch (Exception e) {
+            System.err.println("Failed to send Order Status Update Email: " + e.getMessage());
+        }
+    }
 }
