@@ -9,166 +9,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-        --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888;
-        --paper: #faf8f4; --paper-card: #ffffff;
-        --accent: #c8602a; --accent-dark: #9e4a1e;
-    }
+    :root { --ink: #1a1a1a; --ink-soft: #3d3d3d; --ink-muted: #888; --paper: #faf8f4; --paper-card: #ffffff; --accent: #c8602a; --accent-dark: #9e4a1e; }
+    body { background: linear-gradient(135deg, #f0f2f5 0%, #e2e8f0 100%); font-family: 'DM Sans', sans-serif; color: var(--ink); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 3rem 1rem; }
 
-    body {
-        background: linear-gradient(135deg, #f0f2f5 0%, #e2e8f0 100%);
-        font-family: 'DM Sans', sans-serif;
-        color: var(--ink);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 3rem 1rem;
-    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
 
-    /* ✨ Premium Animations */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideInLeft {
-        from { opacity: 0; transform: translateX(-30px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-
-    .dashboard-wrapper {
-        width: 100%;
-        max-width: 1300px;
-        display: flex;
-        gap: 2rem;
-        margin: auto;
-    }
-
-    /* 🟦 Premium Dark Sidebar */
-    .dashboard-sidebar {
-        width: 280px;
-        background: linear-gradient(135deg, var(--ink) 0%, #000000 100%);
-        border-radius: 12px;
-        padding: 2.5rem 1.5rem;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        color: white;
-        animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        position: relative;
-        overflow: hidden;
-        height: fit-content;
-    }
-
-    .sidebar-brand {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.6rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-        margin-bottom: 2.5rem;
-        text-align: center;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding-bottom: 1.5rem;
-        color: #fff;
-    }
-
+    .dashboard-wrapper { width: 100%; max-width: 1300px; display: flex; gap: 2rem; margin: auto; }
+    .dashboard-sidebar { width: 280px; background: linear-gradient(135deg, var(--ink) 0%, #000000 100%); border-radius: 12px; padding: 2.5rem 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.15); color: white; animation: slideInLeft 0.6s ease forwards; height: fit-content; }
+    .sidebar-brand { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 2.5rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem; }
     .sidebar-brand span { color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; display: block; letter-spacing: 3px; }
 
-    .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
-
-    .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        border-radius: 8px;
-        color: rgba(255,255,255,0.7);
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
     .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
     .nav-item.active { background: rgba(255,255,255,0.1); color: white; box-shadow: inset 3px 0 0 var(--accent); }
 
-    /* ⬜ Main Content Area */
     .dashboard-content { flex: 1; display: flex; flex-direction: column; }
+    .premium-card { background: var(--paper-card); border-radius: 12px; padding: 2.5rem 3.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.04); animation: fadeInUp 0.7s ease forwards; animation-delay: 0.2s; opacity: 0; }
 
-    .premium-card {
-        background: var(--paper-card);
-        border-radius: 12px;
-        padding: 2.5rem 3.5rem;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.04);
-        animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        animation-delay: 0.2s;
-        opacity: 0;
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 2rem;
-        border-bottom: 2px solid #f0f2f5;
-        padding-bottom: 15px;
-    }
-
-    .section-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--ink); margin: 0; }
-
-    /* 🎨 Custom Premium Table */
-    .table-premium { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; }
-    .table-premium th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted); border: none; padding: 12px 20px; font-weight: 600; }
-    .table-premium td { background: #fafafa; border: none; padding: 14px 20px; vertical-align: middle; color: var(--ink-soft); transition: 0.3s; }
-    .table-premium tr:hover td { background: #f5f6f8; transform: scale(1.002); }
+    .table-premium { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+    .table-premium th { font-size: 0.8rem; text-transform: uppercase; color: var(--ink-muted); border: none; padding: 12px 20px; font-weight: 600; }
+    .table-premium td { background: #fafafa; border: none; padding: 14px 20px; vertical-align: middle; transition: 0.3s; }
+    .table-premium tr:hover td { background: #f5f6f8; }
     .table-premium td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
     .table-premium td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
-    /* Typography & Badges */
-    .data-id { font-family: 'Courier New', Courier, monospace; font-weight: 700; font-size: 1.1rem; color: var(--ink); letter-spacing: 0.5px; background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 4px;}
-    .data-price { font-weight: 700; font-size: 1.05rem; color: #198754; letter-spacing: -0.3px; }
+    .data-id { font-family: 'Courier New', Courier, monospace; font-weight: 700; color: var(--ink); background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 4px;}
+    .status-badge { padding: 6px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
+    .badge-processing { background: #fff3cd; color: #856404; }
+    .badge-shipped { background: #cce5ff; color: #004085; }
+    .badge-paid { background: #d4edda; color: #155724; }
+    .badge-cancelled { background: #fde8e8; color: #721c24; }
 
-    .status-badge { padding: 6px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-    .badge-processing { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-    .badge-shipped { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
-    .badge-paid { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .badge-cancelled { background: #fde8e8; color: #721c24; border: 1px solid #f5c6cb; }
+    .select-status { appearance: none; background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.1); font-size: 0.85rem; font-weight: 600; outline: none; }
+    .btn-update { background: var(--ink); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+    .btn-update:hover { background: var(--accent); }
+    .btn-view { background: #fff; color: var(--ink); border: 1px solid rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 6px; transition: 0.2s; }
+    .btn-view:hover { background: #f0f0f0; }
 
-    /* Custom Select & Button */
-    .select-status {
-        appearance: none;
-        background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="%23888" d="M4 6l4 4 4-4z"/></svg>') no-repeat right 10px center / 12px;
-        padding: 8px 30px 8px 15px;
-        border-radius: 6px;
-        border: 1px solid rgba(0,0,0,0.1);
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--ink-soft);
-        outline: none;
-        cursor: pointer;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
-    }
-    .select-status:focus { border-color: var(--accent); }
-
-    .btn-update {
-        background: var(--ink);
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: 0.2s;
-    }
-    .btn-update:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(200,96,42,0.2); }
-
-    /* Staggered Row Animations */
     .table-premium tbody tr { animation: fadeInUp 0.5s ease forwards; opacity: 0; }
-    .table-premium tbody tr:nth-child(1) { animation-delay: 0.3s; }
-    .table-premium tbody tr:nth-child(2) { animation-delay: 0.4s; }
-    .table-premium tbody tr:nth-child(3) { animation-delay: 0.5s; }
-    .table-premium tbody tr:nth-child(4) { animation-delay: 0.6s; }
-    .table-premium tbody tr:nth-child(5) { animation-delay: 0.7s; }
-
-    .top-bar { position: absolute; top: 2rem; right: 3rem; z-index: 100; display: flex; gap: 12px; }
+    .top-bar { position: absolute; top: 2rem; right: 3rem; z-index: 100; }
   </style>
 </head>
 <body>
@@ -180,113 +60,112 @@
 </div>
 
 <div class="dashboard-wrapper">
-
   <aside class="dashboard-sidebar">
-    <div class="sidebar-brand">
-      NEXUS
-      <span>ADMINISTRATOR</span>
-    </div>
+    <div class="sidebar-brand">NEXUS<span>ADMINISTRATOR</span></div>
     <nav class="sidebar-nav">
-      <a th:href="@{/admin/dashboard}" class="nav-item">
-        <i class="bi bi-collection"></i> Inventory Hub
-      </a>
-      <a th:href="@{/admin/users}" class="nav-item">
-        <i class="bi bi-people"></i> User Management
-      </a>
-      <a th:href="@{/admin/orders/manage}" class="nav-item active">
-        <i class="bi bi-box-seam"></i> Order Command Center
-      </a>
+      <a th:href="@{/admin/dashboard}" class="nav-item"><i class="bi bi-collection"></i> Inventory Hub</a>
+      <a th:href="@{/admin/users}" class="nav-item"><i class="bi bi-people"></i> User Management</a>
+      <a th:href="@{/admin/orders/manage}" class="nav-item active"><i class="bi bi-box-seam"></i> Order Command Center</a>
       <form th:action="@{/logout}" method="post" class="mt-5 m-0 p-0">
         <button type="submit" class="nav-item w-100 text-start text-danger opacity-75 bg-transparent border-0">
           <i class="bi bi-box-arrow-right"></i> Terminate Session
         </button>
       </form>
     </nav>
-    <div class="position-absolute bottom-0 start-0 w-100 p-4 text-center opacity-50">
-      <small class="text-white fw-light" style="font-size: 0.7rem;">WD130 &copy; 2026</small>
-    </div>
   </aside>
-
   <main class="dashboard-content">
-
     <div class="premium-card">
-      <div class="section-header">
+      <div class="section-header border-bottom pb-3 mb-4">
         <div>
           <h3 class="section-title h4 border-0 mb-1">Customer Orders</h3>
           <p class="text-muted small mb-0">Manage fulfillment, shipping, and payment statuses.</p>
         </div>
       </div>
 
-      <div th:if="${successMessage}" class="alert alert-success py-2 small fw-medium shadow-sm border-0 mb-4" style="background: #e8f4eb; color: #1e4620; animation: fadeInUp 0.5s ease;">
+      <div th:if="${successMessage}" class="alert alert-success py-2 small fw-medium shadow-sm border-0 mb-4" style="background: #e8f4eb; color: #1e4620;">
         <i class="bi bi-check2-circle me-2"></i> <span th:text="${successMessage}"></span>
-        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
       </div>
 
       <div class="table-responsive" style="overflow-x: visible;">
         <table class="table-premium">
           <thead>
           <tr>
-            <th>Reference</th>
+            <th>Ref</th>
             <th>Customer</th>
             <th>Revenue</th>
-            <th>Current Status</th>
-            <th class="text-center">Fulfillment Action</th>
+            <th>Status</th>
+            <th class="text-center">Action</th>
           </tr>
           </thead>
           <tbody>
-          <tr th:each="order : ${allOrders}">
-            <td>
-              <span class="data-id">#NX-<span th:text="${order.orderId}"></span></span>
-            </td>
-            <td>
-              <div class="d-flex align-items-center gap-2">
-                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center border shadow-sm" style="width: 28px; height: 28px;">
-                  <i class="bi bi-person text-secondary" style="font-size: 0.8rem;"></i>
+          <th:block th:each="order : ${allOrders}">
+            <tr>
+              <td><span class="data-id">#NX-<span th:text="${order.orderId}"></span></span></td>
+              <td><i class="bi bi-person me-1 text-muted"></i> <span th:text="${order.user.username}"></span></td>
+
+              <td><span style="color: var(--accent); font-weight: 700;">LKR <span th:text="${order.totalPrice}"></span></span></td>
+
+              <td>
+                <span th:if="${order.status == 'PROCESSING'}" class="status-badge badge-processing"><i class="bi bi-gear-fill"></i> Processing</span>
+                <span th:if="${order.status == 'SHIPPED'}" class="status-badge badge-shipped"><i class="bi bi-truck"></i> Shipped</span>
+                <span th:if="${order.status == 'PAID'}" class="status-badge badge-paid"><i class="bi bi-check-circle-fill"></i> Paid</span>
+                <span th:if="${order.status == 'DELIVERED'}" class="status-badge badge-paid"><i class="bi bi-box2-heart-fill"></i> Delivered</span>
+                <span th:if="${order.status == 'CANCELLED'}" class="status-badge badge-cancelled"><i class="bi bi-x-circle-fill"></i> Cancelled</span>
+              </td>
+
+              <td class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                  <form th:action="@{/admin/orders/update-status}" method="post" class="m-0 d-flex gap-2">
+                    <input type="hidden" name="orderId" th:value="${order.orderId}">
+                    <select name="status" class="select-status">
+                      <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
+                      <option value="PAID" th:selected="${order.status == 'PAID'}">Paid</option>
+                      <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">Shipped</option>
+                      <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Delivered</option>
+                      <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Cancel</option>
+                    </select>
+                    <button type="submit" class="btn-update">Update</button>
+                  </form>
+
+                  <button type="button" class="btn-view" data-bs-toggle="modal" th:data-bs-target="'#orderModal' + ${order.orderId}" title="View Shipping Details">
+                    <i class="bi bi-eye"></i> Details
+                  </button>
                 </div>
-                <span class="fw-semibold text-dark" th:text="${order.user.username}"></span>
-              </div>
-            </td>
-            <td>
-              <span class="data-price" th:text="'LKR ' + ${order.totalPrice}"></span>
-            </td>
-            <td>
-              <span th:if="${order.status == null or order.status == '' or order.status == 'PROCESSING'}" class="status-badge badge-processing"><i class="bi bi-gear-fill"></i> Processing</span>
-              <span th:if="${order.status == 'SHIPPED'}" class="status-badge badge-shipped"><i class="bi bi-truck"></i> Shipped</span>
-              <span th:if="${order.status == 'PAID'}" class="status-badge badge-paid"><i class="bi bi-check-circle-fill"></i> Paid</span>
-              <span th:if="${order.status == 'CANCELLED'}" class="status-badge badge-cancelled"><i class="bi bi-x-circle-fill"></i> Cancelled</span>
-            </td>
-            <td>
-              <form th:action="@{/admin/orders/update-status}" method="post" class="d-flex gap-2 justify-content-center m-0">
-                <input type="hidden" name="orderId" th:value="${order.orderId}">
-
-                <select name="status" class="select-status">
-                  <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
-                  <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">Shipped</option>
-                  <option value="PAID" th:selected="${order.status == 'PAID'}">Paid / Done</option>
-                  <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Cancelled</option>
-                </select>
-
-                <button type="submit" class="btn-update shadow-sm">
-                  Update
-                </button>
-              </form>
-            </td>
-          </tr>
-
-          <tr th:if="${allOrders == null or allOrders.empty}">
-            <td colspan="5" class="text-center py-5 bg-transparent">
-              <i class="bi bi-inbox opacity-25 mb-3" style="font-size: 3rem; color: var(--ink);"></i>
-              <h5 class="font-playfair fw-bold text-dark">No Orders Received</h5>
-              <p class="text-muted small mb-0">Once customers place orders, they will appear here.</p>
-            </td>
-          </tr>
+              </td>
+            </tr>
+          </th:block>
           </tbody>
         </table>
       </div>
     </div>
-
   </main>
 </div>
+
+<th:block th:each="order : ${allOrders}">
+  <div class="modal fade text-start" th:id="'orderModal' + ${order.orderId}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-0 bg-dark text-white">
+          <h5 class="modal-title font-playfair"><i class="bi bi-box-seam me-2"></i> Order #NX-<span th:text="${order.orderId}"></span> Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <h6 class="text-muted small fw-bold text-uppercase mb-3">Shipping Information</h6>
+          <div class="bg-light p-3 rounded border">
+            <p class="mb-2"><strong><i class="bi bi-person me-2 text-muted"></i>Name:</strong> <span th:text="${order.recipientName != null ? order.recipientName : 'Not Provided'}"></span></p>
+            <p class="mb-2"><strong><i class="bi bi-telephone me-2 text-muted"></i>Phone:</strong> <span th:text="${order.contactNumber != null ? order.contactNumber : 'Not Provided'}"></span></p>
+            <p class="mb-3"><strong><i class="bi bi-geo-alt me-2 text-muted"></i>Address:</strong> <br> <span class="ms-4" th:text="${order.deliveryAddress != null ? order.deliveryAddress : 'Not Provided'}"></span></p>
+            <hr>
+            <p class="mb-0"><strong><i class="bi bi-credit-card me-2 text-muted"></i>Payment Method:</strong> <span class="badge bg-secondary ms-2" th:text="${order.paymentMethod != null ? order.paymentMethod : 'Unknown'}"></span></p>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-dark w-100 rounded-pill py-2" data-bs-dismiss="modal">Close Window</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</th:block>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

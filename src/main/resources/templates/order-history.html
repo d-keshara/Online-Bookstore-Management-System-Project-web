@@ -309,21 +309,25 @@
                         </td>
 
                         <td>
-                                    <span th:if="${order.status == null or order.status == '' or order.status == 'PROCESSING'}" class="status-badge" style="background: #fff3cd; color: #856404;">
-                                        <i class="bi bi-gear-fill"></i> Processing
-                                    </span>
-                            <span th:if="${order.status == 'PAID'}" class="status-badge" style="background: #d4edda; color: #155724;">
-                                        <i class="bi bi-check-circle-fill"></i> Delivered
-                                    </span>
-                            <span th:if="${order.status == 'PENDING'}" class="status-badge" style="background: #fff3cd; color: #856404;">
-                                        <i class="bi bi-hourglass-split"></i> Pending
-                                    </span>
+                            <span th:if="${order.status == null or order.status == '' or order.status == 'PROCESSING' or order.status == 'PENDING'}" class="status-badge" style="background: #fff3cd; color: #856404;">
+                                <i class="bi bi-gear-fill"></i> Processing
+                            </span>
+
+                            <span th:if="${order.status == 'PAID'}" class="status-badge" style="background: #d1ecf1; color: #0c5460;">
+                                <i class="bi bi-credit-card-fill"></i> Paid
+                            </span>
+
                             <span th:if="${order.status == 'SHIPPED'}" class="status-badge" style="background: #cce5ff; color: #004085;">
-                                        <i class="bi bi-truck"></i> Shipped
-                                    </span>
+                                <i class="bi bi-truck"></i> Shipped
+                            </span>
+
+                            <span th:if="${order.status == 'DELIVERED'}" class="status-badge" style="background: #d4edda; color: #155724;">
+                                <i class="bi bi-box2-heart-fill"></i> Delivered
+                            </span>
+
                             <span th:if="${order.status == 'CANCELLED'}" class="status-badge" style="background: #fde8e8; color: #b83232;">
-                                        <i class="bi bi-x-circle-fill"></i> Cancelled
-                                    </span>
+                                <i class="bi bi-x-circle-fill"></i> Cancelled
+                            </span>
                         </td>
 
                         <td class="text-end">

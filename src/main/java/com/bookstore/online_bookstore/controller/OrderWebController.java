@@ -38,19 +38,14 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderWebController {
 
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CartService cartService;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private CartItemRepository cartItemRepository;
+    @Autowired private OrderRepository orderRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private CartService cartService;
+    @Autowired private EmailService emailService;
+    @Autowired private CartItemRepository cartItemRepository;
 
-    // UPGRADED RECEIPT GENERATOR TO HANDLE COD DETAILS
-    private String generateReceiptText(Order order, String address, String phone) {
+    // UPGRADED RECEIPT GENERATOR (Now shows address for BOTH COD and CARD)
+    private String generateReceiptText(Order order) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDate = LocalDateTime.now().format(formatter);
 
@@ -63,9 +58,10 @@ public class OrderWebController {
                 "Status         : " + order.getStatus() + "\n" +
                 "------------------------------------------\n";
 
-        if ("COD".equals(order.getPaymentMethod()) && address != null && !address.isEmpty()) {
-            receipt +=   "Delivery To    : " + address + "\n" +
-                    "Contact No     : " + phone + "\n" +
+        if (order.getDeliveryAddress() != null && !order.getDeliveryAddress().isEmpty()) {
+            receipt +=   "Recipient      : " + order.getRecipientName() + "\n" +
+                    "Delivery To    : " + order.getDeliveryAddress() + "\n" +
+                    "Contact No     : " + order.getContactNumber() + "\n" +
                     "------------------------------------------\n";
         }
 
@@ -81,16 +77,17 @@ public class OrderWebController {
     public String showPaymentPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
         model.addAttribute("cartTotal", cartService.calculateTotal(user));
+        model.addAttribute("user", user); // NEW: Passes user details to pre-fill the form!
         return "payment-selection";
     }
 
     @PostMapping("/confirm")
     public String confirmOrder(@RequestParam("paymentMethod") String paymentMethod,
-                               @RequestParam(value = "deliveryAddress", required = false) String deliveryAddress,
-                               @RequestParam(value = "contactNumber", required = false) String contactNumber,
+                               @RequestParam("recipientName") String recipientName,
+                               @RequestParam("deliveryAddress") String deliveryAddress,
+                               @RequestParam("contactNumber") String contactNumber,
                                @AuthenticationPrincipal UserDetails userDetails,
-                               HttpSession session,
-                               RedirectAttributes ra) {
+                               HttpSession session, RedirectAttributes ra) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
 
         Order order = new Order();
@@ -99,14 +96,14 @@ public class OrderWebController {
         Double totalAmount = cartService.calculateTotal(user);
         order.setTotalPrice(BigDecimal.valueOf(totalAmount));
 
-        // THE STRATEGY PATTERN IN ACTION
+        // NEW:Save the shipping details globally
+        order.setRecipientName(recipientName);
+        order.setDeliveryAddress(deliveryAddress);
+        order.setContactNumber(contactNumber);
+
         Payment paymentStrategy;
-        if ("CARD".equals(paymentMethod)) {
-            paymentStrategy = new CardPayment();
-        } else {
-            paymentStrategy = new CashPayment();
-        }
-        // Triggers the simulated gateway logs in your IntelliJ console!
+        if ("CARD".equals(paymentMethod)) { paymentStrategy = new CardPayment(); }
+        else { paymentStrategy = new CashPayment(); }
         paymentStrategy.processPayment(totalAmount);
 
         List<CartItem> cartItems = cartItemRepository.findByUser(user);
@@ -117,51 +114,39 @@ public class OrderWebController {
             oItem.setOrder(order);
             oItem.setBookId(cItem.getBook().getBookId());
             oItem.setQuantity(cItem.getQuantity());
-
-            BigDecimal itemPrice = cItem.getBook().getPrice().multiply(BigDecimal.valueOf(cItem.getQuantity()));
-            oItem.setPrice(itemPrice);
-
+            oItem.setPrice(cItem.getBook().getPrice().multiply(BigDecimal.valueOf(cItem.getQuantity())));
             orderItems.add(oItem);
         }
-
         order.setItems(orderItems);
 
+        // Strict Status Setting
         if ("COD".equals(paymentMethod)) {
             order.setStatus("PROCESSING");
             ra.addFlashAttribute("orderSuccess", "Order Placed! Please pay LKR " + order.getTotalPrice() + " on delivery.");
         } else {
             order.setStatus("PAID");
-            ra.addFlashAttribute("orderSuccess", "Payment Successful! Your order is being prepared.");
+            ra.addFlashAttribute("orderSuccess", "Payment Successful! Your order is being prepared for shipment.");
         }
 
         orderRepository.save(order);
 
-        // Generate the receipt with the dynamic form data
-        String receiptContent = generateReceiptText(order, deliveryAddress, contactNumber);
-
+        String receiptContent = generateReceiptText(order);
         String directoryPath = "files/";
         String fileName = "receipt_order_" + order.getOrderId() + ".txt";
         String fullPath = directoryPath + fileName;
 
         try {
             Path path = Paths.get(directoryPath);
-            if (!Files.exists(path)) {
-                Files.createDirectories(path);
-            }
+            if (!Files.exists(path)) Files.createDirectories(path);
             Files.write(Paths.get(fullPath), receiptContent.getBytes());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        } catch (Exception e) { System.out.println(e.getMessage()); }
 
         try {
             if (user.getEmail() != null && !user.getEmail().isEmpty()) {
                 emailService.sendOrderConfirmation(user.getEmail(), user.getUsername(), order.getOrderId(), order.getTotalPrice(), fullPath);
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        } catch (Exception e) { System.out.println(e.getMessage()); }
 
-        // Clear cart and any promo sessions
         cartService.clearCart(user);
         session.removeAttribute("appliedDiscount");
         session.removeAttribute("appliedPromoCode");
@@ -182,10 +167,7 @@ public class OrderWebController {
     @GetMapping("/receipt/{orderId}")
     public ResponseEntity<byte[]> downloadReceipt(@PathVariable Integer orderId) {
         Order order = orderRepository.findById(orderId).orElse(null);
-
-        if (order == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        if (order == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         byte[] fileBytes;
         String directoryPath = "files/";
@@ -193,23 +175,15 @@ public class OrderWebController {
         Path path = Paths.get(directoryPath + fileName);
 
         try {
-            // Actually read the perfect file we saved during checkout!
-            if (Files.exists(path)) {
-                fileBytes = Files.readAllBytes(path);
-            } else {
-                // Fallback ONLY if the file was deleted from the server
-                String receiptContent = generateReceiptText(order, "N/A", "N/A");
-                fileBytes = receiptContent.getBytes();
-            }
+            if (Files.exists(path)) { fileBytes = Files.readAllBytes(path); }
+            else { fileBytes = generateReceiptText(order).getBytes(); }
         } catch (Exception e) {
-            System.out.println("Error reading receipt: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_PLAIN);
         headers.setContentDispositionFormData("attachment", fileName);
-
         return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
     }
 }
