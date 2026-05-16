@@ -189,6 +189,16 @@ public class AdminWebController {
     @PostMapping("/save")
     public String saveBook(@ModelAttribute("book") Book book,
                            @RequestParam(value = "imageFile", required = false) MultipartFile file) {
+
+        // If editing an existing book, retrieve the old image path so we don't overwrite it!
+        if (book.getBookId() != null) {
+            Book existingBook = bookRepository.findById(book.getBookId()).orElse(null);
+            if (existingBook != null && (file == null || file.isEmpty())) {
+                book.setCoverImagePath(existingBook.getCoverImagePath());
+            }
+        }
+
+        // Process new file upload (only if a NEW image was actually selected)
         if (file != null && !file.isEmpty()) {
             try {
                 String uploadDir = "src/main/resources/static/images/";
@@ -198,6 +208,7 @@ public class AdminWebController {
                 book.setCoverImagePath("/images/" + fileName);
             } catch (IOException e) { e.printStackTrace(); }
         }
+
         book.setApprovalStatus("APPROVED");
         bookRepository.save(book);
         return "redirect:/admin/dashboard";
