@@ -89,7 +89,6 @@ public class OllamaService {
         }
     }
 
-    // AI Apology Email Generator
     public String generateApologyEmail(String customerName, String bookTitle, String reviewText) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -111,15 +110,19 @@ public class OllamaService {
             return "Error generating email. Please write manually.";
         }
     }
-    
-    // Review Summarizer
+
     public String summarizeBookReviews(String reviewsText) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Forces the AI to stop chatting and just give the answer.
-        String prompt = "You are a strict data summarizer. Read the following book reviews and output exactly ONE direct sentence summarizing the overall customer consensus. Do NOT use conversational filler like 'Here is the summary' or 'I would be happy to'. Do NOT invent or hallucinate details. If the reviews are very short, just say 'Customers generally left positive feedback.' \n\nReviews to summarize: " + reviewsText;
+        String prompt = "You are an expert book review summarizer. Read the following reader reviews. " +
+                "STRICT RULES: " +
+                "1. Write exactly ONE short sentence summarizing the overall sentiment. " +
+                "2. Do NOT invent plots, characters, or details that are not in the reviews. " +
+                "3. Do NOT use conversational filler (e.g., 'Here is the summary'). " +
+                "4. If the reviews are extremely short or lack detail, simply reply exactly with: 'Readers generally left positive feedback based on initial reviews.' " +
+                "\n\nReviews to summarize: " + reviewsText;
 
         String requestJson = String.format("{\"model\": \"%s\", \"prompt\": \"%s\", \"stream\": false}",
                 MODEL_NAME, prompt.replace("\"", "\\\"").replace("\n", " "));
@@ -135,5 +138,4 @@ public class OllamaService {
             return "Unable to generate summary at this time.";
         }
     }
-
 }
