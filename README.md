@@ -24,9 +24,9 @@ The platform features a **Dual-Model Local AI Architecture**, utilizing **Ollama
 | **Hamsana** | **Support Ticket Management:** Planning and architecture for the future customer support ticketing module. |
 | **Sithumi** | **Author Management:** Engineered the core Data classes, Entities, and backend architecture for the Author portal. |
 | **Akindu** | **Promo Management:** Dynamic Promo Code discount engine, validation logic, and cart recalculation. |
-| **Thenujaya** | **Admin & Broadcast Management:** Premium "Nexus" Dashboard UI unification, comprehensive admin routing, frontend polishing, and the real-time Announcement Broadcast Network. |
-| **Dulara** | **Book & Wishlist Management:** Inventory CRUD, catalog display, and the Wishlist module. |
-| **Keshara** | **Order Management & AI (Tech Lead):** Reactive single-page checkout, Strategy Pattern Payment Gateway, and the complete Dual-Model AI Integration (Llama 3 & Phi-3 Mini),And rest parts. |
+| **Thenujaya** | **Featured Admin & Broadcast Management:** implemented featured authors and handles all global announcements and user notifications across the platform. |
+| **Dulara** | **Book Wishlist Management:** Handles the creation, storage, and management of user-specific wishlists. |
+| **Keshara** | **Order,Book,Review,User Management & AI (Tech Lead):** Directs the technical architecture, and developing core management modules while implementing advanced features including a reactive checkout, Strategy Pattern payment gateway, and Dual-Model AI integration. |
 
 ---
 
