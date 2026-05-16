@@ -19,8 +19,8 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (userRepository.count() == 0) {
-            System.out.println(">>> Database is empty. Hatching the Admin egg...");
+        if (userRepository.findByUsername("superadmin").isEmpty()) {
+            System.out.println(">>> Super Admin is missing. Hatching the Admin egg...");
 
             User firstAdmin = new User();
             firstAdmin.setUsername("superadmin");
@@ -32,7 +32,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             System.out.println(">>> First Admin account created automatically! (Username: superadmin)");
         } else {
-            System.out.println(">>> Database already has users. Skipping Seeder.");
+            System.out.println(">>> Superadmin already exists. Skipping Seeder.");
         }
     }
 }

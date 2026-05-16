@@ -117,11 +117,26 @@ public class AdminWebController {
     }
 
     @GetMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable Integer id) {
-        userRepository.deleteById(id);
-        return "redirect:/admin/users?deleted";
-    }
+    public String deleteUser(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
 
+        // Find the user they are trying to delete
+        User userToDelete = userRepository.findById(id).orElse(null);
+
+        // SHIELD 1: Protect by Username instead of ID!
+        if (userToDelete != null && "superadmin".equals(userToDelete.getUsername())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Action Denied: You cannot delete the Super Admin account.");
+            return "redirect:/admin/users";
+        }
+
+        // SHIELD 2: Catch Database Errors
+        try {
+            userRepository.deleteById(id);
+            return "redirect:/admin/users?deleted";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Cannot delete this user because they have existing orders, reviews, or wishlists tied to their account.");
+            return "redirect:/admin/users";
+        }
+    }
     // BOOK REQUESTS
     @GetMapping("/requests")
     public String viewBookRequests(Model model) {

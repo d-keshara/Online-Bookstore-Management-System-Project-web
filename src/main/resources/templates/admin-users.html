@@ -221,6 +221,11 @@
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
             </div>
 
+            <div th:if="${errorMessage}" class="alert alert-danger py-2 small fw-medium shadow-sm border-0 mb-4" style="background: #fde8e8; color: #721c24; animation: fadeInUp 0.5s ease;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+            </div>
+
             <div class="table-responsive" style="overflow-x: visible;">
                 <table class="table-premium">
                     <thead>
