@@ -8,6 +8,5 @@ import java.util.List;
 @Repository
 public interface FeaturedAuthorRepository extends JpaRepository<FeaturedAuthor, Long> {
 
-    // This custom method pulls ONLY the authors meant for the homepage
     List<FeaturedAuthor> findByFeaturedOnHomePageTrue();
 }

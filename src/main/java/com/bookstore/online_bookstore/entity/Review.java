@@ -19,7 +19,7 @@ public class Review {
 
     private String sentiment;
 
-    // 🔥 NEW: Tracks if the review is hidden due to bad words
+    // NEW: Tracks if the review is hidden due to bad words
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean isHidden;
 

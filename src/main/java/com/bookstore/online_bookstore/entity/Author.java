@@ -22,13 +22,12 @@ public class Author {
     @Column
     private String awardTitle;
 
-    // 🔥 Changed primitive 'boolean' to object 'Boolean' to prevent 400 Crash
     @Column(name = "featured_on_home_page")
     private Boolean featuredOnHomePage;
 
     private String profileImageUrl;
 
-    // The "Glue" linking the profile to a user account
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -53,8 +52,6 @@ public class Author {
     public void setUser(User user) { this.user = user; }
     public String getAwardTitle() { return awardTitle; }
     public void setAwardTitle(String awardTitle) { this.awardTitle = awardTitle; }
-
-    // 🔥 Updated to use 'get' instead of 'is' for the Boolean object
     public Boolean getFeaturedOnHomePage() { return featuredOnHomePage; }
     public void setFeaturedOnHomePage(Boolean featuredOnHomePage) { this.featuredOnHomePage = featuredOnHomePage; }
 }

@@ -12,6 +12,5 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
     Author findByUser(User user);
     List<Author> findByAwardTitleIsNotNull();
 
-    // 🔥 Added the missing method!
     List<Author> findByFeaturedOnHomePageTrue();
 }

@@ -19,7 +19,6 @@ public class Announcement {
 
     private LocalDate datePosted = LocalDate.now();
 
-    // Connects the announcement to the Admin who posted it
     @ManyToOne
     @JoinColumn(name = "admin_id")
     private User author;

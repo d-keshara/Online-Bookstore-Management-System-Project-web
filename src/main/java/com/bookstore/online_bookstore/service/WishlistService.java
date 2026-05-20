@@ -20,13 +20,13 @@ public class WishlistService {
     }
 
     // Get all books in a user's wishlist
-    // 🔥 THE FIX: Changed Long to Integer, and called the new method name
+    // THE FIX: Changed Long to Integer, and called the new method name
     public List<Wishlist> getWishlistByUser(Integer userId) {
         return wishlistRepository.findByUser_Id(userId);
     }
 
     // Remove a book from the wishlist
-    // 🔥 THE FIX: Changed Long to Integer, and called the new method name
+    // THE FIX: Changed Long to Integer, and called the new method name
     @Transactional
     public void removeFromWishlist(Integer userId, Integer bookId) {
         wishlistRepository.deleteByUser_IdAndBook_BookId(userId, bookId);

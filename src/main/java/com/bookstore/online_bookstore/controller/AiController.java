@@ -4,7 +4,7 @@ import com.bookstore.online_bookstore.entity.Book;
 import com.bookstore.online_bookstore.entity.Review;
 import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.ReviewRepository;
-import com.bookstore.online_bookstore.service.OllamaService;
+import com.bookstore.online_bookstore.service.GeminiAiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class AiController {
 
     @Autowired
-    private OllamaService ollamaService;
+    private GeminiAiService geminiAiService;
 
     @Autowired
     private BookRepository bookRepository;
@@ -32,7 +32,7 @@ public class AiController {
             return ResponseEntity.badRequest().body(Map.of("error", "Draft cannot be empty"));
         }
 
-        String enhancedText = ollamaService.enhanceSynopsis(draft);
+        String enhancedText = geminiAiService.enhanceSynopsis(draft);
         return ResponseEntity.ok(Map.of("enhanced", enhancedText));
     }
 
@@ -49,7 +49,7 @@ public class AiController {
             catalogData.append(book.getTitle()).append(" (LKR ").append(book.getPrice()).append("), ");
         }
 
-        String aiResponse = ollamaService.chatWithDatabase(userQuery, catalogData.toString());
+        String aiResponse = geminiAiService.chatWithDatabase(userQuery, catalogData.toString());
 
         return ResponseEntity.ok(Map.of("answer", aiResponse));
     }
@@ -60,7 +60,7 @@ public class AiController {
         String bookTitle = request.get("bookTitle");
         String reviewText = request.get("reviewText");
 
-        String email = ollamaService.generateApologyEmail(customerName, bookTitle, reviewText);
+        String email = geminiAiService.generateApologyEmail(customerName, bookTitle, reviewText);
 
         return ResponseEntity.ok(Map.of("email", email));
     }
@@ -89,7 +89,7 @@ public class AiController {
             return ResponseEntity.ok(Map.of("summary", "Current reviews are too brief for an AI consensus."));
         }
 
-        String summary = ollamaService.summarizeBookReviews(allReviewsText.toString());
+        String summary = geminiAiService.summarizeBookReviews(allReviewsText.toString());
         return ResponseEntity.ok(Map.of("summary", summary));
     }
 }

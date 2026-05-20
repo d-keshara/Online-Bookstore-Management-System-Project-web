@@ -76,14 +76,14 @@ public class AuthorWebController {
     @PostMapping("/admin/authors/save")
     public String saveAuthor(@ModelAttribute Author author, RedirectAttributes ra) {
         if (author.getId() == null) {
-            // 1. Save the new Author profile (Bio, Image) to the database
+            //  Save the new Author profile (Bio, Image) to the database
             Author savedAuthor = authorService.createAuthor(author);
 
             // Auto-generate a linked User account so they can log in
             // and they appear in the User Management Dashboard!
             User newUser = new User();
 
-            // Generate a clean username (e.g., "J.K. Rowling" -> "jkrowling")
+            // Generate a clean username
             String generatedUsername = author.getName().replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
 
             newUser.setUsername(generatedUsername);

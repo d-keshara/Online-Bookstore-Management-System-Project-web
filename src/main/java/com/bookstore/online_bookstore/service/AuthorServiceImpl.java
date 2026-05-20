@@ -21,7 +21,6 @@ public class AuthorServiceImpl implements AuthorService {
         this.bookRepository = bookRepository;
     }
 
-    // THIS METHOD WAS MISSING!
     @Override
     public Author createAuthor(Author author) {
         return authorRepository.save(author);
@@ -45,8 +44,6 @@ public class AuthorServiceImpl implements AuthorService {
         author.setBiography(updatedAuthor.getBiography());
         author.setProfileImageUrl(updatedAuthor.getProfileImageUrl());
         author.setAwardTitle(updatedAuthor.getAwardTitle());
-
-        // 🔥 FIX: Changed 'is' to 'get' to match the new Boolean object!
         author.setFeaturedOnHomePage(updatedAuthor.getFeaturedOnHomePage());
 
         return authorRepository.save(author);
@@ -71,7 +68,6 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public List<Author> getFeaturedAuthors() {
-        // Returns all authors — you can later add filtering/sorting here
         return authorRepository.findAll();
     }
 

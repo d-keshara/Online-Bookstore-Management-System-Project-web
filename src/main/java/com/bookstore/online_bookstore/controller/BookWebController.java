@@ -9,7 +9,7 @@ import com.bookstore.online_bookstore.repository.BookRepository;
 import com.bookstore.online_bookstore.repository.ReviewRepository;
 import com.bookstore.online_bookstore.repository.UserRepository;
 import com.bookstore.online_bookstore.service.OrderService;
-import com.bookstore.online_bookstore.service.OllamaService;
+import com.bookstore.online_bookstore.service.GeminiAiService;
 import com.bookstore.online_bookstore.service.AnnouncementService;
 import com.bookstore.online_bookstore.service.WishlistService;
 import org.springframework.data.domain.Page;
@@ -35,7 +35,7 @@ public class BookWebController {
     private final UserRepository userRepository;
     private final OrderService orderService;
     private final ReviewRepository reviewRepository;
-    private final OllamaService ollamaService;
+    private final GeminiAiService geminiAiService;
     private final AnnouncementService announcementService;
     private final WishlistService wishlistService;
 
@@ -43,14 +43,14 @@ public class BookWebController {
                              UserRepository userRepository,
                              OrderService orderService,
                              ReviewRepository reviewRepository,
-                             OllamaService ollamaService,
+                             GeminiAiService geminiAiService,
                              AnnouncementService announcementService,
                              WishlistService wishlistService) {
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.orderService = orderService;
         this.reviewRepository = reviewRepository;
-        this.ollamaService = ollamaService;
+        this.geminiAiService = geminiAiService;
         this.announcementService = announcementService;
         this.wishlistService = wishlistService;
     }
@@ -179,7 +179,7 @@ public class BookWebController {
                 review.setSentiment("NEGATIVE");
             } else {
                 review.setHidden(false);
-                String aiSentiment = ollamaService.analyzeSentiment(comment);
+                String aiSentiment = geminiAiService.analyzeSentiment(comment);
                 review.setSentiment(aiSentiment);
             }
 

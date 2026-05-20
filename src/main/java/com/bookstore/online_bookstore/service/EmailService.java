@@ -46,7 +46,7 @@ public class EmailService {
         }
     }
 
-    // 🔥 NEW: Sends a live update whenever the Admin changes the order status!
+    // Sends a live update whenever the Admin changes the order status!
     public void sendOrderStatusUpdate(String toEmail, String username, Integer orderId, String newStatus) {
         try {
             org.springframework.mail.SimpleMailMessage message = new org.springframework.mail.SimpleMailMessage();
